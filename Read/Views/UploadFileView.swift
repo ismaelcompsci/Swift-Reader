@@ -9,8 +9,6 @@ import RealmSwift
 import SwiftUI
 import WrappingHStack
 
-// TODO: MAKE A METADATA EXTRACTER CLASS THAT DOES ALL THE WORK AND EXPOSE THE RIGHT APIS FOR THIS
-
 struct UploadFileView: View {
     @Environment(\.dismiss) var dismiss
 

@@ -60,9 +60,18 @@ struct Time: Codable {
     var total: Double
 }
 
-struct TocItem: Codable {
+struct TocItem: Codable, Identifiable {
     var label: String
     var href: String
-    var subItems: [TocItem]?
     var id: Int
+
+    var depth: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.label = try container.decode(String.self, forKey: .label)
+        self.href = try container.decode(String.self, forKey: .href)
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.depth = try container.decode(Int.self, forKey: .depth)
+    }
 }

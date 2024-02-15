@@ -10,9 +10,9 @@ import SwiftUI
 import WebKit
 
 class ReaderWebViewCoordinator: NSObject, WKNavigationDelegate {
-    var viewModel: ReaderViewModel
+    var viewModel: EBookReaderViewModel
 
-    init(viewModel: ReaderViewModel) {
+    init(viewModel: EBookReaderViewModel) {
         self.viewModel = viewModel
     }
 
@@ -111,9 +111,9 @@ class CustomWebView: WKWebView {
 struct ReaderWebView: UIViewRepresentable {
     typealias UIViewType = CustomWebView
 
-    var vm: ReaderViewModel
+    var vm: EBookReaderViewModel
 
-    init(viewModel: ReaderViewModel) {
+    init(viewModel: EBookReaderViewModel) {
         self.vm = viewModel
     }
 
@@ -164,7 +164,7 @@ enum WebKitMessageHandlers: String {
     case relocate
 }
 
-class ReaderViewModel: ObservableObject {
+class EBookReaderViewModel: ObservableObject {
     var webView: CustomWebView
 
     @Published var isLoading = true
@@ -174,10 +174,17 @@ class ReaderViewModel: ObservableObject {
 
     @Published var showMenuOverlay = false
     @Published var showSettingsSheet = false
+    @Published var showContentSheet = false
 
     @Published var relocateDetails: Relocate? = nil
 
     @Published var theme = Theme()
+
+    @Published var bookToc: [TocItem]? = nil
+
+    var currentLabel: String {
+        relocateDetails?.tocItem.label ?? ""
+    }
 
     init() {
         let config = WKWebViewConfiguration()
@@ -240,7 +247,6 @@ class ReaderViewModel: ObservableObject {
             break
 //            print(message)
         case .relocate:
-
             if let jsonData = try? JSONSerialization.data(withJSONObject: message),
                let relocateDetails = try? JSONDecoder().decode(Relocate.self, from: jsonData)
             {

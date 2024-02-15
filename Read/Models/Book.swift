@@ -64,7 +64,7 @@ extension AuthorBook {
 
 struct BookMetadata: Codable {
     var title: String? = ""
-    var author: [Author]?
+    var author: [Author]? = []
     var description: String? = ""
     var cover: String? = ""
     var subject: [String]? = []

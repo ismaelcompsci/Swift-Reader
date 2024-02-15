@@ -60,12 +60,17 @@ class EbookMetadataExtractor {
         let isPdf = url.lastPathComponent.hasSuffix(".pdf")
 
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let timestamp = Date().timeIntervalSince1970
-            let lastPathComponent = "\(timestamp)_\(url.lastPathComponent)"
-            let destinationURL = documentsDirectory.appendingPathComponent(lastPathComponent)
+            let id = UUID()
+            let bookDirectoryString = "\(id)"
+            let lastPathComponent = "\(url.lastPathComponent)"
+
+            let destinationDirectoryURL = documentsDirectory.appending(path: bookDirectoryString, directoryHint: .isDirectory)
+            let destinationBookURL = destinationDirectoryURL.appending(path: lastPathComponent, directoryHint: .notDirectory)
 
             do {
-                try FileManager.default.copyItem(at: url, to: destinationURL)
+                try FileManager.default.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: false)
+
+                try FileManager.default.copyItem(at: url, to: destinationBookURL)
             } catch {
                 print("File: \(error.localizedDescription)")
                 return completion(.failure(.fileError))
@@ -74,27 +79,29 @@ class EbookMetadataExtractor {
             var bookMetadata = BookMetadata()
 
             if isPdf {
-                let document = PDFDocument(url: destinationURL)
+                let document = PDFDocument(url: destinationBookURL)
                 let metadata = document?.documentAttributes!
 
-                let author = metadata?[PDFDocumentAttribute.authorAttribute]
+                let author = metadata?[PDFDocumentAttribute.authorAttribute] ?? metadata?["Author"] ?? "Unknown Author"
                 let title = metadata?[PDFDocumentAttribute.titleAttribute]
                 let description = metadata?[PDFDocumentAttribute.subjectAttribute]
 
-                let coverImage = getPDFCover(ofPDFAt: destinationURL)
+                let coverImage = getPDFCover(ofPDFAt: destinationBookURL)
 
-                bookMetadata.title = String(describing: title)
-                bookMetadata.description = String(describing: description)
-                bookMetadata.author?.append(Author(name: String(describing: author ?? "Unknown Author")))
-                bookMetadata.bookPath = lastPathComponent
+                let fullAuthor = Author(name: String(describing: author))
+
+                bookMetadata.title = title as! String? ?? "Unknown Title"
+                bookMetadata.description = description as! String? ?? ""
+                bookMetadata.author?.append(fullAuthor)
+                bookMetadata.bookPath = "\(bookDirectoryString)/\(lastPathComponent)"
 
                 if let coverData = coverImage?.pngData() {
                     let lastImagePathComponent = "\(UUID()).png"
-                    let imagePath = documentsDirectory.appending(path: lastImagePathComponent)
+                    let imagePath = destinationDirectoryURL.appending(path: lastImagePathComponent)
 
                     do {
                         try coverData.write(to: imagePath)
-                        bookMetadata.bookCover = lastImagePathComponent
+                        bookMetadata.bookCover = "\(bookDirectoryString)/\(lastImagePathComponent)"
 
                     } catch {
                         print("Failed to write image, \(error.localizedDescription)")
@@ -104,12 +111,13 @@ class EbookMetadataExtractor {
                 return completion(.success(bookMetadata))
 
             } else {
-                self.getMetadata(path: destinationURL.absoluteString) { result in
+                self.getMetadata(path: destinationBookURL.absoluteString) { result in
                     switch result {
                     case .success(let newBookMetadata):
+
                         bookMetadata.title = newBookMetadata.title ?? "Unknown Title"
                         bookMetadata.description = newBookMetadata.description
-                        bookMetadata.bookPath = lastPathComponent
+                        bookMetadata.bookPath = "\(bookDirectoryString)/\(lastPathComponent)"
                         bookMetadata.author = newBookMetadata.author
                         bookMetadata.subject = newBookMetadata.subject
 
@@ -117,11 +125,11 @@ class EbookMetadataExtractor {
                         if let cover = newBookMetadata.cover {
                             let data = Data(base64Encoded: cover)
                             let lastImagePathComponent = "\(UUID())\(getImageType(base64: String(cover.prefix(20))) ?? "-default.png")"
-                            let imagePath = documentsDirectory.appending(path: lastImagePathComponent)
+                            let imagePath = destinationDirectoryURL.appending(path: lastImagePathComponent)
 
                             do {
                                 try data?.write(to: imagePath)
-                                bookMetadata.bookCover = lastImagePathComponent
+                                bookMetadata.bookCover = "\(bookDirectoryString)/\(lastImagePathComponent)"
 
                             } catch {
                                 print("Failed to write image, \(error.localizedDescription)")

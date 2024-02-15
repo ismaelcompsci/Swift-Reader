@@ -11,6 +11,10 @@ import SwiftUI
 struct BookDetailView: View {
     @Environment(\.dismiss) var dismiss
     var book: Book
+    
+    var isPDF: Bool {
+        book.bookPath?.hasSuffix(".pdf") ?? false
+    }
 
     @State private var readMore = false
 
@@ -53,11 +57,21 @@ struct BookDetailView: View {
                     VStack(alignment: .leading) {
                         HStack {
                             NavigationLink {
-                                EBookReader(book: book)
+                                if !isPDF {
+                                    EBookReader(book: book)
+                                } else {
+//                                    Text("PDF not supported!")
+                                    PDFReader(book: book)
+                                }
                             } label: {
                                 HStack {
                                     Image(systemName: "book.fill")
-                                    Text("Read")
+                                    
+                                    if let position = book.readingPosition {
+                                        Text("Continue Reading \(Int((position.progress ?? 0.0) * 100))%")
+                                    } else {
+                                        Text("Read")
+                                    }
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal, 12)
@@ -76,16 +90,12 @@ struct BookDetailView: View {
                             Text(text)
                                 .lineLimit(readMore ? 9999 : 6)
                                 .onTapGesture {
-//                                    withAnimation {
                                     readMore.toggle()
-//                                    }
                                 }
                             
                             if !text.isEmpty {
                                 Button(readMore ? "less" : "more") {
-//                                    withAnimation {
                                     readMore.toggle()
-//                                    }
                                 }
                             }
                         }

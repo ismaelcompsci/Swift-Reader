@@ -119,3 +119,23 @@ private extension UIEdgeInsets {
         EdgeInsets(top: top, leading: left, bottom: bottom, trailing: right)
     }
 }
+
+func showShareSheet(url: URL) {
+    let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    UIApplication.shared.currentUIWindow()?.rootViewController?.present(activityVC, animated: true, completion: nil)
+}
+
+// utility extension to easily get the window
+public extension UIApplication {
+    func currentUIWindow() -> UIWindow? {
+        let connectedScenes = UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+
+        let window = connectedScenes.first?
+            .windows
+            .first { $0.isKeyWindow }
+
+        return window
+    }
+}

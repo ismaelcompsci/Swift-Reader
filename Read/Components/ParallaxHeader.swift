@@ -35,7 +35,7 @@ struct ParallaxHeader<Content: View, Space: Hashable>: View {
                 )
                 .offset(y: offset)
 
-            LinearGradient(gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.40), Color.black.opacity(0.80), Color.black]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.40), Color.black, Color.black]), startPoint: .top, endPoint: .bottom)
         }
         .frame(height: defaultHeight)
     }

@@ -8,30 +8,6 @@
 import RealmSwift
 import SwiftUI
 
-func getBookCover(path imagePath: String?) -> UIImage? {
-    if let imgPath = imagePath {
-        let documentsPath = URL.documentsDirectory
-        let fullImagePath = documentsPath.appending(path: imgPath)
-
-        do {
-            let data = try Data(contentsOf: fullImagePath)
-
-            return UIImage(data: data)
-
-        } catch {
-            print("DATA RERRr")
-        }
-
-        if let image = UIImage(contentsOfFile: fullImagePath.absoluteString) {
-            return image
-        }
-
-        return UIImage(named: "default")
-    } else {
-        return UIImage(named: "default")
-    }
-}
-
 struct HomeBookList: View {
     var sortedBooks: [Book]
     var realmBooks: ObservedResults<Book>
@@ -63,9 +39,12 @@ struct HomeBookList: View {
                             Spacer()
 
                             HStack {
-                                Spacer()
+                                PieProgress(progress: position.progress ?? 0.0)
+                                    .frame(width: 22)
 
                                 Text("\(Int((position.progress ?? 0) * 100))%")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(.gray)
                             }
                         }
                     }
@@ -73,6 +52,10 @@ struct HomeBookList: View {
                     .frame(maxWidth: .infinity, maxHeight: 61, alignment: .leading)
                     .background(.black)
                     .contextMenu {
+                        Button("Share", systemImage: "square.and.arrow.up.fill") {
+                            showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
+                        }
+                        Button("Clear progress", systemImage: "clear.fill") {}
                         Button("Delete", systemImage: "trash.fill", role: .destructive) {
                             realmBooks.remove(book)
                             BookRemover.removeBook(book: book)
@@ -92,21 +75,43 @@ struct HomeBookGrid: View {
     var sortedBooks: [Book]
     var realmBooks: ObservedResults<Book>
 
-    let size: CGFloat = 120
+    let bookHeight: CGFloat = 120
+    let bookWidth: CGFloat = 90
 
+    let size: CGFloat = 120
     var body: some View {
         LazyVGrid(
             columns: [GridItem(.adaptive(minimum: size))],
-            spacing: 8)
-        {
+            spacing: 8
+        ) {
             ForEach(sortedBooks) { book in
+                let image = getBookCover(path: book.coverPath) ?? UIImage()
                 NavigationLink(destination: BookDetailView(book: book)) {
                     VStack {
-                        Image(uiImage: getBookCover(path: book.coverPath) ?? UIImage())
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 109, height: 111)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        ZStack {
+                            Image(uiImage: image)
+                                .resizable()
+                                .blur(radius: 8, opaque: true)
+                                .frame(width: bookWidth, height: bookHeight)
+                                .aspectRatio(contentMode: .fill)
+
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: bookWidth, height: bookHeight)
+                        }
+                        .cornerRadius(6)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.gray, lineWidth: 0.2)
+                        }
+                        .overlay {
+                            if let position = book.readingPosition {
+                                PieProgress(progress: position.progress ?? 0.0)
+                                    .frame(width: 22)
+                                    .position(x: bookWidth, y: 0)
+                            }
+                        }
 
                         Text(book.title)
                             .lineLimit(1)
@@ -114,10 +119,15 @@ struct HomeBookGrid: View {
                         Text(book.author.first?.name ?? "Unkown Author")
                             .font(.subheadline)
                             .foregroundStyle(.gray)
+                            .lineLimit(1)
                     }
+                    .padding(.vertical, 6)
                     .foregroundStyle(.white)
-                    .frame(maxWidth: 120, maxHeight: 160)
                     .contextMenu {
+                        Button("Share", systemImage: "square.and.arrow.up.fill") {
+                            showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
+                        }
+                        Button("Clear progress", systemImage: "clear.fill") {}
                         Button("Delete", systemImage: "trash.fill", role: .destructive) {
                             realmBooks.remove(book)
                             BookRemover.removeBook(book: book)
@@ -125,7 +135,6 @@ struct HomeBookGrid: View {
                     }
                 }
             }
-            .animation(.easeOut, value: sortedBooks)
         }
     }
 }
@@ -137,8 +146,10 @@ enum LibraryDisplayMode: String, Codable {
 
 struct ContentView: View {
     @ObservedResults(Book.self) var books
+
     @State var showUploadFileView: Bool = false
     @State var searchText = ""
+
     @AppStorage("LibrarySortKey") var librarySortKey: LibrarySortKeys = .title
     @AppStorage("LibrarySortOrder") var librarySortOrder: LibrarySortOrder = .descending
     @AppStorage("LibraryDisplayMode") var libraryDisplayMode: LibraryDisplayMode = .list
@@ -199,7 +210,7 @@ struct ContentView: View {
 
                             if !searchText.isEmpty {
                                 Button {
-                                    withAnimation {
+                                    withAnimation(.smooth) {
                                         searchText = ""
                                     }
                                 } label: {
@@ -239,7 +250,6 @@ struct ContentView: View {
 
                     if libraryDisplayMode == .list {
                         HomeBookList(sortedBooks: sortedBooks, realmBooks: $books)
-                            .animation(.easeOut, value: books)
 
                     } else {
                         HomeBookGrid(sortedBooks: sortedBooks, realmBooks: $books)

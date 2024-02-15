@@ -12,10 +12,7 @@ struct EBookReader: View {
     var realm = try! Realm()
     var book: Book
 
-    @Environment(\.safeAreaInsets) private var safeAreaInsets
-    @Environment(\.dismiss) var dismiss
-
-    @StateObject var viewModel = ReaderViewModel()
+    @StateObject var viewModel = EBookReaderViewModel()
 
     var body: some View {
         GeometryReader { _ in
@@ -31,70 +28,7 @@ struct EBookReader: View {
                 // MARK: Reader Menu
 
                 if viewModel.showMenuOverlay {
-                    VStack(alignment: .leading) {
-                        // MARK: Header
-
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(book.title)
-                                    .lineLimit(1)
-
-                                Text(viewModel.relocateDetails?.tocItem.label ?? "")
-                                    .lineLimit(1)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.gray)
-                            }
-
-                            Spacer()
-
-                            // MARK: Exit Button
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .foregroundStyle(Color.accent)
-                                    .font(.system(size: 22))
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity, maxHeight: 58)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .padding(.horizontal, 16)
-
-                        Spacer()
-
-                        // MARK: Footer
-
-                        HStack(spacing: 24) {
-                            Spacer()
-
-                            // MARK: Contents Button
-
-                            // MARK: Settings Button
-
-                            Button {
-                                viewModel.showSettingsSheet.toggle()
-                            }
-                            label: {
-                                Image(systemName: "gearshape")
-                                    .foregroundStyle(Color.accent)
-                                    .font(.system(size: 20))
-                            }
-                            .padding(12)
-                            .background(.black)
-                            .clipShape(.circle)
-                        }
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity, maxHeight: 58)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .padding(.horizontal, 16)
-                    }
-                    .padding(.top, safeAreaInsets.top)
-                    .padding(.bottom, safeAreaInsets.bottom)
-                    .padding(.leading, safeAreaInsets.leading)
-                    .padding(.trailing, safeAreaInsets.trailing)
+                    EBookReaderMenu(book: book, viewModel: viewModel)
                 }
 
                 // MARK: Loader
@@ -111,6 +45,9 @@ struct EBookReader: View {
         .background(Color(hex: viewModel.theme.bg.rawValue))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: $viewModel.showContentSheet, content: {
+            EBookReaderContent(viewModel: viewModel)
+        })
         .onChange(of: viewModel.isLoading) { _, newValue in
             onWebViewDoneLoading(newValue)
         }
@@ -130,6 +67,7 @@ struct EBookReader: View {
         .sheet(isPresented: $viewModel.showSettingsSheet, content: {
             EBookReaderSettings(viewModel: viewModel)
                 .presentationDetents([.height(300)])
+                .background(.black)
         })
     }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EBookReaderSettings: View {
-    @StateObject var viewModel: ReaderViewModel
+    @StateObject var viewModel: EBookReaderViewModel
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -158,5 +158,5 @@ struct EBookReaderSettings: View {
 }
 
 #Preview {
-    EBookReaderSettings(viewModel: ReaderViewModel())
+    EBookReaderSettings(viewModel: EBookReaderViewModel())
 }

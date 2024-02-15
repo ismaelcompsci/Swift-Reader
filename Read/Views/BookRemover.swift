@@ -11,37 +11,22 @@ enum BookRemover {
     static let documentsDir = URL.documentsDirectory
 
     static func removeBook(book: Book) {
-        BookRemover.removeBookFile(book: book)
-        BookRemover.removeBookCover(book: book)
+        BookRemover.removeBookDirectory(book: book)
     }
 
-    static func removeBookFile(book: Book) {
+    static func removeBookDirectory(book: Book) {
         guard let bookPath = book.bookPath else {
             print("Book has no path")
             return
         }
 
         let fullBookPath = documentsDir.appending(path: bookPath)
+        let directoryPath = fullBookPath.deletingLastPathComponent()
 
         do {
-            try FileManager.default.removeItem(at: fullBookPath)
+            try FileManager.default.removeItem(at: directoryPath)
         } catch {
             print("Failed to remove book \(error.localizedDescription)")
-        }
-    }
-
-    static func removeBookCover(book: Book) {
-        guard let coverPath = book.coverPath else {
-            print("Book has no cover")
-            return
-        }
-
-        let fullCoverPath = documentsDir.appending(path: coverPath)
-
-        do {
-            try FileManager.default.removeItem(at: fullCoverPath)
-        } catch {
-            print("Failed to remove book cover: \(error.localizedDescription)")
         }
     }
 }

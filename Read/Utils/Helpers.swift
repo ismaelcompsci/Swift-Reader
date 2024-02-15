@@ -27,7 +27,6 @@ func getImageType(base64: String) -> String? {
 
 enum SupportedFileTypes: String, CaseIterable {
     case EPUB = "epub"
-    case OPF = "opf"
     case CBZ = "cbz"
     case FB2 = "fb2"
     case FBZ = "fbz"
@@ -105,7 +104,7 @@ func getPDFCover(ofPDFAt: URL) -> UIImage? {
         var image: UIImage?
 
         for pdfImage in images {
-            if pdfImage != nil {
+            if pdfImage as UIImage? != nil {
                 image = pdfImage
                 break
             }
@@ -114,4 +113,28 @@ func getPDFCover(ofPDFAt: URL) -> UIImage? {
         return image
     }
     return nil
+}
+
+func getBookCover(path imagePath: String?) -> UIImage? {
+    if let imgPath = imagePath {
+        let documentsPath = URL.documentsDirectory
+        let fullImagePath = documentsPath.appending(path: imgPath)
+
+        do {
+            let data = try Data(contentsOf: fullImagePath)
+
+            return UIImage(data: data)
+
+        } catch {
+            print("Error getting Book cover: \(error.localizedDescription)")
+        }
+
+        if let image = UIImage(contentsOfFile: fullImagePath.absoluteString) {
+            return image
+        }
+
+        return UIImage(named: "default")
+    } else {
+        return UIImage(named: "default")
+    }
 }
