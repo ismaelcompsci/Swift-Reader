@@ -202,37 +202,49 @@ class NoContextMenuPDFView: PDFView {
 //    }
 // }
 
-class CustomPage: PDFPage {
+class PDFPageCustomBackground: PDFPage {
     static var bg: CGColor?
-    static var fg: CGColor?
+    static let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     override init() {
         super.init()
     }
 
+    // https://github.com/drearycold/YetAnotherEBookReader/blob/6b1c67cee92917d53aea418956e5fbbd46342420/YetAnotherEBookReader/Views/PDFView/PDFPageWithBackground.swift#L11
     override func draw(with box: PDFDisplayBox, to context: CGContext) {
         super.draw(with: box, to: context)
-        if let color = CustomPage.bg, let fgColor = CustomPage.fg {
-            context.setFillColor(color)
+
+        guard let fillColor = PDFPageCustomBackground.bg,
+              let fillColorDeviceRGB = fillColor.converted(to: PDFPageCustomBackground.colorSpace, intent: .defaultIntent, options: nil) else { return }
+
+        let grayComponents = fillColor.converted(to: CGColorSpace(name: CGColorSpace.linearGray)!, intent: .defaultIntent, options: nil)?.components ?? []
+        print("\(#function) draw gray \(grayComponents)")
+
+        let rect = bounds(for: box)
+
+        if grayComponents.count > 1, grayComponents[0] < 0.3 {
+            UIGraphicsPushContext(context)
+            context.saveGState()
+
+            context.setBlendMode(.exclusion)
+            context.setFillColor(gray: 1.0 - grayComponents[0], alpha: 1.0)
+            context.fill(rect.offsetBy(dx: -rect.minX, dy: -rect.minY))
+
+            context.setBlendMode(.darken)
+            context.setFillColor(gray: 0.7, alpha: 1.0)
+            context.fill(rect.offsetBy(dx: -rect.minX, dy: -rect.minY))
+
+            context.restoreGState()
+            UIGraphicsPopContext()
+        } else {
+            UIGraphicsPushContext(context)
+            context.saveGState()
+            context.setBlendMode(.darken)
+            context.setFillColor(fillColorDeviceRGB)
+            context.fill(rect.offsetBy(dx: -rect.minX, dy: -rect.minY))
+            context.restoreGState()
+            UIGraphicsPopContext()
         }
-
-        // Draw original content
-
-        // get page bounds
-        let pageBounds = bounds(for: box)
-        // change backgroud color
-
-        // set blend mode
-        context.setBlendMode(.multiply)
-
-        var rect = pageBounds
-        // you need to switch the width and height for horizontal pages
-        // the coordinate system for the context is the lower left corner
-        if rotation == 90 || rotation == 270 {
-            rect = CGRect(origin: .zero, size: CGSize(width: pageBounds.height, height: pageBounds.width))
-        }
-
-        context.fill(rect)
     }
 }
 
@@ -244,7 +256,7 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
     }
 
     func classForPage() -> AnyClass {
-        return CustomPage.self
+        return PDFPageCustomBackground.self
     }
 
     @objc func handleVisiblePagesChanged(notification: Notification) {}
@@ -348,9 +360,6 @@ struct PDFKitView: UIViewRepresentable {
         pdfView.displayDirection = .horizontal
         pdfView.usePageViewController(true, withViewOptions: nil)
         pdfView.document = viewModel.pdfDocument
-
-//        let rgba = getRGBFromHex(hex: viewModel.theme.bg.rawValue)
-//        pdfView.backgroundColor = UIColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
 
         NotificationCenter.default.addObserver(context.coordinator, selector: #selector(context.coordinator.handlePageChange(notification:)), name: .PDFViewPageChanged, object: nil)
 

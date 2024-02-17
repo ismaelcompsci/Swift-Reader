@@ -235,9 +235,7 @@ class ReaderViewModel: ObservableObject {
             let rgbaFg = getRGBFromHex(hex: theme.fg.rawValue)
 
             pdfView.backgroundColor = UIColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
-
-            CustomPage.bg = CGColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
-            CustomPage.fg = CGColor(red: rgbaFg["red"] ?? 0, green: rgbaFg["green"] ?? 0, blue: rgbaFg["blue"] ?? 0, alpha: 1)
+            PDFPageCustomBackground.bg = CGColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
 
             setLoading(true)
             pdfView.goToNextPage(nil)
