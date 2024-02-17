@@ -45,7 +45,7 @@ struct BookDetailView: View {
                             Image(systemName: "person.fill")
                                 .foregroundStyle(Color.accent)
                             
-                            Text(book.author.first?.name ?? "Unknown Author")
+                            Text(book.authors.first?.name ?? "Unknown Author")
                         }
                         .font(.subheadline)
                     }
@@ -57,12 +57,14 @@ struct BookDetailView: View {
                     VStack(alignment: .leading) {
                         HStack {
                             NavigationLink {
-                                if !isPDF {
-                                    EBookReader(book: book)
-                                } else {
-//                                    Text("PDF not supported!")
-                                    PDFReader(book: book)
-                                }
+//                                if !isPDF {
+//                                    EBookReader(book: book)
+//                                } else {
+                                ////                                    Text("PDF not supported!")
+//                                    PDFReader(book: book)
+//                                }
+                                
+                                Reader(book: book)
                             } label: {
                                 HStack {
                                     Image(systemName: "book.fill")

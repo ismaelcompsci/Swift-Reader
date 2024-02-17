@@ -176,7 +176,7 @@ struct UploadFileView: View {
         for url in fileUrls {
             print("PROCESSING FILE \(url.lastPathComponent)")
 
-            EbookMetadataExtractor.parseBook(from: url) { result in
+            EBookMetadataExtractor.parseBook(from: url) { result in
                 switch result {
                 case .success(let metadata):
                     let book = Book()
@@ -196,7 +196,7 @@ struct UploadFileView: View {
                         author.map { author in
                             let newAuthor = AuthorBook()
                             newAuthor.name = author.name ?? "Unknown Author"
-                            book.author.append(newAuthor)
+                            book.authors.append(newAuthor)
                         }
                     }
                     book.processed = true

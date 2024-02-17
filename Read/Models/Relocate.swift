@@ -9,17 +9,16 @@ import Foundation
 
 struct Relocate: Codable, Equatable, Identifiable {
     var id: String {
-        "\(cfi)-\(updatedAt)-\(fraction)"
+        "\(cfi ?? "cfi")-\(updatedAt ?? .now)-\(fraction ?? 0.0)"
     }
 
-    var cfi: String
-    var fraction: Double
-    var updatedAt: Date
-    var location: Location
-//    var pageItem:
-    var section: Section
-    var time: Time
-    var tocItem: TocItem
+    var cfi: String?
+    var fraction: Double?
+    var updatedAt: Date?
+    var location: Location?
+    var section: Section?
+    var time: Time?
+    var tocItem: EBookTocItem?
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -36,7 +35,7 @@ struct Relocate: Codable, Equatable, Identifiable {
         self.location = try container.decode(Location.self, forKey: .location)
         self.section = try container.decode(Section.self, forKey: .section)
         self.time = try container.decode(Time.self, forKey: .time)
-        self.tocItem = try container.decode(TocItem.self, forKey: .tocItem)
+        self.tocItem = try container.decode(EBookTocItem.self, forKey: .tocItem)
     }
 
     static func == (lhs: Relocate, rhs: Relocate) -> Bool {
@@ -60,7 +59,7 @@ struct Time: Codable {
     var total: Double
 }
 
-struct TocItem: Codable, Identifiable {
+struct EBookTocItem: Codable, Identifiable {
     var label: String
     var href: String
     var id: Int

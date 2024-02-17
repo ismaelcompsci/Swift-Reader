@@ -14,7 +14,7 @@ enum BookMetadataError: Error {
     case fileError
 }
 
-class EbookMetadataExtractor {
+class EBookMetadataExtractor {
     static let extracterInstance: Int = 0
 
     init() {}
@@ -26,7 +26,7 @@ class EbookMetadataExtractor {
         let extracterName = "metadata\(extracterInstance)"
         let function = """
         var \(extracterName) = new MetaDataExtractor()
-        var promise = \(extracterName)?.initBook('\(bookPath)');
+        var promise = \(extracterName)?.initBook(`\(bookPath)`);
         await promise;
         return promise;
         """

@@ -9,6 +9,8 @@ import RealmSwift
 import SwiftUI
 
 struct HomeBookList: View {
+    var realm = try! Realm()
+
     var sortedBooks: [Book]
     var realmBooks: ObservedResults<Book>
 
@@ -29,7 +31,7 @@ struct HomeBookList: View {
                             Text(book.title)
                                 .lineLimit(1)
 
-                            Text(book.author.first?.name ?? "Unkown Author")
+                            Text(book.authors.first?.name ?? "Unkown Author")
                                 .font(.subheadline)
                                 .foregroundStyle(.gray)
                                 .lineLimit(1)
@@ -55,7 +57,16 @@ struct HomeBookList: View {
                         Button("Share", systemImage: "square.and.arrow.up.fill") {
                             showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
                         }
-                        Button("Clear progress", systemImage: "clear.fill") {}
+                        if book.readingPosition != nil {
+                            Button("Clear progress", systemImage: "clear.fill") {
+                                let thawedBook = book.thaw()
+                                try! realm.write {
+                                    if thawedBook?.readingPosition != nil {
+                                        thawedBook?.readingPosition = nil
+                                    }
+                                }
+                            }
+                        }
                         Button("Delete", systemImage: "trash.fill", role: .destructive) {
                             realmBooks.remove(book)
                             BookRemover.removeBook(book: book)
@@ -72,6 +83,8 @@ struct HomeBookList: View {
 }
 
 struct HomeBookGrid: View {
+    var realm = try! Realm()
+
     var sortedBooks: [Book]
     var realmBooks: ObservedResults<Book>
 
@@ -116,7 +129,7 @@ struct HomeBookGrid: View {
                         Text(book.title)
                             .lineLimit(1)
 
-                        Text(book.author.first?.name ?? "Unkown Author")
+                        Text(book.authors.first?.name ?? "Unkown Author")
                             .font(.subheadline)
                             .foregroundStyle(.gray)
                             .lineLimit(1)
@@ -127,7 +140,16 @@ struct HomeBookGrid: View {
                         Button("Share", systemImage: "square.and.arrow.up.fill") {
                             showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
                         }
-                        Button("Clear progress", systemImage: "clear.fill") {}
+                        if book.readingPosition != nil {
+                            Button("Clear progress", systemImage: "clear.fill") {
+                                let thawedBook = book.thaw()
+                                try! realm.write {
+                                    if thawedBook?.readingPosition != nil {
+                                        thawedBook?.readingPosition = nil
+                                    }
+                                }
+                            }
+                        }
                         Button("Delete", systemImage: "trash.fill", role: .destructive) {
                             realmBooks.remove(book)
                             BookRemover.removeBook(book: book)
@@ -173,9 +195,9 @@ struct ContentView: View {
 
                 case .author:
                     if librarySortOrder == .descending {
-                        return lhs.author.first?.name ?? "" > rhs.author.first?.name ?? ""
+                        return lhs.authors.first?.name ?? "" > rhs.authors.first?.name ?? ""
                     } else {
-                        return lhs.author.first?.name ?? "" < rhs.author.first?.name ?? ""
+                        return lhs.authors.first?.name ?? "" < rhs.authors.first?.name ?? ""
                     }
                 case .last_read:
                     if librarySortOrder == .descending {

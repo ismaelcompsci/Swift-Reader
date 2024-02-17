@@ -9,7 +9,9 @@ import Foundation
 import os
 import WebKit
 
-class _HeadlessWebView {
+class HeadlessWebView {
+    static let shared = HeadlessWebView()
+
     let webView: WKWebView
 
     init() {
@@ -65,10 +67,4 @@ class LoggingMessageHandler: NSObject, WKScriptMessageHandler {
             print("READER LOG: \(message.body)")
         }
     }
-}
-
-class HeadlessWebView {
-    static let shared = _HeadlessWebView()
-
-    init() {}
 }
