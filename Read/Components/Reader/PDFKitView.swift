@@ -218,7 +218,6 @@ class PDFPageCustomBackground: PDFPage {
               let fillColorDeviceRGB = fillColor.converted(to: PDFPageCustomBackground.colorSpace, intent: .defaultIntent, options: nil) else { return }
 
         let grayComponents = fillColor.converted(to: CGColorSpace(name: CGColorSpace.linearGray)!, intent: .defaultIntent, options: nil)?.components ?? []
-        print("\(#function) draw gray \(grayComponents)")
 
         let rect = bounds(for: box)
 
@@ -266,47 +265,14 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
     }
 
     @objc func handleAnnotationHit(notification: Notification) {
-        if notification.userInfo?["PDFAnnotationHit"] is PDFAnnotation {
-            print("annotation Hit")
-//            viewModel.pdfAnnotationTapped(annotation: annotation)
-        }
+        guard let annotation = notification.userInfo?["PDFAnnotationHit"] as? PDFAnnotation else { return }
+
+        print("annotation Hit: \(annotation)")
     }
 
     @objc func selectionDidChange(notification: Notification) {
         viewModel.selectionDidChange()
     }
-
-//        viewModel.showMenu = false
-//
-//        guard let selection = viewModel.pdfView.currentSelection,
-//              let selectionString = selection.string,
-//              selectionString.count > 0
-//        else {
-//            viewModel.showMenu = false
-//            return
-//        }
-//
-//        guard let selectionLastLine = selection.selectionsByLine().last,
-//              let selectionLastLinePage = selectionLastLine.pages.last
-//        else {
-//            viewModel.showMenu = false
-//            return
-//        }
-//
-//        let selectionBound = selectionLastLine.bounds(for: selectionLastLinePage)
-//        let selectionInView = viewModel.pdfView.convert(selectionBound, from: selectionLastLinePage)
-//
-//        let buttonSize = CGFloat(viewModel.frame.width)
-//        _ = CGSize(width: buttonSize, height: viewModel.frame.height)
-//
-//        let annotationViewPosition = CGPoint(
-//            x: selectionInView.minX + selectionInView.width / 2.0,
-//            y: selectionInView.minY + 44
-//        )
-
-//        viewModel.position = annotationViewPosition
-//        viewModel.showMenu = true
-//    }
 
     @objc func tapGesture(_ gestureRecognizer: UITapGestureRecognizer) {
         guard let pdfView = viewModel.pdfView else {
@@ -317,27 +283,26 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
             return
         }
 
-//        if viewModel.pdfView.currentSelection != nil {
-
-        let bounds = pdfView.currentSelection?.bounds(for: currentPage)
         let tapPoint = gestureRecognizer.location(in: nil)
         let convertedPoint = pdfView.convert(tapPoint, to: currentPage)
 
-        viewModel.tapped.send(convertedPoint)
+        var hitAnnotation: PDFAnnotation? = nil
 
-//
-//                if let bounds {
-//                    if bounds.contains(convertedPoint) {
-//                        return
-//                    }
-//                }
-//            }
-//            viewModel.pdfView.clearSelection()
-//
-//            return
-//        }
-//
-//        viewModel.showMenuOverlay.toggle()
+        for annotation in currentPage.annotations {
+            let bounds = annotation.bounds
+
+            if bounds.contains(convertedPoint) {
+                hitAnnotation = annotation
+                break
+            }
+        }
+
+        if let annotation = hitAnnotation {
+            handleAnnotationHit(notification: Notification(name: .PDFViewAnnotationHit, object: hitAnnotation, userInfo: ["PDFAnnotationHit": annotation]))
+            return
+        }
+
+        viewModel.tapped.send(convertedPoint)
     }
 }
 

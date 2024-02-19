@@ -8,159 +8,6 @@
 import RealmSwift
 import SwiftUI
 
-struct HomeBookList: View {
-    var realm = try! Realm()
-
-    var sortedBooks: [Book]
-    var realmBooks: ObservedResults<Book>
-
-    var body: some View {
-        ForEach(sortedBooks) { book in
-            VStack {
-                NavigationLink(destination: {
-                    BookDetailView(book: book)
-                }) {
-                    HStack {
-                        Image(uiImage: getBookCover(path: book.coverPath) ?? UIImage())
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 34.5, height: 52)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-
-                        VStack(alignment: .leading) {
-                            Text(book.title)
-                                .lineLimit(1)
-
-                            Text(book.authors.first?.name ?? "Unkown Author")
-                                .font(.subheadline)
-                                .foregroundStyle(.gray)
-                                .lineLimit(1)
-                        }
-
-                        if let position = book.readingPosition {
-                            Spacer()
-
-                            HStack {
-                                PieProgress(progress: position.progress ?? 0.0)
-                                    .frame(width: 22)
-
-                                Text("\(Int((position.progress ?? 0) * 100))%")
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(.gray)
-                            }
-                        }
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, maxHeight: 61, alignment: .leading)
-                    .background(.black)
-                    .contextMenu {
-                        Button("Share", systemImage: "square.and.arrow.up.fill") {
-                            showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
-                        }
-                        if book.readingPosition != nil {
-                            Button("Clear progress", systemImage: "clear.fill") {
-                                let thawedBook = book.thaw()
-                                try! realm.write {
-                                    if thawedBook?.readingPosition != nil {
-                                        thawedBook?.readingPosition = nil
-                                    }
-                                }
-                            }
-                        }
-                        Button("Delete", systemImage: "trash.fill", role: .destructive) {
-                            realmBooks.remove(book)
-                            BookRemover.removeBook(book: book)
-                        }
-                    }
-                }
-
-                if sortedBooks.last?.id != book.id {
-                    Divider()
-                }
-            }
-        }
-    }
-}
-
-struct HomeBookGrid: View {
-    var realm = try! Realm()
-
-    var sortedBooks: [Book]
-    var realmBooks: ObservedResults<Book>
-
-    let bookHeight: CGFloat = 120
-    let bookWidth: CGFloat = 90
-
-    let size: CGFloat = 120
-    var body: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: size))],
-            spacing: 8
-        ) {
-            ForEach(sortedBooks) { book in
-                let image = getBookCover(path: book.coverPath) ?? UIImage()
-                NavigationLink(destination: BookDetailView(book: book)) {
-                    VStack {
-                        ZStack {
-                            Image(uiImage: image)
-                                .resizable()
-                                .blur(radius: 8, opaque: true)
-                                .frame(width: bookWidth, height: bookHeight)
-                                .aspectRatio(contentMode: .fill)
-
-                            Image(uiImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: bookWidth, height: bookHeight)
-                        }
-                        .cornerRadius(6)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.gray, lineWidth: 0.2)
-                        }
-                        .overlay {
-                            if let position = book.readingPosition {
-                                PieProgress(progress: position.progress ?? 0.0)
-                                    .frame(width: 22)
-                                    .position(x: bookWidth, y: 0)
-                            }
-                        }
-
-                        Text(book.title)
-                            .lineLimit(1)
-
-                        Text(book.authors.first?.name ?? "Unkown Author")
-                            .font(.subheadline)
-                            .foregroundStyle(.gray)
-                            .lineLimit(1)
-                    }
-                    .padding(.vertical, 6)
-                    .foregroundStyle(.white)
-                    .contextMenu {
-                        Button("Share", systemImage: "square.and.arrow.up.fill") {
-                            showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
-                        }
-                        if book.readingPosition != nil {
-                            Button("Clear progress", systemImage: "clear.fill") {
-                                let thawedBook = book.thaw()
-                                try! realm.write {
-                                    if thawedBook?.readingPosition != nil {
-                                        thawedBook?.readingPosition = nil
-                                    }
-                                }
-                            }
-                        }
-                        Button("Delete", systemImage: "trash.fill", role: .destructive) {
-                            realmBooks.remove(book)
-                            BookRemover.removeBook(book: book)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 enum LibraryDisplayMode: String, Codable {
     case grid
     case list
@@ -192,7 +39,6 @@ struct ContentView: View {
                     } else {
                         return lhs.addedAt < rhs.addedAt
                     }
-
                 case .author:
                     if librarySortOrder == .descending {
                         return lhs.authors.first?.name ?? "" > rhs.authors.first?.name ?? ""
@@ -270,11 +116,25 @@ struct ContentView: View {
                     LibrarySortPopover(selectedSortKey: $librarySortKey, selectedSortOrder: $librarySortOrder)
                         .padding(.vertical, 8)
 
-                    if libraryDisplayMode == .list {
-                        HomeBookList(sortedBooks: sortedBooks, realmBooks: $books)
-
+                    if books.count == 0 {
+                        ContentUnavailableView(label: {
+                            Label("No Books", systemImage: "plus.circle.fill")
+                        }) {
+                            Text("Add books to your library.")
+                        } actions: {
+                            Button {
+                                showUploadFileView = true
+                            } label: {
+                                Text("Get started")
+                            }
+                        }
                     } else {
-                        HomeBookGrid(sortedBooks: sortedBooks, realmBooks: $books)
+                        if libraryDisplayMode == .list {
+                            BookList(sortedBooks: sortedBooks)
+
+                        } else {
+                            BookGrid(sortedBooks: sortedBooks)
+                        }
                     }
                 }
             }
@@ -282,6 +142,7 @@ struct ContentView: View {
             .scrollDismissesKeyboard(.immediately)
             .sheet(isPresented: self.$showUploadFileView, content: {
                 UploadFileView()
+                    .interactiveDismissDisabled()
             })
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -301,5 +162,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+//        .environment(\.realmConfiguration, MockRealms.config)
         .preferredColorScheme(.dark)
 }

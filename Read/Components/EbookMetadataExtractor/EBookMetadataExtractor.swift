@@ -30,27 +30,28 @@ class EBookMetadataExtractor {
         await promise;
         return promise;
         """
-
-        HeadlessWebView.shared.webView.callAsyncJavaScript(function, in: nil, in: .page) { result in
-            switch result {
-            case .success(let metadata):
-                let metadataString = String(describing: metadata)
-                if let data = metadataString.data(using: .utf8) {
-                    do {
-                        let book = try JSONDecoder().decode(BookMetadata.self, from: data)
-                        completion(.success(book))
-                    } catch {
-                        print("Failed to decode")
+        DispatchQueue.main.async {
+            HeadlessWebView.shared.webView.callAsyncJavaScript(function, in: nil, in: .page) { result in
+                switch result {
+                case .success(let metadata):
+                    let metadataString = String(describing: metadata)
+                    if let data = metadataString.data(using: .utf8) {
+                        do {
+                            let book = try JSONDecoder().decode(BookMetadata.self, from: data)
+                            completion(.success(book))
+                        } catch {
+                            print("Failed to decode")
+                            completion(.failure(.decodingError))
+                        }
+                    } else {
+                        print("NO DATA")
                         completion(.failure(.decodingError))
                     }
-                } else {
-                    print("NO DATA")
-                    completion(.failure(.decodingError))
-                }
 
-            case .failure(let error):
-                print("[JS_SWIFT] initBook \(error.localizedDescription)")
-                completion(.failure(.metadataExtractionError))
+                case .failure(let error):
+                    print("[JS_SWIFT] initBook \(error.localizedDescription)")
+                    completion(.failure(.metadataExtractionError))
+                }
             }
         }
     }
@@ -105,6 +106,7 @@ class EBookMetadataExtractor {
 
                     } catch {
                         print("Failed to write image, \(error.localizedDescription)")
+                        return completion(.failure(.fileError))
                     }
                 }
 
@@ -133,6 +135,7 @@ class EBookMetadataExtractor {
 
                             } catch {
                                 print("Failed to write image, \(error.localizedDescription)")
+                                return completion(.failure(.fileError))
                             }
                         }
 
@@ -140,6 +143,13 @@ class EBookMetadataExtractor {
 
                     case .failure(let failure):
                         print("Could not parse book: \(failure)")
+                        return completion(.failure(.metadataExtractionError))
+                    }
+
+                    do {
+                        if accessing {
+                            url.stopAccessingSecurityScopedResource()
+                        }
                     }
                 }
             }
@@ -148,6 +158,23 @@ class EBookMetadataExtractor {
         do {
             if accessing {
                 url.stopAccessingSecurityScopedResource()
+            }
+        }
+    }
+
+    // async version
+    // the callback version caused issues when importin a large amount of files
+    static func parseBook(from url: URL) async throws -> BookMetadata {
+        return try await withCheckedThrowingContinuation {
+            (continuation: CheckedContinuation<BookMetadata, Error>) in
+
+            EBookMetadataExtractor.parseBook(from: url) { result in
+                switch result {
+                case .success(let success):
+                    continuation.resume(returning: success)
+                case .failure(let failure):
+                    continuation.resume(throwing: failure)
+                }
             }
         }
     }

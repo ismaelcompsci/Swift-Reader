@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ReaderMenu: View {
+struct ReaderOverlay: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.dismiss) var dismiss
 
@@ -98,5 +98,5 @@ struct ReaderMenu: View {
 }
 
 #Preview {
-    ReaderMenu(book: .example1, viewModel: ReaderViewModel(url: URL(string: "")!))
+    ReaderOverlay(book: .example1, viewModel: ReaderViewModel(url: URL(string: "")!))
 }

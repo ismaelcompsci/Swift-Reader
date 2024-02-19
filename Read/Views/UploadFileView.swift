@@ -96,14 +96,25 @@ struct UploadFileView: View {
                 Button {
                     processBooks()
                 } label: {
-                    Text("Add \(fileUrls.count == 1 ? "book" : "books")")
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .foregroundStyle(.white)
-                        .background(Color.accent)
-                        .clipShape(.capsule)
+                    if processingBook {
+                        ProgressView()
+                            .padding()
+                            .foregroundStyle(.white)
+                            .tint(Color.accent)
+                            .background(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    } else {
+                        Text("Add \(fileUrls.count == 1 ? "book" : "books")")
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .foregroundStyle(.white)
+                            .background(Color.accent)
+                            .clipShape(.capsule)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
+                .disabled(processingBook)
 
             } else {
                 // MARK: File Upload Card
@@ -172,13 +183,11 @@ struct UploadFileView: View {
     }
 
     func processBooks() {
-        processingBook = true
-        for url in fileUrls {
-            print("PROCESSING FILE \(url.lastPathComponent)")
-
-            EBookMetadataExtractor.parseBook(from: url) { result in
-                switch result {
-                case .success(let metadata):
+        Task {
+            processingBook = true
+            for url in fileUrls {
+                print("PROCESSING FILE \(url.lastPathComponent)")
+                if let metadata = try? await EBookMetadataExtractor.parseBook(from: url) {
                     let book = Book()
 
                     book.title = metadata.title ?? "Untitled"
@@ -199,24 +208,59 @@ struct UploadFileView: View {
                             book.authors.append(newAuthor)
                         }
                     }
-                    book.processed = true
 
+                    book.processed = true
                     $books.append(book)
 
-                case .failure(let failure):
-                    print("Failed to open book: \(failure.localizedDescription)")
-                }
-            }
+                    totalBytes -= url.size
 
-            if let fileIndex = fileUrls.firstIndex(of: url) {
-                _ = withAnimation {
-                    fileUrls.remove(at: fileIndex)
+                    if let fileIndex = fileUrls.firstIndex(of: url) {
+                        fileUrls.remove(at: fileIndex)
+                    }
                 }
+
+                //            EBookMetadataExtractor.parseBook(from: url) { result in
+                //                switch result {
+                //                case .success(let metadata):
+                //                    let book = Book()
+                //
+                //                    book.title = metadata.title ?? "Untitled"
+                //                    book.summary = metadata.description ?? ""
+                //                    book.coverPath = metadata.bookCover
+                //                    book.bookPath = metadata.bookPath
+                //
+                //                    _ = metadata.subject?.map { item in
+                //                        let newTag = Tag()
+                //                        newTag.name = item
+                //                        book.tags.append(newTag)
+                //                    }
+                //
+                //                    _ = metadata.author.map { author in
+                //                        author.map { author in
+                //                            let newAuthor = AuthorBook()
+                //                            newAuthor.name = author.name ?? "Unknown Author"
+                //                            book.authors.append(newAuthor)
+                //                        }
+                //                    }
+                //                    book.processed = true
+                //
+                //                    $books.append(book)
+                //
+                //                case .failure(let failure):
+                //                    print("Failed to open book: \(failure.localizedDescription)")
+                //                }
+                //            }
+
+                //            if let fileIndex = fileUrls.firstIndex(of: url) {
+                //                _ = withAnimation {
+                //                    fileUrls.remove(at: fileIndex)
+                //                }
+                //            }
             }
+            processingBook = false
+            fileUrls = []
+            dismiss()
         }
-        processingBook = false
-        fileUrls = []
-        dismiss()
     }
 
     func removeFile(_ set: IndexSet) {

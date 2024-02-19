@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import PDFKit
+import UniformTypeIdentifiers
 import WebKit
 
 struct Selection {
@@ -79,41 +80,9 @@ class ReaderViewModel: ObservableObject {
     var bookRelocated = PassthroughSubject<Relocate, Never>()
     var pdfRelocated = PassthroughSubject<PDFPage, Never>()
     var tapped = PassthroughSubject<CGPoint, Never>()
-    var selectionChanged = PassthroughSubject<Selection, Never>()
+    var selectionChanged = PassthroughSubject<Selection?, Never>()
 
     var relocateDetails: Relocate? = nil
-
-    private var ebookToc: [BookTocItem]?
-    var toc: [BookTocItem]? {
-        if isPDF {
-            return getPdfToc()
-        } else {
-            return ebookToc
-        }
-    }
-
-    private var currentTocItemHolder: BookTocItem?
-    var currentTocItem: BookTocItem? {
-        guard let toc else {
-            return nil
-        }
-
-        if isPDF {
-            let first = toc.last { tocItem in
-                tocItem.outline?.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
-            }
-
-            if first == nil {
-                return currentTocItemHolder
-            }
-
-            currentTocItemHolder = first
-
-            return first
-        } else {
-            return BookTocItem(depth: relocateDetails?.tocItem?.depth ?? 0, label: relocateDetails?.tocItem?.label, href: relocateDetails?.tocItem?.href, chapterId: relocateDetails?.tocItem?.id)
-        }
-    }
 
     init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil) {
         self.url = url
@@ -212,7 +181,6 @@ class ReaderViewModel: ObservableObject {
                let text = rectData["text"] as? String
             {
                 let selection = Selection(bounds: CGRect(x: x, y: y, width: width, height: height), string: text)
-
                 selectionChanged.send(selection)
             }
         case .relocate:
@@ -222,6 +190,8 @@ class ReaderViewModel: ObservableObject {
                 bookRelocated.send(relocateDetails)
                 setRelocateDetails(relocateDetails)
             }
+        case .didTapHighlight:
+            print(message)
         }
     }
 
@@ -232,7 +202,6 @@ class ReaderViewModel: ObservableObject {
             }
 
             let rgba = getRGBFromHex(hex: theme.bg.rawValue)
-            let rgbaFg = getRGBFromHex(hex: theme.fg.rawValue)
 
             pdfView.backgroundColor = UIColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
             PDFPageCustomBackground.bg = CGColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
@@ -255,7 +224,7 @@ class ReaderViewModel: ObservableObject {
                 lineHeight: \(theme.lineHeight),
                 justify: \(theme.justify),
                 hyphenate: \(theme.hyphenate),
-                theme: {bg: "\(theme.bg.rawValue)", fg: "\(theme.fg.rawValue)"},
+                theme: {bg: "\(theme.bg.rawValue)", fg: "\(theme.fg.rawValue)", name: "\(theme.bg == .dark ? "dark" : "light")"},
                 fontSize: \(theme.fontSize),
             }
 
@@ -275,27 +244,67 @@ class ReaderViewModel: ObservableObject {
         }
     }
 
-    var currentSectionHolder = ""
+    private var currentSectionHolder = ""
+    private var ebookToc: [BookTocItem]?
+    private var currentTocItemHolder: BookTocItem?
 }
 
 // MARK: Computed Values
 
 extension ReaderViewModel {
-    var currentLabel: String {
+    var toc: [BookTocItem]? {
         if isPDF {
-            let first = toc?.first { tocItem in
+            return getPdfToc()
+        } else {
+            return ebookToc
+        }
+    }
+
+    var currentTocItem: BookTocItem? {
+        guard let toc else {
+            return nil
+        }
+
+        if isPDF {
+            let first = toc.last { tocItem in
                 tocItem.outline?.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
             }
 
             if first == nil {
-                return currentSectionHolder
+                return currentTocItemHolder
             }
 
-            currentSectionHolder = first?.outline?.label ?? ""
-            return first?.outline?.label ?? ""
+            currentTocItemHolder = first
+
+            return first
         } else {
-            return relocateDetails?.tocItem?.label ?? ""
+            return BookTocItem(depth: relocateDetails?.tocItem?.depth ?? 0, label: relocateDetails?.tocItem?.label, href: relocateDetails?.tocItem?.href, chapterId: relocateDetails?.tocItem?.id)
         }
+    }
+
+    var currentLabel: String {
+        if isPDF {
+            pdfCurrentLabel
+        } else {
+            ebookCurrentLabel
+        }
+    }
+
+    var pdfCurrentLabel: String {
+        let first = toc?.first { tocItem in
+            tocItem.outline?.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
+        }
+
+        if first == nil {
+            return currentSectionHolder
+        }
+
+        currentSectionHolder = first?.outline?.label ?? ""
+        return first?.outline?.label ?? ""
+    }
+
+    var ebookCurrentLabel: String {
+        relocateDetails?.tocItem?.label ?? ""
     }
 }
 
@@ -369,26 +378,98 @@ extension ReaderViewModel {
     }
 
     func selectionDidChange() {
-        guard let pdfView else {
+        selectionChanged.send(nil)
+    }
+
+    func highlightSelection() {
+        if isPDF {
+            guard let pdfView else {
+                return
+            }
+
+            let selections = pdfView.currentSelection?.selectionsByLine()
+
+            guard let page = selections?.first?.pages.first else {
+                pdfView.clearSelection()
+                return
+            }
+
+            selections?.forEach { selection in
+                let highlight = PDFAnnotation(bounds: selection.bounds(for: page), forType: .highlight, withProperties: nil)
+                highlight.endLineStyle = .square
+                highlight.color = UIColor.yellow.withAlphaComponent(1)
+
+                page.addAnnotation(highlight)
+            }
+
+            pdfView.clearSelection()
+
+        } else {
+            guard let webView else {
+                return
+            }
+
+            let script = """
+            var range = getSelectionRange(globalReader?.doc);
+            var cfi = globalReader.view.getCFI(globalReader.index, range);
+            globalReader.view.addAnnotation({value: cfi, color: "yellow" } );
+            """
+
+            webView.evaluateJavaScript(script) { success, error in
+                if let success {
+                    print(success)
+                }
+
+                if let error {
+                    print(error)
+                }
+
+                self.clearWebViewSelection()
+            }
+        }
+    }
+
+    func copySelection() {
+        if isPDF {
+            guard let pdfView else {
+                print("NO PDF VIEW")
+                return
+            }
+
+            let selections = pdfView.currentSelection?.string
+            guard let text = selections else {
+                return
+            }
+            UIPasteboard.general.setValue(text, forPasteboardType: UTType.plainText.identifier)
+            pdfView.clearSelection()
+        } else {
+            let script = """
+            globalReader?.doc?.getSelection()?.toString()
+            """
+
+            webView?.evaluateJavaScript(script, completionHandler: { success, error in
+                if let success {
+                    UIPasteboard.general.setValue(success as! String, forPasteboardType: UTType.plainText.identifier)
+
+                    self.clearWebViewSelection()
+                }
+
+                if let error {
+                    print(error)
+                }
+            })
+        }
+    }
+
+    private func clearWebViewSelection() {
+        guard let webView else {
             return
         }
+        let script = """
+        globalReader?.doc?.getSelection()?.removeAllRanges();
+        """
 
-        guard let selection = pdfView.currentSelection, let selectionString = selection.string,
-              selectionString.count > 0
-        else {
-            return
-        }
-
-        guard let selectionLastLine = selection.selectionsByLine().last,
-              let selectionLastLinePage = selectionLastLine.pages.last
-        else {
-            return
-        }
-
-        let selectionBound = selectionLastLine.bounds(for: selectionLastLinePage)
-        let selectionInView = pdfView.convert(selectionBound, from: selectionLastLinePage)
-
-        print(selectionBound, selectionInView)
+        webView.evaluateJavaScript(script)
     }
 }
 
