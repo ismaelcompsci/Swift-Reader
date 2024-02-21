@@ -448,7 +448,6 @@ extension ReaderViewModel {
             }
 
             // single highlight but possible to highlight between multiple pages
-            // save this as a highlight
             var pdfHighlightPageLocations = [HighlightPage]()
 
             currentSelection.pages.forEach { selectionPage in

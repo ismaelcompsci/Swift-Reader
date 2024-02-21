@@ -16,7 +16,7 @@ struct ReaderContent: View {
             ScrollView {
                 HStack {
                     Text("Contents")
-                        .font(.title)
+                        .font(.system(size: 36))
                     
                     Spacer()
                     
@@ -26,6 +26,7 @@ struct ReaderContent: View {
                     .foregroundStyle(Color.accent)
                 }
                 .padding(.horizontal)
+                .padding(.vertical)
                 
                 ForEach(viewModel.toc ?? []) { tocItem in
                     let selected = viewModel.isBookTocItemSelected(item: tocItem)
@@ -63,6 +64,7 @@ struct ReaderContent: View {
                     .id(tocItem.id)
                 }
             }
+            .scrollIndicators(.hidden)
             .onAppear {
                 value.scrollTo(viewModel.currentTocItem?.id)
             }
