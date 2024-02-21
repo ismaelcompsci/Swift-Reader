@@ -62,5 +62,5 @@ struct ReaderContextMenu: View {
 }
 
 #Preview {
-    ReaderContextMenu(viewModel: ReaderViewModel(url: URL(string: "")!, highlights: []), showContextMenu: .constant(false), position: .zero)
+    ReaderContextMenu(viewModel: ReaderViewModel(url: URL(string: "")!, pdfHighlights: []), showContextMenu: .constant(false), position: .zero)
 }

@@ -98,5 +98,5 @@ struct ReaderOverlay: View {
 }
 
 #Preview {
-    ReaderOverlay(book: .example1, viewModel: ReaderViewModel(url: URL(string: "")!, highlights: []))
+    ReaderOverlay(book: .example1, viewModel: ReaderViewModel(url: URL(string: "")!, pdfHighlights: []))
 }

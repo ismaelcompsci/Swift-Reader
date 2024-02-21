@@ -11,6 +11,12 @@ import PDFKit
 import UniformTypeIdentifiers
 import WebKit
 
+struct Annotation: Codable {
+    var index: Int
+    var value: String
+    var color: String
+}
+
 struct HighlightPage {
     var page: Int
     var ranges: [NSRange]
@@ -81,11 +87,12 @@ class ReaderViewModel: ObservableObject {
     var pdfRelocated = PassthroughSubject<PDFPage, Never>()
     var tapped = PassthroughSubject<CGPoint, Never>()
     var selectionChanged = PassthroughSubject<Selection?, Never>()
-    var highlighted = PassthroughSubject<(String, [HighlightPage]), Never>()
+    /// 0 text, 1 pdfHighlight, 2 cfi,  3 index, 4 label
+    var highlighted = PassthroughSubject<(String, [HighlightPage]?, String?, Int?, String?), Never>()
 
     var relocateDetails: Relocate? = nil
 
-    init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil, highlights: [HighlightPage]? = nil) {
+    init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil, pdfHighlights: [HighlightPage]? = nil) {
         self.url = url
         self.isPDF = isPDF
         self.initialEBookPosition = cfi
@@ -95,8 +102,8 @@ class ReaderViewModel: ObservableObject {
             self.pdfDocument = PDFDocument(url: url) ?? PDFDocument()
             self.pdfView = NoContextMenuPDFView()
 
-            if let highlights {
-                self.addHighlightToPages(highlight: highlights)
+            if let pdfHighlights {
+                self.addHighlightToPages(highlight: pdfHighlights)
             }
 
             setTheme()
@@ -106,8 +113,27 @@ class ReaderViewModel: ObservableObject {
             let config = WKWebViewConfiguration()
             config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
             self.webView = CustomWebView(frame: .zero, configuration: config)
-
             loadReaderHTML()
+        }
+    }
+
+    func setBookAnnotations(annotations: [Annotation]) {
+        do {
+            let jsonAnnotations = try JSONEncoder().encode(annotations)
+            let stringJSONAnnotations = String(data: jsonAnnotations, encoding: .utf8) ?? "{}"
+
+            let script = """
+                            globalReader?.setAnnotations(\(stringJSONAnnotations))
+            """
+
+            guard let webView else {
+                return
+            }
+
+            webView.evaluateJavaScript(script)
+
+        } catch {
+            print("Failed to set annotations")
         }
     }
 
@@ -411,7 +437,6 @@ extension ReaderViewModel {
     }
 
     // pdf - https://github.com/drearycold/YetAnotherEBookReader/blob/main/YetAnotherEBookReader/Views/PDFView/YabrPDFView.swift#L453
-    //
     func highlightSelection() {
         if isPDF {
             guard let pdfView else {
@@ -441,26 +466,53 @@ extension ReaderViewModel {
             addHighlightToPages(highlight: pdfHighlightPageLocations)
 
             let selectedString = currentSelection.string ?? ""
-            highlighted.send((selectedString, pdfHighlightPageLocations))
+            highlighted.send((selectedString, pdfHighlightPageLocations, nil, nil, nil))
 
         } else {
             guard let webView else {
                 return
             }
+            // TODO: make into a function inside the reader
 
             let script = """
             var range = getSelectionRange(globalReader?.doc);
+            if (!range) return
+            var selectionString = range?.toString()
             var cfi = globalReader.view.getCFI(globalReader.index, range);
-            globalReader.view.addAnnotation({value: cfi, color: "yellow" });
+            var promise = globalReader.view.addAnnotation({value: cfi, color: "#FFFF00" });
+            var chap = await promise;
+            console.log("SETTING ANN BY VAL")
+            globalReader?.annotationsByValue.set(
+                  cfi,
+                  {
+                    index: chap.index,
+                    range: range,
+                    value: cfi,
+                    pos: getPosition(range),
+                    text: range.toString(),
+                    color: "#FFFF00"
+                  }
+            );
+            console.log("DONE SETTING")
+
+            return {index: chap.index, label: chap.label, cfi: cfi, text: selectionString};
             """
 
-            webView.evaluateJavaScript(script) { success, error in
-                if let success {
-                    print(success)
-                }
+            webView.callAsyncJavaScript(script, in: nil, in: .page) { result in
 
-                if let error {
-                    print(error)
+                switch result {
+                case .success(let success):
+                    if let data = success as? [String: Any],
+                       let index = data["index"] as? Int,
+                       let label = data["label"] as? String,
+                       let cfi = data["cfi"] as? String,
+                       let text = data["text"] as? String
+                    {
+                        self.highlighted.send((text, nil, cfi, index, label))
+                    }
+
+                case .failure(let error):
+                    print("EBOOK highlightSelection error: \(error.localizedDescription)")
                 }
 
                 self.clearWebViewSelection()

@@ -71,5 +71,5 @@ struct ReaderContent: View {
 }
 
 #Preview {
-    ReaderContent(viewModel: ReaderViewModel(url: URL(string: "")!, highlights: []))
+    ReaderContent(viewModel: ReaderViewModel(url: URL(string: "")!, pdfHighlights: []))
 }

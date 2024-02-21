@@ -12,10 +12,10 @@ class BookHighlight: EmbeddedObject {
     @Persisted var cfi: String? // non-pdf
     @Persisted var position: List<PDFHighlight> = List() // pdf
 
-    @Persisted var chapter: Int? // pdf
+    @Persisted var chapter: Int?
     @Persisted var chapterTitle: String?
 
-    @Persisted var backgroundColor: Int?
+    @Persisted var backgroundColor: String = "#FFFF00"
 
     @Persisted var highlightText: String?
 

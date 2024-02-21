@@ -47,7 +47,7 @@ struct Reader: View {
             }
         }
         
-        _viewModel = StateObject(wrappedValue: ReaderViewModel(url: bookPathURL, isPDF: isPDF, cfi: book.readingPosition?.epubCfi, pdfPageNumber: book.readingPosition?.chapter, highlights: highlightPages))
+        _viewModel = StateObject(wrappedValue: ReaderViewModel(url: bookPathURL, isPDF: isPDF, cfi: book.readingPosition?.epubCfi, pdfPageNumber: book.readingPosition?.chapter, pdfHighlights: highlightPages))
     }
     
     var body: some View {
@@ -129,17 +129,37 @@ struct Reader: View {
         .onReceive(viewModel.pdfRelocated, perform: relocatedPDF)
         .onReceive(viewModel.selectionChanged, perform: selectionChanged)
         .onReceive(viewModel.highlighted, perform: newHighlight)
+        .onChange(of: viewModel.hasRenderedBook) { oldValue, newValue in
+            if oldValue == false && newValue == true {
+                var annotations = [Annotation]()
+                
+                book.highlights.forEach { highlight in
+                    
+                    guard let cfi = highlight.cfi, let index = highlight.chapter else {
+                        return
+                    }
+                    
+                    let ann = Annotation(index: index, value: cfi, color: highlight.backgroundColor)
+                    annotations.append(ann)
+                }
+                
+                viewModel.setBookAnnotations(annotations: annotations)
+            }
+        }
     }
     
-    private func newHighlight(highlight: (String, [HighlightPage])) {
-        if viewModel.isPDF, let bookRealm = book.realm?.thaw() {
-            let (text, locations) = highlight
-
+    private func newHighlight(highlight: (String, [HighlightPage]?, String?, Int?, String?)) {
+        let (text, locations, cfi, index, label) = highlight
+        
+        if viewModel.isPDF, let bookRealm = book.realm?.thaw(), let locations {
             let label = viewModel.pdfCurrentLabel
 
             guard let thawedBook = book.thaw() else {
+                print("Unable to thaw book")
                 return
             }
+            
+            var pageNumber: Int?
 
             try! bookRealm.write {
                 let pHighlight = BookHighlight()
@@ -147,6 +167,10 @@ struct Reader: View {
                 locations.forEach { hPage in
                     let pdfHighlight = PDFHighlight()
                     pdfHighlight.page = hPage.page
+                    
+                    if pageNumber != nil {
+                        pageNumber = hPage.page
+                    }
                     
                     _ = hPage.ranges.map { range in
                         let highlightRange = HighlightRange()
@@ -161,14 +185,38 @@ struct Reader: View {
                 
                 pHighlight.addedAt = .now
                 pHighlight.updatedAt = .now
-//                pHighlight.chapter = pageNumber
+                pHighlight.chapter = pageNumber
                 pHighlight.chapterTitle = label
                 pHighlight.highlightText = text
 
                 thawedBook.highlights.append(pHighlight)
             }
 
-        } else {}
+        } else {
+            guard let cfi, let label, let index else {
+                print("Missing selection data")
+                return
+            }
+            
+            guard let thawedBook = book.thaw() else {
+                print("Unable to thaw book")
+                return
+            }
+            
+            if let bookRealm = book.realm?.thaw() {
+                try! bookRealm.write {
+                    let pHighlight = BookHighlight()
+                    pHighlight.highlightText = text
+                    pHighlight.cfi = cfi
+                    pHighlight.chapter = index
+                    pHighlight.chapterTitle = label
+                    pHighlight.addedAt = .now
+                    pHighlight.updatedAt = .now
+                    
+                    thawedBook.highlights.append(pHighlight)
+                }
+            }
+        }
     }
     
     private func selectionChanged(selectionSelected: Selection?) {
