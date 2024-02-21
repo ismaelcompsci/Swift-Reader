@@ -157,3 +157,15 @@ func getRGBFromHex(hex: String) -> [String: Double] {
 
     return ["red": Double(r) / 255, "green": Double(g) / 255, "blue": Double(b) / 255, "opacity": Double(a) / 255]
 }
+
+func rgbaToInt(r: Int, g: Int, b: Int, a: Int) -> Int {
+    return (r << 24) | (g << 16) | (b << 8) | a
+}
+
+func getRGBA(from convertedValue: Int) -> (r: Int, g: Int, b: Int, a: Int) {
+    let r = (convertedValue >> 24) & 0xFF
+    let g = (convertedValue >> 16) & 0xFF
+    let b = (convertedValue >> 8) & 0xFF
+    let a = convertedValue & 0xFF
+    return (r, g, b, a)
+}

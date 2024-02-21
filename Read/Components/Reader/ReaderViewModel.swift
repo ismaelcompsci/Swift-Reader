@@ -11,6 +11,11 @@ import PDFKit
 import UniformTypeIdentifiers
 import WebKit
 
+struct HighlightPage {
+    var page: Int
+    var ranges: [NSRange]
+}
+
 struct Selection {
     var bounds: CGRect
     var string: String?
@@ -19,11 +24,6 @@ struct Selection {
 struct PDFTocItem {
     var outline: PDFOutline
     var depth: Int
-}
-
-enum EBookToc {
-    case ebook([EBookTocItem])
-    case pdf([PDFTocItem])
 }
 
 struct BookTocItem: Identifiable {
@@ -81,10 +81,11 @@ class ReaderViewModel: ObservableObject {
     var pdfRelocated = PassthroughSubject<PDFPage, Never>()
     var tapped = PassthroughSubject<CGPoint, Never>()
     var selectionChanged = PassthroughSubject<Selection?, Never>()
+    var highlighted = PassthroughSubject<(String, [HighlightPage]), Never>()
 
     var relocateDetails: Relocate? = nil
 
-    init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil) {
+    init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil, highlights: [HighlightPage]? = nil) {
         self.url = url
         self.isPDF = isPDF
         self.initialEBookPosition = cfi
@@ -93,6 +94,10 @@ class ReaderViewModel: ObservableObject {
         if self.isPDF || url.lastPathComponent.hasSuffix(".pdf") {
             self.pdfDocument = PDFDocument(url: url) ?? PDFDocument()
             self.pdfView = NoContextMenuPDFView()
+
+            if let highlights {
+                self.addHighlightToPages(highlight: highlights)
+            }
 
             setTheme()
             setLoading(false)
@@ -377,32 +382,66 @@ extension ReaderViewModel {
         pdfRelocated.send(page)
     }
 
+    func addHighlightToPages(highlight: [HighlightPage]) {
+        highlight.forEach { highlightPageLocation in
+            guard let highlightPage = self.pdfDocument?.page(at: highlightPageLocation.page - 1) else { return }
+
+            highlightPageLocation.ranges.forEach { highlightPageRange in
+                guard let highlightSelection = self.pdfDocument?.selection(from: highlightPage, atCharacterIndex: highlightPageRange.lowerBound, to: highlightPage, atCharacterIndex: highlightPageRange.upperBound)
+                else { return }
+
+                highlightSelection.selectionsByLine().forEach { hightlightSelectionByLine in
+                    let annotation = PDFAnnotation(
+                        bounds: hightlightSelectionByLine.bounds(for: highlightPage),
+                        forType: .highlight,
+                        withProperties: nil
+                    )
+
+                    annotation.endLineStyle = .square
+                    annotation.color = UIColor.yellow.withAlphaComponent(1)
+                    highlightPage.addAnnotation(annotation)
+                    self.pdfView?.clearSelection()
+                }
+            }
+        }
+    }
+
     func selectionDidChange() {
         selectionChanged.send(nil)
     }
 
+    // pdf - https://github.com/drearycold/YetAnotherEBookReader/blob/main/YetAnotherEBookReader/Views/PDFView/YabrPDFView.swift#L453
+    //
     func highlightSelection() {
         if isPDF {
             guard let pdfView else {
                 return
             }
 
-            let selections = pdfView.currentSelection?.selectionsByLine()
-
-            guard let page = selections?.first?.pages.first else {
-                pdfView.clearSelection()
+            guard let currentSelection = pdfView.currentSelection else {
                 return
             }
 
-            selections?.forEach { selection in
-                let highlight = PDFAnnotation(bounds: selection.bounds(for: page), forType: .highlight, withProperties: nil)
-                highlight.endLineStyle = .square
-                highlight.color = UIColor.yellow.withAlphaComponent(1)
+            // single highlight but possible to highlight between multiple pages
+            // save this as a highlight
+            var pdfHighlightPageLocations = [HighlightPage]()
 
-                page.addAnnotation(highlight)
+            currentSelection.pages.forEach { selectionPage in
+                guard let selectionPageNumber = selectionPage.pageRef?.pageNumber else { return }
+                var pdfHighlightPage = HighlightPage(page: selectionPageNumber, ranges: [])
+                for i in 0 ..< currentSelection.numberOfTextRanges(on: selectionPage) {
+                    let selectionPageRange = currentSelection.range(at: i, on: selectionPage)
+
+                    pdfHighlightPage.ranges.append(selectionPageRange)
+                }
+
+                pdfHighlightPageLocations.append(pdfHighlightPage)
             }
 
-            pdfView.clearSelection()
+            addHighlightToPages(highlight: pdfHighlightPageLocations)
+
+            let selectedString = currentSelection.string ?? ""
+            highlighted.send((selectedString, pdfHighlightPageLocations))
 
         } else {
             guard let webView else {
@@ -412,7 +451,7 @@ extension ReaderViewModel {
             let script = """
             var range = getSelectionRange(globalReader?.doc);
             var cfi = globalReader.view.getCFI(globalReader.index, range);
-            globalReader.view.addAnnotation({value: cfi, color: "yellow" } );
+            globalReader.view.addAnnotation({value: cfi, color: "yellow" });
             """
 
             webView.evaluateJavaScript(script) { success, error in

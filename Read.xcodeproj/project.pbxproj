@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0763622B840F09003E1351 /* ReadingPosition.swift */; };
+		9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0763642B840F59003E1351 /* BookHighlight.swift */; };
 		9F09694B2B74A55700B03C12 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F09694A2B74A55700B03C12 /* ReaderSettings.swift */; };
 		9F09694D2B75CF7800B03C12 /* Relocate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F09694C2B75CF7700B03C12 /* Relocate.swift */; };
 		9F0CA8BC2B8021E300C02675 /* ReaderContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0CA8BB2B8021E300C02675 /* ReaderContent.swift */; };
@@ -43,6 +45,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9F0763622B840F09003E1351 /* ReadingPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPosition.swift; sourceTree = "<group>"; };
+		9F0763642B840F59003E1351 /* BookHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookHighlight.swift; sourceTree = "<group>"; };
 		9F09694A2B74A55700B03C12 /* ReaderSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSettings.swift; sourceTree = "<group>"; };
 		9F09694C2B75CF7700B03C12 /* Relocate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Relocate.swift; sourceTree = "<group>"; };
 		9F0CA8BB2B8021E300C02675 /* ReaderContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderContent.swift; sourceTree = "<group>"; };
@@ -180,6 +184,8 @@
 			isa = PBXGroup;
 			children = (
 				9F608E992B65F40A00D2B5F4 /* Book.swift */,
+				9F0763622B840F09003E1351 /* ReadingPosition.swift */,
+				9F0763642B840F59003E1351 /* BookHighlight.swift */,
 				9F54EE2C2B7327FD001DB7D7 /* Theme.swift */,
 				9F09694C2B75CF7700B03C12 /* Relocate.swift */,
 				9FE38F032B7DFB50005A446A /* BookMetadata.swift */,
@@ -298,6 +304,7 @@
 				9FA902E22B7E17A6009B3B78 /* ReaderContextMenu.swift in Sources */,
 				9F4DEB282B69FB390046B76C /* HeadlessWebView.swift in Sources */,
 				9F09694B2B74A55700B03C12 /* ReaderSettings.swift in Sources */,
+				9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */,
 				9FE38F042B7DFB50005A446A /* BookMetadata.swift in Sources */,
 				9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */,
 				9F608E8F2B65DDD100D2B5F4 /* Extensions.swift in Sources */,
@@ -306,6 +313,7 @@
 				9F5AADF22B82CB6D00712230 /* BookGrid.swift in Sources */,
 				9F09694D2B75CF7800B03C12 /* Relocate.swift in Sources */,
 				9F608E802B65D05B00D2B5F4 /* ReadApp.swift in Sources */,
+				9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */,
 				9F5AADEF2B82CA1400712230 /* MockRealm.swift in Sources */,
 				9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */,
 				9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */,

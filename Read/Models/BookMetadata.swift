@@ -9,7 +9,7 @@ import Foundation
 
 struct BookMetadata: Codable {
     var title: String? = ""
-    var author: [Author]? = []
+    var author: [MetadataAuthor]? = []
     var description: String? = ""
     var cover: String? = ""
     var subject: [String]? = []
@@ -34,13 +34,13 @@ struct BookMetadata: Codable {
         if let authorArray = try? container.decodeIfPresent([String].self, forKey: .author) {
             // Case: authors is an array of strings
             self.author = authorArray.map { author in
-                Author(name: author)
+                MetadataAuthor(name: author)
             }
 
-        } else if let authorArray = try? container.decodeIfPresent([Author].self, forKey: .author) {
+        } else if let authorArray = try? container.decodeIfPresent([MetadataAuthor].self, forKey: .author) {
             // Case: authors is an array of dictionary with .name property
             self.author = authorArray.map { authorObject in
-                Author(name: authorObject.name)
+                MetadataAuthor(name: authorObject.name)
             }
         } else {
             // Case: unknown format for authors, handle as needed
@@ -64,7 +64,7 @@ struct BookMetadata: Codable {
     }
 }
 
-struct Author: Codable {
+struct MetadataAuthor: Codable {
     var name: String? = ""
 }
 

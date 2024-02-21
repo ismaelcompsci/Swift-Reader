@@ -203,7 +203,7 @@ struct UploadFileView: View {
 
                     _ = metadata.author.map { author in
                         author.map { author in
-                            let newAuthor = AuthorBook()
+                            let newAuthor = Author()
                             newAuthor.name = author.name ?? "Unknown Author"
                             book.authors.append(newAuthor)
                         }
@@ -237,7 +237,7 @@ struct UploadFileView: View {
                 //
                 //                    _ = metadata.author.map { author in
                 //                        author.map { author in
-                //                            let newAuthor = AuthorBook()
+                //                            let newAuthor = Author()
                 //                            newAuthor.name = author.name ?? "Unknown Author"
                 //                            book.authors.append(newAuthor)
                 //                        }

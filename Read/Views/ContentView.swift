@@ -128,6 +128,7 @@ struct ContentView: View {
                                 Text("Get started")
                             }
                         }
+                        .tint(Color.accent)
                     } else {
                         if libraryDisplayMode == .list {
                             BookList(sortedBooks: sortedBooks)

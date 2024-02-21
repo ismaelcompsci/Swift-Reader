@@ -160,5 +160,5 @@ struct ReaderSettings: View {
 }
 
 #Preview {
-    ReaderSettings(viewModel: ReaderViewModel(url: URL(string: "")!))
+    ReaderSettings(viewModel: ReaderViewModel(url: URL(string: "")!, highlights: []))
 }

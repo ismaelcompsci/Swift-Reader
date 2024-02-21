@@ -27,7 +27,27 @@ struct Reader: View {
         let bookPathURL = URL.documentsDirectory.appending(path: book.bookPath ?? "")
         url = bookPathURL
         let isPDF = book.bookPath?.hasSuffix(".pdf") ?? false
-        _viewModel = StateObject(wrappedValue: ReaderViewModel(url: bookPathURL, isPDF: isPDF, cfi: book.readingPosition?.epubCfi, pdfPageNumber: book.readingPosition?.chapter))
+        
+        // TODO: Change to method in viewModel on pdf start
+        // pdf only
+        var highlightPages = [HighlightPage]()
+        book.highlights.forEach { bookHighlight in
+            bookHighlight.position.forEach { highlight in
+                let page = highlight.page
+
+                var ranges = [NSRange]()
+
+                highlight.ranges.forEach { hRange in
+                    let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
+
+                    ranges.append(range)
+                }
+
+                highlightPages.append(HighlightPage(page: page, ranges: ranges))
+            }
+        }
+        
+        _viewModel = StateObject(wrappedValue: ReaderViewModel(url: bookPathURL, isPDF: isPDF, cfi: book.readingPosition?.epubCfi, pdfPageNumber: book.readingPosition?.chapter, highlights: highlightPages))
     }
     
     var body: some View {
@@ -108,6 +128,47 @@ struct Reader: View {
         .onReceive(viewModel.bookRelocated, perform: relocated)
         .onReceive(viewModel.pdfRelocated, perform: relocatedPDF)
         .onReceive(viewModel.selectionChanged, perform: selectionChanged)
+        .onReceive(viewModel.highlighted, perform: newHighlight)
+    }
+    
+    private func newHighlight(highlight: (String, [HighlightPage])) {
+        if viewModel.isPDF, let bookRealm = book.realm?.thaw() {
+            let (text, locations) = highlight
+
+            let label = viewModel.pdfCurrentLabel
+
+            guard let thawedBook = book.thaw() else {
+                return
+            }
+
+            try! bookRealm.write {
+                let pHighlight = BookHighlight()
+                
+                locations.forEach { hPage in
+                    let pdfHighlight = PDFHighlight()
+                    pdfHighlight.page = hPage.page
+                    
+                    _ = hPage.ranges.map { range in
+                        let highlightRange = HighlightRange()
+                        highlightRange.lowerBound = range.lowerBound
+                        highlightRange.uppperBound = range.upperBound
+                        
+                        pdfHighlight.ranges.append(highlightRange)
+                    }
+                    
+                    pHighlight.position.append(pdfHighlight)
+                }
+                
+                pHighlight.addedAt = .now
+                pHighlight.updatedAt = .now
+//                pHighlight.chapter = pageNumber
+                pHighlight.chapterTitle = label
+                pHighlight.highlightText = text
+
+                thawedBook.highlights.append(pHighlight)
+            }
+
+        } else {}
     }
     
     private func selectionChanged(selectionSelected: Selection?) {
@@ -183,6 +244,26 @@ struct Reader: View {
     }
     
     func relocatedPDF(currentPage: PDFPage) {
+        if book.highlights.count > 0 {
+            let pageHightlights = book.highlights.filter { highlight in
+                highlight.chapter == currentPage.pageRef?.pageNumber
+            }
+            
+            pageHightlights.forEach { highlight in
+                
+                guard let selection = viewModel.pdfView?.document?.findString(highlight.highlightText ?? "", withOptions: .caseInsensitive).first else { return }
+                
+                guard let page = selection.pages.first else { return }
+                
+                selection.selectionsByLine().forEach { s in
+                    let highlight = PDFAnnotation(bounds: s.bounds(for: page), forType: .highlight, withProperties: nil)
+                    highlight.color = UIColor.yellow
+                    highlight.endLineStyle = .square
+                    page.addAnnotation(highlight)
+                }
+            }
+        }
+        
         guard let pdfDocument = viewModel.pdfDocument else {
             return
         }

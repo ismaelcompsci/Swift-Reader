@@ -82,14 +82,14 @@ class EBookMetadataExtractor {
             if isPdf {
                 let document = PDFDocument(url: destinationBookURL)
                 let metadata = document?.documentAttributes!
-
+                
                 let author = metadata?[PDFDocumentAttribute.authorAttribute] ?? metadata?["Author"] ?? "Unknown Author"
                 let title = metadata?[PDFDocumentAttribute.titleAttribute]
                 let description = metadata?[PDFDocumentAttribute.subjectAttribute]
 
                 let coverImage = getPDFCover(ofPDFAt: destinationBookURL)
 
-                let fullAuthor = Author(name: String(describing: author))
+                let fullAuthor = MetadataAuthor(name: String(describing: author))
 
                 bookMetadata.title = title as! String? ?? "Unknown Title"
                 bookMetadata.description = description as! String? ?? ""
