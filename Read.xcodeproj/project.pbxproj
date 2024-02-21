@@ -151,7 +151,7 @@
 		9F608E7E2B65D05B00D2B5F4 /* Read */ = {
 			isa = PBXGroup;
 			children = (
-				9FCF1BBA2B85FCB1002D5BF2 /* Web.bundle */,
+				9FC596062B86A06A00ED3734 /* Resources */,
 				9F5954B02B6DD101009FC2F1 /* Components */,
 				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
 				9F608E982B65F3F700D2B5F4 /* Models */,
@@ -161,6 +161,7 @@
 				9F608E832B65D05D00D2B5F4 /* Assets.xcassets */,
 				9F608E852B65D05D00D2B5F4 /* Preview Content */,
 				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
+				9FCF1BBA2B85FCB1002D5BF2 /* Web.bundle */,
 			);
 			path = Read;
 			sourceTree = "<group>";
@@ -204,6 +205,13 @@
 				9FE38F032B7DFB50005A446A /* BookMetadata.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		9FC596062B86A06A00ED3734 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		9FD83CB02B7AF8DE0095B584 /* Reader */ = {
