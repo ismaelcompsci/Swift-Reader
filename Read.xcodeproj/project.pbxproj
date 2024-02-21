@@ -210,8 +210,16 @@
 		9FC596062B86A06A00ED3734 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9FC5962F2B86A0C500ED3734 /* New Group */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		9FC5962F2B86A0C500ED3734 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 		9FD83CB02B7AF8DE0095B584 /* Reader */ = {
