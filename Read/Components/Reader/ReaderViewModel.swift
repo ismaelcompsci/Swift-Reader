@@ -481,7 +481,7 @@ extension ReaderViewModel {
             var cfi = globalReader.view.getCFI(globalReader.index, range);
             var promise = globalReader.view.addAnnotation({value: cfi, color: "#FFFF00" });
             var chap = await promise;
-            console.log("SETTING ANN BY VAL")
+
             globalReader?.annotationsByValue.set(
                   cfi,
                   {
@@ -493,7 +493,7 @@ extension ReaderViewModel {
                     color: "#FFFF00"
                   }
             );
-            console.log("DONE SETTING")
+
 
             return {index: chap.index, label: chap.label, cfi: cfi, text: selectionString};
             """
