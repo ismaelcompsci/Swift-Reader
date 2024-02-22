@@ -57,13 +57,6 @@ struct BookDetailView: View {
                     VStack(alignment: .leading) {
                         HStack {
                             NavigationLink {
-//                                if !isPDF {
-//                                    EBookReader(book: book)
-//                                } else {
-                                ////                                    Text("PDF not supported!")
-//                                    PDFReader(book: book)
-//                                }
-                                
                                 Reader(book: book)
                             } label: {
                                 HStack {
@@ -94,6 +87,7 @@ struct BookDetailView: View {
                                 .onTapGesture {
                                     readMore.toggle()
                                 }
+                                .font(.subheadline)
                             
                             if !text.isEmpty {
                                 Button(readMore ? "less" : "more") {

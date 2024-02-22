@@ -12,6 +12,7 @@ struct ReadApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.font, Font.custom("Poppins-Regular", size: 16))
         }
     }
 }

@@ -163,6 +163,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-//        .environment(\.realmConfiguration, MockRealms.config)
         .preferredColorScheme(.dark)
+        .environment(\.font, Font.custom("Poppins-Regular", size: 16))
 }

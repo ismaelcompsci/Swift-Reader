@@ -77,20 +77,6 @@ class NoContextMenuPDFView: PDFView {
     }
 }
 
-// class PDFReaderViewModel: ObservableObject {
-//    var pdfDocument: PDFDocument
-//    var pdfView: NoContextMenuPDFView
-//    let url: URL
-//
-//    @Published var currentPage: PDFPage?
-//    @Published var showMenuOverlay = false
-//    @Published var showSettingsSheet = false
-//    @Published var showContentSheet = false
-//    @Published var isLoading = true
-//
-//    @Published var showMenu = false
-//    @Published var frame: CGSize = .zero
-//    @Published var position: CGPoint = .zero
 //
 //    var currentPageLabel: String {
 //        return currentPage?.label ?? ""
@@ -215,7 +201,11 @@ class PDFPageCustomBackground: PDFPage {
         super.draw(with: box, to: context)
 
         guard let fillColor = PDFPageCustomBackground.bg,
-              let fillColorDeviceRGB = fillColor.converted(to: PDFPageCustomBackground.colorSpace, intent: .defaultIntent, options: nil) else { return }
+              let fillColorDeviceRGB = fillColor.converted(to: PDFPageCustomBackground.colorSpace, intent: .defaultIntent, options: nil)
+        else {
+            print("NO FILL COLOR OR DEVICE RGB")
+            return
+        }
 
         let grayComponents = fillColor.converted(to: CGColorSpace(name: CGColorSpace.linearGray)!, intent: .defaultIntent, options: nil)?.components ?? []
 

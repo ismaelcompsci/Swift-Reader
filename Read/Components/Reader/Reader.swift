@@ -28,26 +28,7 @@ struct Reader: View {
         url = bookPathURL
         let isPDF = book.bookPath?.hasSuffix(".pdf") ?? false
         
-        // TODO: Change to method in viewModel on pdf start
-        // pdf only
-        var highlightPages = [HighlightPage]()
-        book.highlights.forEach { bookHighlight in
-            bookHighlight.position.forEach { highlight in
-                let page = highlight.page
-
-                var ranges = [NSRange]()
-
-                highlight.ranges.forEach { hRange in
-                    let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
-
-                    ranges.append(range)
-                }
-
-                highlightPages.append(HighlightPage(page: page, ranges: ranges))
-            }
-        }
-        
-        _viewModel = StateObject(wrappedValue: ReaderViewModel(url: bookPathURL, isPDF: isPDF, cfi: book.readingPosition?.epubCfi, pdfPageNumber: book.readingPosition?.chapter, pdfHighlights: highlightPages))
+        _viewModel = StateObject(wrappedValue: ReaderViewModel(url: bookPathURL, isPDF: isPDF, cfi: book.readingPosition?.epubCfi, pdfPageNumber: book.readingPosition?.chapter))
     }
     
     var body: some View {
@@ -83,14 +64,42 @@ struct Reader: View {
                             }
                         })
                     }
-                   
+                
             } else {
                 PDFKitView(viewModel: viewModel)
                     .onAppear {
                         viewModel.currentPage = viewModel.pdfView?.currentPage
+                        viewModel.setLoading(true)
+                        
+                        // TODO: Change to method in viewModel on pdf start
+                        var highlightPages = [HighlightPage]()
+                        book.highlights.forEach { bookHighlight in
+                            bookHighlight.position.forEach { highlight in
+                                let page = highlight.page
+                                
+                                var ranges = [NSRange]()
+                                
+                                highlight.ranges.forEach { hRange in
+                                    let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
+                                    
+                                    ranges.append(range)
+                                }
+                                
+                                highlightPages.append(HighlightPage(page: page, ranges: ranges))
+                            }
+                        }
+                        
+                        viewModel.addHighlightToPages(highlight: highlightPages)
                         
                         if let pageIndex = book.readingPosition?.chapter {
                             viewModel.goTo(pageIndex: pageIndex)
+                        }
+                        
+                        viewModel.doneWithInitalLoading = true
+                        
+                        Task {
+                            try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
+                            viewModel.setLoading(false)
                         }
                     }
             }
@@ -107,11 +116,14 @@ struct Reader: View {
             
             // MARK: Loader
             
-            if viewModel.isLoading {
+            if viewModel.isLoading || !viewModel.doneWithInitalLoading {
                 ZStack {
                     Color.black
                     ProgressView()
                 }
+                .transition(.slide)
+                .animation(.easeInOut(duration: 2), value: viewModel.isLoading)
+                .zIndex(1)
             }
         }
         .ignoresSafeArea()

@@ -81,6 +81,8 @@ class ReaderViewModel: ObservableObject {
         setEbookToc()
     }}
 
+    @Published var doneWithInitalLoading = false
+
     // MARK: Events
 
     var bookRelocated = PassthroughSubject<Relocate, Never>()
@@ -92,7 +94,7 @@ class ReaderViewModel: ObservableObject {
 
     var relocateDetails: Relocate? = nil
 
-    init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil, pdfHighlights: [HighlightPage]? = nil) {
+    init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil) {
         self.url = url
         self.isPDF = isPDF
         self.initialEBookPosition = cfi
@@ -102,13 +104,7 @@ class ReaderViewModel: ObservableObject {
             self.pdfDocument = PDFDocument(url: url) ?? PDFDocument()
             self.pdfView = NoContextMenuPDFView()
 
-            if let pdfHighlights {
-                self.addHighlightToPages(highlight: pdfHighlights)
-            }
-
             setTheme()
-            setLoading(false)
-
         } else {
             let config = WKWebViewConfiguration()
             config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
@@ -193,6 +189,11 @@ class ReaderViewModel: ObservableObject {
         case .bookRendered:
             setTheme { _, _ in
                 self.setHasRenderedBook(rendered: true)
+
+                Task {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
+                    self.doneWithInitalLoading = true
+                }
             }
         case .tapHandler:
             if let pointData = message as? [String: Any],
@@ -426,6 +427,7 @@ extension ReaderViewModel {
                     annotation.endLineStyle = .square
                     annotation.color = UIColor.yellow.withAlphaComponent(1)
                     highlightPage.addAnnotation(annotation)
+
                     self.pdfView?.clearSelection()
                 }
             }

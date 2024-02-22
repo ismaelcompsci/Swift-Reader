@@ -57,6 +57,7 @@
 		9FC596552B86A30800ED3734 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596422B86A30800ED3734 /* Poppins-SemiBold.ttf */; };
 		9FC596562B86A30800ED3734 /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596432B86A30800ED3734 /* Poppins-Italic.ttf */; };
 		9FC596572B86A30800ED3734 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */; };
+		9FC596592B86A56A00ED3734 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC596582B86A56A00ED3734 /* Font+Extensions.swift */; };
 		9FCF1BBB2B85FCB2002D5BF2 /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9FCF1BBA2B85FCB1002D5BF2 /* Web.bundle */; };
 		9FD83CB22B7AF8F50095B584 /* ReaderOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD83CB12B7AF8F50095B584 /* ReaderOverlay.swift */; };
 		9FE324402B85D30E003E61F6 /* grid.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243A2B85D30D003E61F6 /* grid.PNG */; };
@@ -119,6 +120,7 @@
 		9FC596422B86A30800ED3734 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		9FC596432B86A30800ED3734 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Italic.ttf"; sourceTree = "<group>"; };
 		9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
+		9FC596582B86A56A00ED3734 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
 		9FCF1BBA2B85FCB1002D5BF2 /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Web.bundle; sourceTree = "<group>"; };
 		9FD83CB12B7AF8F50095B584 /* ReaderOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderOverlay.swift; sourceTree = "<group>"; };
 		9FE3243A2B85D30D003E61F6 /* grid.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grid.PNG; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 			isa = PBXGroup;
 			children = (
 				9F608E8E2B65DDD100D2B5F4 /* Extensions.swift */,
+				9FC596582B86A56A00ED3734 /* Font+Extensions.swift */,
 				9F559B0D2B68F9C000B147D9 /* Helpers.swift */,
 				9F5AADEE2B82CA1400712230 /* MockRealm.swift */,
 			);
@@ -455,6 +458,7 @@
 				9F5AADF42B82CB9D00712230 /* BookList.swift in Sources */,
 				9F5954A92B6C7A70009FC2F1 /* EBookMetadataExtractor.swift in Sources */,
 				9F54EE2D2B7327FD001DB7D7 /* Theme.swift in Sources */,
+				9FC596592B86A56A00ED3734 /* Font+Extensions.swift in Sources */,
 				9FF92A8D2B788C9400025405 /* PieProgress.swift in Sources */,
 				9FD83CB22B7AF8F50095B584 /* ReaderOverlay.swift in Sources */,
 				9FA902E62B7EC92D009B3B78 /* ReaderViewModel.swift in Sources */,

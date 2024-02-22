@@ -16,8 +16,7 @@ struct ReaderContent: View {
             ScrollView {
                 HStack {
                     Text("Contents")
-                        .font(.system(size: 36))
-                    
+                        .font(.setCustom(fontStyle: .title, fontWeight: .bold))
                     Spacer()
                     
                     Button("Done") {
@@ -55,7 +54,7 @@ struct ReaderContent: View {
                                 Image(systemName: "chevron.right")
                             }
                             .foregroundStyle(selected ? Color.accent : .white)
-                            .fontWeight(tocItem.depth == 0 ? .bold : .light)
+                            .fontWeight(tocItem.depth == 0 ? .semibold : .light)
                         }
                         .padding(.leading, CGFloat(tocItem.depth) * 10)
                     }
@@ -73,5 +72,5 @@ struct ReaderContent: View {
 }
 
 #Preview {
-    ReaderContent(viewModel: ReaderViewModel(url: URL(string: "")!, pdfHighlights: []))
+    ReaderContent(viewModel: ReaderViewModel(url: URL(string: "")!))
 }
