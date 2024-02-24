@@ -99,6 +99,14 @@ extension ReaderWebViewCoordinator: WKUIDelegate {
     func webView(_ webView: WKWebView, willPresentEditMenuWithAnimator animator: UIEditMenuInteractionAnimating) {}
 }
 
+enum WebKitMessageHandlers: String {
+    case bookRendered
+    case tapHandler
+    case selectedText
+    case relocate
+    case didTapHighlight
+}
+
 extension ReaderWebViewCoordinator: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if let handlerCase = WebKitMessageHandlers(rawValue: message.name) {
@@ -119,7 +127,7 @@ struct ReaderWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> CustomWebView {
         guard let webView = vm.webView else {
-            print("no web view")
+            print("[ReaderWebView] makeUIView: no web view")
 
             return CustomWebView()
         }
@@ -154,7 +162,7 @@ struct ReaderWebView: UIViewRepresentable {
                                   name: WebKitMessageHandlers.didTapHighlight.rawValue)
 
         // TODO: Remove
-        webView.isInspectable = true
+        webView.isInspectable = true /* DEBUG ONLY */
 
         return webView
     }
@@ -164,12 +172,4 @@ struct ReaderWebView: UIViewRepresentable {
     func makeCoordinator() -> ReaderWebViewCoordinator {
         return ReaderWebViewCoordinator(viewModel: vm)
     }
-}
-
-enum WebKitMessageHandlers: String {
-    case bookRendered
-    case tapHandler
-    case selectedText
-    case relocate
-    case didTapHighlight
 }

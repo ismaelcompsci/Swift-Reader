@@ -41,28 +41,13 @@ struct Reader: View {
             if !viewModel.isPDF {
                 ReaderWebView(viewModel: viewModel)
                     .onTapGesture {
-                        let script = """
-                        function test() {
-                        const sel = globalReader?.doc?.getSelection();
-                          if (!sel.rangeCount) return false;
-                          const range = sel.getRangeAt(0);
-                          if (range.collapsed) return false;
-                          return true;
-                        }
-                        
-                        !!test();
-                        """
-                        viewModel.webView?.evaluateJavaScript(script, completionHandler: { success, error in
-                            if let success {
-                                if success as! Bool == true {
-                                    showContextMenu = false
-                                }
-                            }
+                        Task {
+                            let hasSelection = try await viewModel.hasSelection()
                             
-                            if let error {
-                                print(error)
+                            if hasSelection {
+                                showContextMenu = false
                             }
-                        })
+                        }
                     }
                 
             } else {
@@ -113,7 +98,7 @@ struct Reader: View {
             // MARK: Reader Menu
             
 //            if showOverlay {
-                ReaderOverlay(book: book, viewModel: viewModel, showOverlay: $showOverlay)
+            ReaderOverlay(book: book, viewModel: viewModel, showOverlay: $showOverlay)
 //            }
             
             if showContextMenu && contextMenuPosition != .zero {

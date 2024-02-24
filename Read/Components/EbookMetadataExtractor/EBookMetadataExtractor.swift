@@ -40,16 +40,16 @@ class EBookMetadataExtractor {
                             let book = try JSONDecoder().decode(BookMetadata.self, from: data)
                             completion(.success(book))
                         } catch {
-                            print("Failed to decode")
+                            print("[EBookMetadataExtractor] getMetadata: Failed to decode - \(error.localizedDescription)")
                             completion(.failure(.decodingError))
                         }
                     } else {
-                        print("NO DATA")
+                        print("[EBookMetadataExtractor] getMetadata: NO DATA")
                         completion(.failure(.decodingError))
                     }
 
                 case .failure(let error):
-                    print("[JS_SWIFT] initBook \(error.localizedDescription)")
+                    print("[EBookMetadataExtractor] getMetadata: \(error.localizedDescription)")
                     completion(.failure(.metadataExtractionError))
                 }
             }
@@ -73,7 +73,7 @@ class EBookMetadataExtractor {
 
                 try FileManager.default.copyItem(at: url, to: destinationBookURL)
             } catch {
-                print("File: \(error.localizedDescription)")
+                print("[EBookMetadataExtractor] parseBook: \(error.localizedDescription)")
                 return completion(.failure(.fileError))
             }
 
@@ -82,7 +82,7 @@ class EBookMetadataExtractor {
             if isPdf {
                 let document = PDFDocument(url: destinationBookURL)
                 let metadata = document?.documentAttributes!
-                
+
                 let author = metadata?[PDFDocumentAttribute.authorAttribute] ?? metadata?["Author"] ?? "Unknown Author"
                 let title = metadata?[PDFDocumentAttribute.titleAttribute]
                 let description = metadata?[PDFDocumentAttribute.subjectAttribute]
@@ -105,7 +105,7 @@ class EBookMetadataExtractor {
                         bookMetadata.bookCover = "\(bookDirectoryString)/\(lastImagePathComponent)"
 
                     } catch {
-                        print("Failed to write image, \(error.localizedDescription)")
+                        print("[EBookMetadataExtractor] parseBook: Failed to write image, \(error.localizedDescription)")
                         return completion(.failure(.fileError))
                     }
                 }
@@ -134,7 +134,7 @@ class EBookMetadataExtractor {
                                 bookMetadata.bookCover = "\(bookDirectoryString)/\(lastImagePathComponent)"
 
                             } catch {
-                                print("Failed to write image, \(error.localizedDescription)")
+                                print("[EBookMetadataExtractor] parseBook: Failed to write image, \(error.localizedDescription)")
                                 return completion(.failure(.fileError))
                             }
                         }
@@ -142,7 +142,7 @@ class EBookMetadataExtractor {
                         completion(.success(bookMetadata))
 
                     case .failure(let failure):
-                        print("Could not parse book: \(failure)")
+                        print("[EBookMetadataExtractor] parseBook: \(failure)")
                         return completion(.failure(.metadataExtractionError))
                     }
 

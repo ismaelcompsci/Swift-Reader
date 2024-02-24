@@ -15,13 +15,12 @@ class HeadlessWebView {
     let webView: WKWebView
 
     init() {
-        print("HeadlessWebView init")
         let source = "function captureLog(msg) { window.webkit.messageHandlers.logHandler.postMessage(msg); } window.console.log = captureLog;"
         let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
 
         self.webView = WKWebView()
 
-        webView.isInspectable = true
+        webView.isInspectable = true /* DEBUG ONLY */
         webView.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
         webView.configuration.userContentController.addUserScript(script)
         webView.configuration.userContentController.add(LoggingMessageHandler(), name: "logHandler")
@@ -32,25 +31,25 @@ class HeadlessWebView {
             do {
                 try FileManager.default.removeItem(atPath: newLocation.absoluteString)
             } catch {
-                print("Error removing file")
+                print("[HeadlessWebView] init: \(error.localizedDescription)")
             }
 
             if let bundleHtml = Bundle.main.url(forResource: "Web.bundle/index", withExtension: "html") {
                 do {
                     try FileManager.default.copyItem(at: bundleHtml, to: newLocation)
                 } catch {
-                    print("Error copying bundle: ")
+                    print("[HeadlessWebView] init: \(error.localizedDescription) ")
                 }
 
                 webView.loadFileURL(newLocation, allowingReadAccessTo: URL.documentsDirectory)
 
             } else {
                 // TODO: ERROR
-                print("NO BUNDLE URL")
+                print("[HeadlessWebView]: NO BUNDLE URL")
             }
         } else {
             // TODO: ERROR
-            print("NO DOCUMENT URL")
+            print("[HeadlessWebView]: NO DOCUMENT URL")
         }
     }
 

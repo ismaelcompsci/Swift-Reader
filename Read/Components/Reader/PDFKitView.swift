@@ -77,117 +77,6 @@ class NoContextMenuPDFView: PDFView {
     }
 }
 
-//
-//    var currentPageLabel: String {
-//        return currentPage?.label ?? ""
-//    }
-//
-//    var currentSectionHolder = ""
-//    var currentLabel: String {
-//        let first = pdfToc.first { outline in
-//            outline.outline.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
-//        }
-//
-//        if first == nil {
-//            return currentSectionHolder
-//        }
-//
-//        currentSectionHolder = first?.outline.label ?? ""
-//        return first?.outline.label ?? ""
-//    }
-//
-//    // page number / total pages
-//    var currentPageNumberLabel: String {
-//        guard let currentPage = pdfView.currentPage else {
-//            return ""
-//        }
-//        let index = pdfDocument.index(for: currentPage)
-//        let pageCount = pdfDocument.pageCount
-//        return String(format: "%d/%d", index + 1, pageCount)
-//    }
-//
-//    var currentTocItemHolder: PDFTocItem?
-//    var currenTocItem: PDFTocItem? {
-//        let first = pdfToc.last { outline in
-//            outline.outline.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
-//        }
-//
-//        if first == nil {
-//            return currentTocItemHolder
-//        }
-//
-//        currentTocItemHolder = first
-//
-//        return first
-//    }
-//
-//    // Flattend PDF Toc items
-//    var pdfToc: [PDFTocItem] {
-//        var toc = [PDFTocItem]()
-//        if let root = pdfDocument.outlineRoot {
-//            var stack: [(outline: PDFOutline, depth: Int)] = [(root, -1)]
-//            while !stack.isEmpty {
-//                let (current, depth) = stack.removeLast()
-//                if let label = current.label, !label.isEmpty {
-//                    toc.append(PDFTocItem(outline: current, depth: depth))
-//                }
-//                for i in (0 ..< current.numberOfChildren).reversed() {
-//                    if let child = current.child(at: i) {
-//                        stack.append((child, depth + 1))
-//                    }
-//                }
-//            }
-//        }
-//
-//        return toc
-//    }
-//
-//    init(url: URL) {
-//        self.url = url
-//        pdfDocument = PDFDocument(url: url) ?? PDFDocument()
-//        pdfView = NoContextMenuPDFView()
-//    }
-//
-//    func pdfPageChanged() {
-//        currentPage = pdfView.currentPage
-//
-//        // Disable popup menu
-//        pdfView.disableMenuInteractions()
-//    }
-//
-//    func highlightSelection() {
-//        let selections = pdfView.currentSelection?.selectionsByLine()
-//        // Simple scenario, assuming your pdf is single-page.
-//        guard let page = selections?.first?.pages.first else {
-//            showMenu = false
-//            pdfView.clearSelection()
-//            return
-//        }
-//
-//        selections?.forEach { selection in
-//            let highlight = PDFAnnotation(bounds: selection.bounds(for: page), forType: .highlight, withProperties: nil)
-//            highlight.endLineStyle = .square
-//            highlight.color = UIColor.orange.withAlphaComponent(0.5)
-//
-//            page.addAnnotation(highlight)
-//        }
-//
-//        showMenu = false
-//        pdfView.clearSelection()
-//    }
-//
-//    func copySelection() {
-//        let selections = pdfView.currentSelection?.string
-//        guard let text = selections else {
-//            showMenu = false
-//            return
-//        }
-//        UIPasteboard.general.setValue(text, forPasteboardType: UTType.plainText.identifier)
-//        showMenu = false
-//        pdfView.clearSelection()
-//    }
-// }
-
 class PDFPageCustomBackground: PDFPage {
     static var bg: CGColor?
     static let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -203,7 +92,7 @@ class PDFPageCustomBackground: PDFPage {
         guard let fillColor = PDFPageCustomBackground.bg,
               let fillColorDeviceRGB = fillColor.converted(to: PDFPageCustomBackground.colorSpace, intent: .defaultIntent, options: nil)
         else {
-            print("NO FILL COLOR OR DEVICE RGB")
+            print("[PDFPageCustomBackground] draw:  NO FILL COLOR OR DEVICE RGB")
             return
         }
 

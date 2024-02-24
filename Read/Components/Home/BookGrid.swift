@@ -13,8 +13,8 @@ struct BookGrid: View {
 
     var sortedBooks: [Book]
 
-    let bookHeight: CGFloat = 120
-    let bookWidth: CGFloat = 90
+    let bookHeight: CGFloat = 170
+    let bookWidth: CGFloat = 115
 
     let size: CGFloat = 120
     var body: some View {
@@ -23,41 +23,23 @@ struct BookGrid: View {
             spacing: 8
         ) {
             ForEach(sortedBooks) { book in
-                let image = getBookCover(path: book.coverPath)
 
                 NavigationLink(destination: BookDetailView(book: book)) {
                     VStack {
                         ZStack {
-                            if let image {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .blur(radius: 8, opaque: true)
-                                    .frame(width: bookWidth, height: bookHeight)
-                                    .aspectRatio(contentMode: .fill)
-
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: bookWidth, height: bookHeight)
-                            } else {
-                                VStack {
-                                    Image(systemName: "book.pages.fill")
-                                        .resizable()
-                                        .frame(width: bookWidth / 2, height: bookHeight / 2)
-                                }
+                            BookCover(coverPath: book.coverPath)
                                 .frame(width: bookWidth, height: bookHeight)
-                            }
                         }
-                        .cornerRadius(6)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                         .overlay {
                             RoundedRectangle(cornerRadius: 6)
-                                .stroke(.gray, lineWidth: 0.2)
+                                .stroke(.gray, lineWidth: 0.3)
                         }
                         .overlay {
                             if let position = book.readingPosition {
                                 PieProgress(progress: position.progress ?? 0.0)
                                     .frame(width: 22)
-                                    .position(x: bookWidth, y: 0)
+                                    .position(x: bookWidth - 5, y: 0)
                             }
                         }
 

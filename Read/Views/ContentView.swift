@@ -71,26 +71,9 @@ struct ContentView: View {
                     HStack {
                         // MARK: Search Bar
 
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundStyle(Color.accent)
-                            TextField("Search for book...", text: $searchText)
+                        SearchBar(placeholderText: "Search for book...", searchText: $searchText)
 
-                            if !searchText.isEmpty {
-                                Button {
-                                    withAnimation(.smooth) {
-                                        searchText = ""
-                                    }
-                                } label: {
-                                    Image(systemName: "multiply.circle.fill")
-                                        .foregroundStyle(Color.accent)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 8)
-                        .background(Color.backgroundSecondary)
-                        .clipShape(.capsule)
+                        // MARK: Display Buttons
 
                         Button {
                             withAnimation {
@@ -112,12 +95,14 @@ struct ContentView: View {
                         .font(.system(size: 20))
                         .foregroundStyle(libraryDisplayMode == .grid ? Color.accent : .white)
                     }
+
                     HStack {
                         if books.count > 0 {
-                            Text("Books: \(books.count)")
+                            Text(books.count == 1 ? "\(books.count) Book" : "\(books.count) Books")
                                 .font(.subheadline)
                                 .foregroundStyle(.gray)
                         }
+
                         LibrarySortPopover(selectedSortKey: $librarySortKey, selectedSortOrder: $librarySortOrder)
                             .padding(.vertical, 8)
                     }

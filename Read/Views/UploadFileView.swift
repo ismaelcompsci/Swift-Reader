@@ -51,7 +51,6 @@ struct UploadFileView: View {
 
                 List {
                     ForEach(fileUrls, id: \.self) { file in
-//                        let _ = totalBytes += file.size
 
                         HStack {
                             VStack(alignment: .leading) {
@@ -186,7 +185,7 @@ struct UploadFileView: View {
         Task {
             processingBook = true
             for url in fileUrls {
-                print("PROCESSING FILE \(url.lastPathComponent)")
+                // made async instead of closure so that a large number of books are not being proccessed at the same time
                 if let metadata = try? await EBookMetadataExtractor.parseBook(from: url) {
                     let book = Book()
 
@@ -218,44 +217,6 @@ struct UploadFileView: View {
                         fileUrls.remove(at: fileIndex)
                     }
                 }
-
-                //            EBookMetadataExtractor.parseBook(from: url) { result in
-                //                switch result {
-                //                case .success(let metadata):
-                //                    let book = Book()
-                //
-                //                    book.title = metadata.title ?? "Untitled"
-                //                    book.summary = metadata.description ?? ""
-                //                    book.coverPath = metadata.bookCover
-                //                    book.bookPath = metadata.bookPath
-                //
-                //                    _ = metadata.subject?.map { item in
-                //                        let newTag = Tag()
-                //                        newTag.name = item
-                //                        book.tags.append(newTag)
-                //                    }
-                //
-                //                    _ = metadata.author.map { author in
-                //                        author.map { author in
-                //                            let newAuthor = Author()
-                //                            newAuthor.name = author.name ?? "Unknown Author"
-                //                            book.authors.append(newAuthor)
-                //                        }
-                //                    }
-                //                    book.processed = true
-                //
-                //                    $books.append(book)
-                //
-                //                case .failure(let failure):
-                //                    print("Failed to open book: \(failure.localizedDescription)")
-                //                }
-                //            }
-
-                //            if let fileIndex = fileUrls.firstIndex(of: url) {
-                //                _ = withAnimation {
-                //                    fileUrls.remove(at: fileIndex)
-                //                }
-                //            }
             }
             processingBook = false
             fileUrls = []

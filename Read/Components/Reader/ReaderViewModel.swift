@@ -66,12 +66,15 @@ class ReaderViewModel: ObservableObject {
 
     @Published var currentTocItem: BookTocItem? = nil
     @Published var currentLabel: String = ""
-
     @Published var showSettingsSheet = false
+    @Published var doneWithInitalLoading = false
     @Published var showContentSheet = false
-
+    @Published var relocateDetails: Relocate? = nil
     @Published var theme = Theme()
     @Published var currentPage: PDFPage?
+    @Published var hasRenderedBook = false { didSet {
+        setEbookToc()
+    }}
     @Published var isLoading = true {
         didSet {
             if isLoading == false && !hasRenderedBook && !isPDF {
@@ -79,12 +82,6 @@ class ReaderViewModel: ObservableObject {
             }
         }
     }
-
-    @Published var hasRenderedBook = false { didSet {
-        setEbookToc()
-    }}
-
-    @Published var doneWithInitalLoading = false
 
     // MARK: Events
 
@@ -94,8 +91,6 @@ class ReaderViewModel: ObservableObject {
     var selectionChanged = PassthroughSubject<Selection?, Never>()
     /// 0 text, 1 pdfHighlight, 2 cfi,  3 index, 4 label
     var highlighted = PassthroughSubject<(String, [HighlightPage]?, String?, Int?, String?), Never>()
-
-    @Published var relocateDetails: Relocate? = nil
 
     init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil) {
         self.url = url
@@ -116,44 +111,24 @@ class ReaderViewModel: ObservableObject {
         }
     }
 
-    func setBookAnnotations(annotations: [Annotation]) {
-        do {
-            let jsonAnnotations = try JSONEncoder().encode(annotations)
-            let stringJSONAnnotations = String(data: jsonAnnotations, encoding: .utf8) ?? "{}"
-
-            let script = """
-                            globalReader?.setAnnotations(\(stringJSONAnnotations))
-            """
-
-            guard let webView else {
-                return
-            }
-
-            webView.evaluateJavaScript(script)
-
-        } catch {
-            print("Failed to set annotations")
-        }
-    }
-
     /// Moves html from app bundle to documents, to give the webview permissions to read files
-    func loadReaderHTML() {
+    private func loadReaderHTML() {
         guard let webView else {
-            print("[READERVIEWMODEL] loadReaderHtml: book is a pdf or webview has not been initialized")
+            print("[ReaderViewModel] loadReaderHtml: book is a pdf or webview has not been initialized")
             return
         }
         let documentsDir = URL.documentsDirectory
         let newLocation = documentsDir.appendingPathComponent("reader.html")
 
         guard let readerBundleHtml = Bundle.main.url(forResource: "Web.bundle/reader", withExtension: "html") else {
-            print("[READERVIEWMODEL]: READER HTML NOT FOUND")
+            print("[ReaderViewModel]: READER HTML NOT FOUND")
             return
         }
 
         do {
             try FileManager.default.copyItem(at: readerBundleHtml, to: newLocation)
         } catch {
-            print("[READERVIEWMODEL]: Failed to copy reader html to documents dir")
+            print("[ReaderViewModel]: Failed to copy reader html to documents dir - \(error.localizedDescription)")
         }
 
         webView.loadFileURL(newLocation, allowingReadAccessTo: URL.documentsDirectory)
@@ -163,9 +138,9 @@ class ReaderViewModel: ObservableObject {
     /// - Parameters:
     ///   - bookPath: The path of the book. Book must be in documents directory of the app
     ///   - bookPosition: Book start position must be book cfi
-    func loadBook(bookPath: String, bookPosition: String?, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+    private func loadBook(bookPath: String, bookPosition: String?, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         guard let webView else {
-            print("[READERVIEWMODEL] loadBook: book is a pdf or webview has not been initialized")
+            print("[ReaderViewModel] loadBook: book is a pdf or webview has not been initialized")
             return
         }
 
@@ -183,6 +158,26 @@ class ReaderViewModel: ObservableObject {
 
         webView.evaluateJavaScript(script) { success, error in
             completionHandler?(success, error)
+        }
+    }
+
+    func setBookAnnotations(annotations: [Annotation]) {
+        do {
+            let jsonAnnotations = try JSONEncoder().encode(annotations)
+            let stringJSONAnnotations = String(data: jsonAnnotations, encoding: .utf8) ?? "{}"
+
+            let script = """
+                            globalReader?.setAnnotations(\(stringJSONAnnotations))
+            """
+
+            guard let webView else {
+                return
+            }
+
+            webView.evaluateJavaScript(script)
+
+        } catch {
+            print("[ReaderViewModel] setBookAnnotations: Failed to set annotations - \(error.localizedDescription)")
         }
     }
 
@@ -255,7 +250,7 @@ class ReaderViewModel: ObservableObject {
 
         } else {
             guard let webView else {
-                print("[READERVIEWMODEL] setTheme: book is a pdf or webview has not been initialized")
+                print("[ReaderViewModel] setTheme: book is a pdf or webview has not been initialized")
                 return
             }
 
@@ -284,6 +279,31 @@ class ReaderViewModel: ObservableObject {
         }
     }
 
+    func pdfPageChanged() {
+        guard let pdfView else {
+            return
+        }
+
+        currentPage = pdfView.currentPage
+
+        // Disable popup menu
+        pdfView.disableMenuInteractions()
+
+        guard let page = pdfView.currentPage else {
+            print("[ReaderViewModel] pdfPageChanged: No page")
+            return
+        }
+
+        currentTocItem = getPDFCurrentTocItem(from: page)
+        setPDFCurrentLabel(from: page)
+
+        pdfRelocated.send(page)
+    }
+
+    func selectionDidChange() {
+        selectionChanged.send(nil)
+    }
+
     private var currentSectionHolder = ""
     private var ebookToc: [BookTocItem]?
     private var currentTocItemHolder: BookTocItem?
@@ -298,7 +318,7 @@ extension ReaderViewModel {
         }
     }
 
-    func getPDFCurrentTocItem(from: PDFPage) -> BookTocItem? {
+    private func getPDFCurrentTocItem(from: PDFPage) -> BookTocItem? {
         guard let toc else {
             return nil
         }
@@ -316,10 +336,12 @@ extension ReaderViewModel {
         return first
     }
 
-    func getEBookCurrentTocItem() -> BookTocItem {
+    private func getEBookCurrentTocItem() -> BookTocItem {
         return BookTocItem(depth: relocateDetails?.tocItem?.depth ?? 0, label: relocateDetails?.tocItem?.label, href: relocateDetails?.tocItem?.href, chapterId: relocateDetails?.tocItem?.id)
     }
+}
 
+extension ReaderViewModel {
     func setPDFCurrentLabel(from page: PDFPage) {
         let first = toc?.first { tocItem in
             tocItem.outline?.destination?.page?.pageRef?.pageNumber == page.pageRef?.pageNumber
@@ -337,9 +359,7 @@ extension ReaderViewModel {
     func setEBookCurrentLabel() {
         currentLabel = relocateDetails?.tocItem?.label ?? ""
     }
-}
 
-extension ReaderViewModel {
     func setLoading(_ loading: Bool) {
         isLoading = loading
     }
@@ -355,99 +375,19 @@ extension ReaderViewModel {
     func setReaderThemeBackground(_ background: ThemeBackground) {
         theme.bg = background
     }
-
-    /// got to cfi in book or pageIndex in pdf, can only be one or the other
-    func goTo(cfi: String? = nil, pageIndex: Int? = nil) {
-        if isPDF, let index = pageIndex {
-            guard let pdfDocument else {
-                print("[READERVIEWMODEL] goTo: no pdfDocument")
-                return
-            }
-
-            guard let pdfView else {
-                print("[READERVIEWMODEL] goTo: no pdfView")
-                return
-            }
-
-            if let page = pdfDocument.page(at: index) {
-                pdfView.go(to: page)
-            }
-        } else if let cfi {
-            guard let webView else {
-                print("[READERVIEWMODEL] goTo: webView not intiliazed")
-                return
-            }
-
-            let setPositionScript = """
-                   globalReader?.view.goTo("\(cfi)")
-            """
-
-            webView.evaluateJavaScript(setPositionScript) { _, _ in }
-        } else {
-            print("[READERVIEWMODEL] goTo: Going nowhere")
-        }
-    }
 }
 
 extension ReaderViewModel {
-    func pdfPageChanged() {
-        guard let pdfView else {
-            return
-        }
-
-        currentPage = pdfView.currentPage
-
-        // Disable popup menu
-        pdfView.disableMenuInteractions()
-
-        guard let page = pdfView.currentPage else {
-            print("[READERVIEWMODEL] pdfPageChanged: No page")
-            return
-        }
-
-        currentTocItem = getPDFCurrentTocItem(from: page)
-        setPDFCurrentLabel(from: page)
-
-        pdfRelocated.send(page)
-    }
-
-    func addHighlightToPages(highlight: [HighlightPage]) {
-        highlight.forEach { highlightPageLocation in
-            guard let highlightPage = self.pdfDocument?.page(at: highlightPageLocation.page - 1) else { return }
-
-            highlightPageLocation.ranges.forEach { highlightPageRange in
-                guard let highlightSelection = self.pdfDocument?.selection(from: highlightPage, atCharacterIndex: highlightPageRange.lowerBound, to: highlightPage, atCharacterIndex: highlightPageRange.upperBound)
-                else { return }
-
-                highlightSelection.selectionsByLine().forEach { hightlightSelectionByLine in
-                    let annotation = PDFAnnotation(
-                        bounds: hightlightSelectionByLine.bounds(for: highlightPage),
-                        forType: .highlight,
-                        withProperties: nil
-                    )
-
-                    annotation.endLineStyle = .square
-                    annotation.color = UIColor.yellow.withAlphaComponent(1)
-                    highlightPage.addAnnotation(annotation)
-
-                    self.pdfView?.clearSelection()
-                }
-            }
-        }
-    }
-
-    func selectionDidChange() {
-        selectionChanged.send(nil)
-    }
-
     // pdf - https://github.com/drearycold/YetAnotherEBookReader/blob/main/YetAnotherEBookReader/Views/PDFView/YabrPDFView.swift#L453
     func highlightSelection() {
         if isPDF {
             guard let pdfView else {
+                print("[ReaderViewModel] highlightSelection: no pdf view")
                 return
             }
 
             guard let currentSelection = pdfView.currentSelection else {
+                print("[ReaderViewModel] highlightSelection: no selection")
                 return
             }
 
@@ -473,6 +413,7 @@ extension ReaderViewModel {
 
         } else {
             guard let webView else {
+                print("[ReaderViewModel] highlightSelection: no webview")
                 return
             }
             // TODO: make into a function inside the reader
@@ -515,7 +456,7 @@ extension ReaderViewModel {
                     }
 
                 case .failure(let error):
-                    print("EBOOK highlightSelection error: \(error.localizedDescription)")
+                    print("[ReaderViewModel] highlightSelection error: \(error.localizedDescription)")
                 }
 
                 self.clearWebViewSelection()
@@ -526,7 +467,7 @@ extension ReaderViewModel {
     func copySelection() {
         if isPDF {
             guard let pdfView else {
-                print("NO PDF VIEW")
+                print("[ReaderViewModel] NO PDF VIEW")
                 return
             }
 
@@ -549,7 +490,7 @@ extension ReaderViewModel {
                 }
 
                 if let error {
-                    print(error)
+                    print("[ReaderViewModel] copySelection: \(error)")
                 }
             })
         }
@@ -568,7 +509,7 @@ extension ReaderViewModel {
 }
 
 extension ReaderViewModel {
-    func getPdfToc() -> [BookTocItem]? {
+    private func getPdfToc() -> [BookTocItem]? {
         guard let pdfDocument else {
             return nil
         }
@@ -593,9 +534,9 @@ extension ReaderViewModel {
         return toc
     }
 
-    func setEbookToc() {
+    private func setEbookToc() {
         guard let webView else {
-            print("[READERVIEWMODEL] setEbookToc: NO WEBVIEW ")
+            print("[ReaderViewModel] setEbookToc: NO WEBVIEW ")
             return
         }
 
@@ -638,14 +579,74 @@ extension ReaderViewModel {
                         }
 
                     } catch {
-                        print("[READERVIEWMODEL] setEbookToc: Failed to decode: \(error.localizedDescription)")
+                        print("[ReaderViewModel] setEbookToc: Failed to decode: \(error.localizedDescription)")
                     }
                 }
             }
 
             if let error {
-                print("[READERVIEWMODEL] setEbookToc: \(error.localizedDescription)")
+                print("[ReaderViewModel] setEbookToc: \(error.localizedDescription)")
             }
+        }
+    }
+}
+
+// non private
+extension ReaderViewModel {
+    func addHighlightToPages(highlight: [HighlightPage]) {
+        highlight.forEach { highlightPageLocation in
+            guard let highlightPage = self.pdfDocument?.page(at: highlightPageLocation.page - 1) else { return }
+
+            highlightPageLocation.ranges.forEach { highlightPageRange in
+                guard let highlightSelection = self.pdfDocument?.selection(from: highlightPage, atCharacterIndex: highlightPageRange.lowerBound, to: highlightPage, atCharacterIndex: highlightPageRange.upperBound)
+                else { return }
+
+                highlightSelection.selectionsByLine().forEach { hightlightSelectionByLine in
+                    let annotation = PDFAnnotation(
+                        bounds: hightlightSelectionByLine.bounds(for: highlightPage),
+                        forType: .highlight,
+                        withProperties: nil
+                    )
+
+                    annotation.endLineStyle = .square
+                    annotation.color = UIColor.yellow.withAlphaComponent(1)
+                    highlightPage.addAnnotation(annotation)
+
+                    self.pdfView?.clearSelection()
+                }
+            }
+        }
+    }
+
+    /// got to cfi in book or pageIndex in pdf, can only be one or the other
+    func goTo(cfi: String? = nil, pageIndex: Int? = nil) {
+        if isPDF, let index = pageIndex {
+            guard let pdfDocument else {
+                print("[READERVIEWMODEL] goTo: no pdfDocument")
+                return
+            }
+
+            guard let pdfView else {
+                print("[READERVIEWMODEL] goTo: no pdfView")
+                return
+            }
+
+            if let page = pdfDocument.page(at: index) {
+                pdfView.go(to: page)
+            }
+        } else if let cfi {
+            guard let webView else {
+                print("[READERVIEWMODEL] goTo: webView not intiliazed")
+                return
+            }
+
+            let setPositionScript = """
+                   globalReader?.view.goTo("\(cfi)")
+            """
+
+            webView.evaluateJavaScript(setPositionScript) { _, _ in }
+        } else {
+            print("[READERVIEWMODEL] goTo: Going nowhere")
         }
     }
 
@@ -654,5 +655,42 @@ extension ReaderViewModel {
         let pdfSelected = isPDF && item.outline?.hashValue == currentTocItem?.outline?.hashValue
 
         return selected || pdfSelected
+    }
+
+    func hasSelection() async throws -> Bool {
+        return try await withCheckedThrowingContinuation {
+            (continuation: CheckedContinuation<Bool, Error>) in
+            guard let webView = self.webView else {
+                print("[READERVIEWMODEL] hasSelection: no webView")
+                continuation.resume(returning: false)
+                return
+            }
+
+            let script = """
+            function test() {
+            const sel = globalReader?.doc?.getSelection();
+              if (!sel.rangeCount) return false;
+              const range = sel.getRangeAt(0);
+              if (range.collapsed) return false;
+              return true;
+            }
+
+            !!test();
+            """
+
+            DispatchQueue.main.async {
+                webView.evaluateJavaScript(script, completionHandler: { success, error in
+                    if let success {
+                        if success as! Bool == true {
+                            continuation.resume(returning: true)
+                        }
+                    }
+
+                    if let error {
+                        continuation.resume(returning: false)
+                    }
+                })
+            }
+        }
     }
 }
