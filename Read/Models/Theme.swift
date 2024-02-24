@@ -72,7 +72,7 @@ enum ThemeForeground: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-class Theme: Codable {
+struct Theme: Codable {
     // MARK: Layout
 
     static let saveKey = "ReaderTheme"
@@ -97,31 +97,31 @@ class Theme: Codable {
 
     // TODO: SET MINIMUM AND MAXIMUM VALUES
 
-    func increaseFontSize() {
+    mutating func increaseFontSize() {
         fontSize += 2
     }
 
-    func decreaseFontSize() {
+    mutating func decreaseFontSize() {
         fontSize -= 2
     }
 
-    func increaseGap() {
+    mutating func increaseGap() {
         gap += 0.01
     }
 
-    func decreaseGap() {
+    mutating func decreaseGap() {
         gap -= 0.01
     }
 
-    func increaseBlockSize() {
+    mutating func increaseBlockSize() {
         maxBlockSize += 50
     }
 
-    func decreaseBlockSize() {
+    mutating func decreaseBlockSize() {
         maxBlockSize -= 50
     }
 
-    func setMaxColumnCount(_ count: Int) {
+    mutating func setMaxColumnCount(_ count: Int) {
         maxColumnCount = count
     }
 

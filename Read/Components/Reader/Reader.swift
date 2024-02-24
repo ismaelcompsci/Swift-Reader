@@ -68,7 +68,6 @@ struct Reader: View {
             } else {
                 PDFKitView(viewModel: viewModel)
                     .onAppear {
-                        viewModel.currentPage = viewModel.pdfView?.currentPage
                         viewModel.setLoading(true)
                         
                         // TODO: Change to method in viewModel on pdf start
@@ -100,15 +99,22 @@ struct Reader: View {
                         Task {
                             try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
                             viewModel.setLoading(false)
+                            viewModel.currentPage = viewModel.pdfView?.currentPage
+                            
+                            guard let page = viewModel.currentPage else {
+                                return
+                            }
+                            
+                            viewModel.setPDFCurrentLabel(from: page)
                         }
                     }
             }
             
             // MARK: Reader Menu
             
-            if showOverlay {
-                ReaderOverlay(book: book, viewModel: viewModel)
-            }
+//            if showOverlay {
+                ReaderOverlay(book: book, viewModel: viewModel, showOverlay: $showOverlay)
+//            }
             
             if showContextMenu && contextMenuPosition != .zero {
                 ReaderContextMenu(viewModel: viewModel, showContextMenu: $showContextMenu, position: contextMenuPosition)
@@ -120,9 +126,10 @@ struct Reader: View {
                 ZStack {
                     Color.black
                     ProgressView()
+                        .controlSize(.regular)
                 }
                 .transition(.slide)
-                .animation(.easeInOut(duration: 2), value: viewModel.isLoading)
+                .animation(.easeInOut(duration: 1), value: viewModel.isLoading)
                 .zIndex(1)
             }
         }
@@ -164,7 +171,7 @@ struct Reader: View {
         let (text, locations, cfi, index, label) = highlight
         
         if viewModel.isPDF, let bookRealm = book.realm?.thaw(), let locations {
-            let label = viewModel.pdfCurrentLabel
+            let label = viewModel.currentLabel
 
             guard let thawedBook = book.thaw() else {
                 print("Unable to thaw book")

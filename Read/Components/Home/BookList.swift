@@ -15,16 +15,24 @@ struct BookList: View {
 
     var body: some View {
         ForEach(sortedBooks) { book in
+            let image = getBookCover(path: book.coverPath)
+
             VStack {
                 NavigationLink(destination: {
                     BookDetailView(book: book)
                 }) {
                     HStack {
-                        Image(uiImage: getBookCover(path: book.coverPath) ?? UIImage())
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 34.5, height: 52)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        if let image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 34.5, height: 52)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                        } else {
+                            Image(systemName: "book.pages.fill")
+                                .resizable()
+                                .frame(width: 34.5, height: 52)
+                        }
 
                         VStack(alignment: .leading) {
                             Text(book.title)

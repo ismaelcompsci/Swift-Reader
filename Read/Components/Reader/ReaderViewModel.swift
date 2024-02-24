@@ -64,6 +64,9 @@ class ReaderViewModel: ObservableObject {
     let initialEBookPosition: String?
     let initialPDFPosition: Int?
 
+    @Published var currentTocItem: BookTocItem? = nil
+    @Published var currentLabel: String = ""
+
     @Published var showSettingsSheet = false
     @Published var showContentSheet = false
 
@@ -92,7 +95,7 @@ class ReaderViewModel: ObservableObject {
     /// 0 text, 1 pdfHighlight, 2 cfi,  3 index, 4 label
     var highlighted = PassthroughSubject<(String, [HighlightPage]?, String?, Int?, String?), Never>()
 
-    var relocateDetails: Relocate? = nil
+    @Published var relocateDetails: Relocate? = nil
 
     init(url: URL, isPDF: Bool = false, cfi: String? = nil, pdfPageNumber: Int? = nil) {
         self.url = url
@@ -192,7 +195,10 @@ class ReaderViewModel: ObservableObject {
 
                 Task {
                     try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
-                    self.doneWithInitalLoading = true
+
+                    DispatchQueue.main.async {
+                        self.doneWithInitalLoading = true
+                    }
                 }
             }
         case .tapHandler:
@@ -219,8 +225,10 @@ class ReaderViewModel: ObservableObject {
             if let jsonData = try? JSONSerialization.data(withJSONObject: message),
                let relocateDetails = try? JSONDecoder().decode(Relocate.self, from: jsonData)
             {
-                bookRelocated.send(relocateDetails)
                 setRelocateDetails(relocateDetails)
+                currentTocItem = getEBookCurrentTocItem()
+                setEBookCurrentLabel()
+                bookRelocated.send(relocateDetails)
             }
         case .didTapHighlight:
             print(message)
@@ -281,8 +289,6 @@ class ReaderViewModel: ObservableObject {
     private var currentTocItemHolder: BookTocItem?
 }
 
-// MARK: Computed Values
-
 extension ReaderViewModel {
     var toc: [BookTocItem]? {
         if isPDF {
@@ -292,51 +298,44 @@ extension ReaderViewModel {
         }
     }
 
-    var currentTocItem: BookTocItem? {
+    func getPDFCurrentTocItem(from: PDFPage) -> BookTocItem? {
         guard let toc else {
             return nil
         }
 
-        if isPDF {
-            let first = toc.last { tocItem in
-                tocItem.outline?.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
-            }
-
-            if first == nil {
-                return currentTocItemHolder
-            }
-
-            currentTocItemHolder = first
-
-            return first
-        } else {
-            return BookTocItem(depth: relocateDetails?.tocItem?.depth ?? 0, label: relocateDetails?.tocItem?.label, href: relocateDetails?.tocItem?.href, chapterId: relocateDetails?.tocItem?.id)
-        }
-    }
-
-    var currentLabel: String {
-        if isPDF {
-            pdfCurrentLabel
-        } else {
-            ebookCurrentLabel
-        }
-    }
-
-    var pdfCurrentLabel: String {
-        let first = toc?.first { tocItem in
-            tocItem.outline?.destination?.page?.pageRef?.pageNumber == currentPage?.pageRef?.pageNumber
+        let first = toc.last { tocItem in
+            tocItem.outline?.destination?.page?.pageRef?.pageNumber == from.pageRef?.pageNumber
         }
 
         if first == nil {
-            return currentSectionHolder
+            return currentTocItemHolder
+        }
+
+        currentTocItemHolder = first
+
+        return first
+    }
+
+    func getEBookCurrentTocItem() -> BookTocItem {
+        return BookTocItem(depth: relocateDetails?.tocItem?.depth ?? 0, label: relocateDetails?.tocItem?.label, href: relocateDetails?.tocItem?.href, chapterId: relocateDetails?.tocItem?.id)
+    }
+
+    func setPDFCurrentLabel(from page: PDFPage) {
+        let first = toc?.first { tocItem in
+            tocItem.outline?.destination?.page?.pageRef?.pageNumber == page.pageRef?.pageNumber
+        }
+
+        if first == nil {
+            currentLabel = currentSectionHolder
+            return
         }
 
         currentSectionHolder = first?.outline?.label ?? ""
-        return first?.outline?.label ?? ""
+        currentLabel = first?.outline?.label ?? ""
     }
 
-    var ebookCurrentLabel: String {
-        relocateDetails?.tocItem?.label ?? ""
+    func setEBookCurrentLabel() {
+        currentLabel = relocateDetails?.tocItem?.label ?? ""
     }
 }
 
@@ -405,6 +404,9 @@ extension ReaderViewModel {
             print("[READERVIEWMODEL] pdfPageChanged: No page")
             return
         }
+
+        currentTocItem = getPDFCurrentTocItem(from: page)
+        setPDFCurrentLabel(from: page)
 
         pdfRelocated.send(page)
     }

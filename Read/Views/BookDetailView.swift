@@ -29,9 +29,17 @@ struct BookDetailView: View {
                     coordinateSpace: CoordinateSpaces.scrollView,
                     defaultHeight: 620
                 ) {
-                    Image(uiImage: getBookCover(path: book.coverPath) ?? UIImage())
-                        .resizable()
-                        .scaledToFill()
+                    let image = getBookCover(path: book.coverPath)
+                    
+                    if let image {
+                        Image(uiImage: getBookCover(path: book.coverPath) ?? UIImage())
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        Image(systemName: "book.pages.fill")
+                            .resizable()
+                            .scaledToFill()
+                    }
                 }
                 
                 VStack {

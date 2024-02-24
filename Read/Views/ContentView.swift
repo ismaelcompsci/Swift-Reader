@@ -112,11 +112,19 @@ struct ContentView: View {
                         .font(.system(size: 20))
                         .foregroundStyle(libraryDisplayMode == .grid ? Color.accent : .white)
                     }
-
-                    LibrarySortPopover(selectedSortKey: $librarySortKey, selectedSortOrder: $librarySortOrder)
-                        .padding(.vertical, 8)
+                    HStack {
+                        if books.count > 0 {
+                            Text("Books: \(books.count)")
+                                .font(.subheadline)
+                                .foregroundStyle(.gray)
+                        }
+                        LibrarySortPopover(selectedSortKey: $librarySortKey, selectedSortOrder: $librarySortOrder)
+                            .padding(.vertical, 8)
+                    }
 
                     if books.count == 0 {
+                        // MARK: EMPTY VIEW
+
                         ContentUnavailableView(label: {
                             Label("No Books", systemImage: "plus.circle.fill")
                         }) {

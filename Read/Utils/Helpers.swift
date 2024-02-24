@@ -133,9 +133,10 @@ func getBookCover(path imagePath: String?) -> UIImage? {
             return image
         }
 
-        return UIImage(named: "default")
+        return /* UIImage(named: "default") */ nil
     } else {
-        return UIImage(named: "default")
+//        return UIImage(named: "default")
+        return nil
     }
 }
 

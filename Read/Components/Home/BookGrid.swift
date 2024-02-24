@@ -23,20 +23,30 @@ struct BookGrid: View {
             spacing: 8
         ) {
             ForEach(sortedBooks) { book in
-                let image = getBookCover(path: book.coverPath) ?? UIImage()
+                let image = getBookCover(path: book.coverPath)
+
                 NavigationLink(destination: BookDetailView(book: book)) {
                     VStack {
                         ZStack {
-                            Image(uiImage: image)
-                                .resizable()
-                                .blur(radius: 8, opaque: true)
-                                .frame(width: bookWidth, height: bookHeight)
-                                .aspectRatio(contentMode: .fill)
+                            if let image {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .blur(radius: 8, opaque: true)
+                                    .frame(width: bookWidth, height: bookHeight)
+                                    .aspectRatio(contentMode: .fill)
 
-                            Image(uiImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: bookWidth, height: bookHeight)
+                            } else {
+                                VStack {
+                                    Image(systemName: "book.pages.fill")
+                                        .resizable()
+                                        .frame(width: bookWidth / 2, height: bookHeight / 2)
+                                }
                                 .frame(width: bookWidth, height: bookHeight)
+                            }
                         }
                         .cornerRadius(6)
                         .overlay {
