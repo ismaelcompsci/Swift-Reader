@@ -21,6 +21,8 @@ enum LibrarySortOrder: String {
 }
 
 struct LibrarySortPopover: View {
+    @EnvironmentObject var appColor: AppColor
+
     @State var sortPopoverShowing = false
 
     @Binding var selectedSortKey: LibrarySortKeys
@@ -81,7 +83,7 @@ struct LibrarySortPopover: View {
                          .presentationCompactAdaptation(.popover)
 
                      })
-            .foregroundStyle(Color.accent)
+            .foregroundStyle(appColor.accent)
         }
     }
 }

@@ -26,7 +26,6 @@
 		9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */; };
 		9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954B12B6DD11C009FC2F1 /* LibrarySortPopover.swift */; };
 		9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */; };
-		9F5954BB2B6F4379009FC2F1 /* ParallaxHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954BA2B6F4379009FC2F1 /* ParallaxHeader.swift */; };
 		9F5AADEF2B82CA1400712230 /* MockRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5AADEE2B82CA1400712230 /* MockRealm.swift */; };
 		9F5AADF22B82CB6D00712230 /* BookGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5AADF12B82CB6D00712230 /* BookGrid.swift */; };
 		9F5AADF42B82CB9D00712230 /* BookList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5AADF32B82CB9D00712230 /* BookList.swift */; };
@@ -42,6 +41,7 @@
 		9FA902E22B7E17A6009B3B78 /* ReaderContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA902E12B7E17A6009B3B78 /* ReaderContextMenu.swift */; };
 		9FA902E62B7EC92D009B3B78 /* ReaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA902E52B7EC92D009B3B78 /* ReaderViewModel.swift */; };
 		9FA902E82B7F0C65009B3B78 /* Reader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA902E72B7F0C65009B3B78 /* Reader.swift */; };
+		9FB62D832B8D841F00A10EF5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB62D822B8D841F00A10EF5 /* SettingsView.swift */; };
 		9FC596452B86A30800ED3734 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596322B86A30700ED3734 /* Poppins-ExtraLight.ttf */; };
 		9FC596462B86A30800ED3734 /* Poppins-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596332B86A30700ED3734 /* Poppins-ThinItalic.ttf */; };
 		9FC596472B86A30800ED3734 /* Poppins-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596342B86A30700ED3734 /* Poppins-ExtraLightItalic.ttf */; };
@@ -94,7 +94,6 @@
 		9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9F5954B12B6DD11C009FC2F1 /* LibrarySortPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySortPopover.swift; sourceTree = "<group>"; };
 		9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
-		9F5954BA2B6F4379009FC2F1 /* ParallaxHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxHeader.swift; sourceTree = "<group>"; };
 		9F5AADEE2B82CA1400712230 /* MockRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRealm.swift; sourceTree = "<group>"; };
 		9F5AADF12B82CB6D00712230 /* BookGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookGrid.swift; sourceTree = "<group>"; };
 		9F5AADF32B82CB9D00712230 /* BookList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookList.swift; sourceTree = "<group>"; };
@@ -110,6 +109,7 @@
 		9FA902E12B7E17A6009B3B78 /* ReaderContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderContextMenu.swift; sourceTree = "<group>"; };
 		9FA902E52B7EC92D009B3B78 /* ReaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderViewModel.swift; sourceTree = "<group>"; };
 		9FA902E72B7F0C65009B3B78 /* Reader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reader.swift; sourceTree = "<group>"; };
+		9FB62D822B8D841F00A10EF5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9FC596322B86A30700ED3734 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		9FC596332B86A30700ED3734 /* Poppins-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ThinItalic.ttf"; sourceTree = "<group>"; };
 		9FC596342B86A30700ED3734 /* Poppins-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
@@ -174,7 +174,6 @@
 			children = (
 				9F5AADF02B82CB5E00712230 /* Home */,
 				9F5954B12B6DD11C009FC2F1 /* LibrarySortPopover.swift */,
-				9F5954BA2B6F4379009FC2F1 /* ParallaxHeader.swift */,
 				9FF92A8C2B788C9400025405 /* PieProgress.swift */,
 				9F86C52A2B89B24300DB61A6 /* BookCover.swift */,
 				9F86C52C2B89B3F300DB61A6 /* SearchBar.swift */,
@@ -253,6 +252,7 @@
 				9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */,
 				9F608E912B65E29000D2B5F4 /* UploadFileView.swift */,
 				9F14FBF42B8AB845001CA119 /* Test.swift */,
+				9FB62D822B8D841F00A10EF5 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -456,8 +456,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FB62D832B8D841F00A10EF5 /* SettingsView.swift in Sources */,
 				9F559B0E2B68F9C000B147D9 /* Helpers.swift in Sources */,
-				9F5954BB2B6F4379009FC2F1 /* ParallaxHeader.swift in Sources */,
 				9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */,
 				9F0CA8BC2B8021E300C02675 /* ReaderContent.swift in Sources */,
 				9FA902E22B7E17A6009B3B78 /* ReaderContextMenu.swift in Sources */,

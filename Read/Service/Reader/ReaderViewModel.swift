@@ -54,8 +54,6 @@ struct BookTocItem: Identifiable {
     Book files must be written to documents directory
  */
 class ReaderViewModel: ObservableObject {
-    // END TESTING
-
     let url: URL
     let isPDF: Bool
 
@@ -597,7 +595,6 @@ extension ReaderViewModel {
     }
 }
 
-// non private
 extension ReaderViewModel {
     func addHighlightToPages(highlight: [HighlightPage]) {
         highlight.forEach { highlightPageLocation in
@@ -692,7 +689,6 @@ extension ReaderViewModel {
                     } else if let success = result as? Bool {
                         continuation.resume(returning: success)
                     } else {
-                        // Unexpected result type
                         let unexpectedError = NSError(domain: "YourDomain", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unexpected result type"])
                         continuation.resume(throwing: unexpectedError)
                     }

@@ -13,8 +13,25 @@ enum LibraryDisplayMode: String, Codable {
     case list
 }
 
+class SearchViewModel: ObservableObject {
+    @Published var searchText = ""
+    @Published var debouncedSearchText = ""
+
+    init() {
+        debouncedSearchText = searchText
+
+        $searchText
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .assign(to: &$debouncedSearchText)
+    }
+}
+
 struct ContentView: View {
     @ObservedResults(Book.self) var books
+
+    @EnvironmentObject var appColor: AppColor
+
+    @StateObject var searchViewModel = SearchViewModel()
 
     @State var showUploadFileView: Bool = false
     @State var searchText = ""
@@ -24,7 +41,7 @@ struct ContentView: View {
     @AppStorage("LibraryDisplayMode") var libraryDisplayMode: LibraryDisplayMode = .list
 
     var sortedBooks: [Book] {
-        if searchText.isEmpty {
+        if searchViewModel.debouncedSearchText.isEmpty {
             return books.sorted { lhs, rhs in
                 switch librarySortKey {
                 case .title:
@@ -60,7 +77,7 @@ struct ContentView: View {
                 }
             }
         } else {
-            return books.filter { $0.title.lowercased().contains(searchText.lowercased()) }
+            return books.filter { $0.title.lowercased().contains(searchViewModel.debouncedSearchText.lowercased()) }
         }
     }
 
@@ -71,29 +88,33 @@ struct ContentView: View {
                     HStack {
                         // MARK: Search Bar
 
-                        SearchBar(placeholderText: "Search for book...", searchText: $searchText)
+                        SearchBar(placeholderText: "Search for book...", searchText: $searchViewModel.searchText)
+                            .onReceive(searchViewModel.$searchText, perform: { text in
+                                // force update on debounce if text is empty
+                                if text.isEmpty {
+                                    searchViewModel.debouncedSearchText = ""
+                                }
+                            })
 
                         // MARK: Display Buttons
 
                         Button {
-                            withAnimation {
-                                libraryDisplayMode = .list
-                            }
+                            libraryDisplayMode = .list
+
                         } label: {
                             Image(systemName: "list.bullet")
                         }
                         .font(.system(size: 20))
-                        .foregroundStyle(libraryDisplayMode == .list ? Color.accent : .white)
+                        .foregroundStyle(libraryDisplayMode == .list ? appColor.accent : .white)
 
                         Button {
-                            withAnimation {
-                                libraryDisplayMode = .grid
-                            }
+                            libraryDisplayMode = .grid
+
                         } label: {
                             Image(systemName: "square.grid.2x2")
                         }
                         .font(.system(size: 20))
-                        .foregroundStyle(libraryDisplayMode == .grid ? Color.accent : .white)
+                        .foregroundStyle(libraryDisplayMode == .grid ? appColor.accent : .white)
                     }
 
                     HStack {
@@ -121,13 +142,14 @@ struct ContentView: View {
                                 Text("Get started")
                             }
                         }
-                        .tint(Color.accent)
+                        .tint(appColor.accent)
                     } else {
-                        if libraryDisplayMode == .list {
-                            BookList(sortedBooks: sortedBooks)
-
-                        } else {
+                        switch libraryDisplayMode {
+                        case .grid:
                             BookGrid(sortedBooks: sortedBooks)
+
+                        case .list:
+                            BookList(sortedBooks: sortedBooks)
                         }
                     }
                 }
@@ -139,12 +161,21 @@ struct ContentView: View {
                     .interactiveDismissDisabled()
             })
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink(destination: {
+                        SettingsView()
+                    }, label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundStyle(appColor.accent)
+                    })
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         self.showUploadFileView = true
                     } label: {
                         Image(systemName: "plus.circle.fill")
-                            .foregroundStyle(Color.accent)
+                            .foregroundStyle(appColor.accent)
                     }
                 }
             }
@@ -158,4 +189,6 @@ struct ContentView: View {
     ContentView()
         .preferredColorScheme(.dark)
         .environment(\.font, Font.custom("Poppins-Regular", size: 16))
+        .environmentObject(AppColor())
+        .environmentObject(OrientationInfo())
 }

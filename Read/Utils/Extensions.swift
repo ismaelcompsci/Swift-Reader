@@ -101,10 +101,26 @@ extension Color {
     }
 }
 
+// https://stackoverflow.com/a/68989580
+extension UIApplication {
+    var keyWindow: UIWindow? {
+        // Get connected scenes
+        return self.connectedScenes
+            // Keep only active scenes, onscreen and visible to the user
+            .filter { $0.activationState == .foregroundActive }
+            // Keep only the first `UIWindowScene`
+            .first(where: { $0 is UIWindowScene })
+            // Get its associated windows
+            .flatMap { $0 as? UIWindowScene }?.windows
+            // Finally, keep only the key window
+            .first(where: \.isKeyWindow)
+    }
+}
+
 // https://stackoverflow.com/a/66880368
 private struct SafeAreaInsetsKey: EnvironmentKey {
     static var defaultValue: EdgeInsets {
-        (UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.safeAreaInsets ?? .zero).insets
+        (UIApplication.shared.keyWindow?.safeAreaInsets ?? .zero).insets
     }
 }
 
@@ -158,4 +174,3 @@ extension UIView {
         }
     }
 }
-

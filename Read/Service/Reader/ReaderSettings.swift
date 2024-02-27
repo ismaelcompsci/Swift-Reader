@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ReaderSettings: View {
+    @EnvironmentObject var appColor: AppColor
     @StateObject var viewModel: ReaderViewModel
 
     var body: some View {
@@ -18,7 +19,7 @@ struct ReaderSettings: View {
                 Button("Done") {
                     viewModel.showSettingsSheet.toggle()
                 }
-                .foregroundStyle(Color.accent)
+                .foregroundStyle(appColor.accent)
             }
 
             VStack(alignment: .center) {
@@ -42,8 +43,8 @@ struct ReaderSettings: View {
                             
                             if themeBg == viewModel.theme.bg {
                                 Circle()
-                                    .stroke(Color.accent)
-                                    .fill(Color.accent)
+                                    .stroke(appColor.accent)
+                                    .fill(appColor.accent)
                                     .frame(width: 8, height: 8)
                                     .offset(x: -14, y: -18)
                             }
@@ -132,7 +133,7 @@ struct ReaderSettings: View {
                         } label: {
                             Image(systemName: "square")
                                 .font(.system(size: 24))
-                                .foregroundStyle(viewModel.theme.maxColumnCount == 1 ? Color.accent : .white)
+                                .foregroundStyle(viewModel.theme.maxColumnCount == 1 ? appColor.accent : .white)
                         }
                         
                         Divider()
@@ -144,7 +145,7 @@ struct ReaderSettings: View {
                         } label: {
                             Image(systemName: "square.split.2x1")
                                 .font(.system(size: 24))
-                                .foregroundStyle(viewModel.theme.maxColumnCount == 2 ? Color.accent : .white)
+                                .foregroundStyle(viewModel.theme.maxColumnCount == 2 ? appColor.accent : .white)
                         }
                     }
                     .foregroundStyle(.white)

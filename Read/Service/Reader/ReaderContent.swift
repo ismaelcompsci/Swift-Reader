@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ReaderContent: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var appColor: AppColor
     @StateObject var viewModel: ReaderViewModel
 
     var body: some View {
@@ -22,7 +23,7 @@ struct ReaderContent: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundStyle(Color.accent)
+                    .foregroundStyle(appColor.accent)
                 }
                 .padding(.horizontal)
                 .padding(.vertical)
@@ -53,7 +54,7 @@ struct ReaderContent: View {
                                 
                                 Image(systemName: "chevron.right")
                             }
-                            .foregroundStyle(selected ? Color.accent : .white)
+                            .foregroundStyle(selected ? appColor.accent : .white)
                             .fontWeight(tocItem.depth == 0 ? .semibold : .light)
                         }
                         .padding(.leading, CGFloat(tocItem.depth) * 10)

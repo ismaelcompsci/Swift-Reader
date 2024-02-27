@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SearchBar: View {
+    @EnvironmentObject var appColor: AppColor
+
     var placeholderText: String?
 
     @Binding var searchText: String
@@ -15,7 +17,7 @@ struct SearchBar: View {
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(Color.accent)
+                .foregroundStyle(appColor.accent)
             TextField(placeholderText ?? "", text: $searchText)
 
             if !searchText.isEmpty {
@@ -25,7 +27,7 @@ struct SearchBar: View {
                     }
                 } label: {
                     Image(systemName: "multiply.circle.fill")
-                        .foregroundStyle(Color.accent)
+                        .foregroundStyle(appColor.accent)
                 }
             }
         }

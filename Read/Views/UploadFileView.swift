@@ -11,6 +11,7 @@ import WrappingHStack
 
 struct UploadFileView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var appColor: AppColor
 
     @ObservedResults(Book.self) var books
 
@@ -40,7 +41,7 @@ struct UploadFileView: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 24))
-                        .foregroundStyle(Color.accent.opacity(0.7))
+                        .foregroundStyle(appColor.accent.opacity(0.7))
                 }
             }
 
@@ -97,7 +98,7 @@ struct UploadFileView: View {
                         ProgressView()
                             .padding()
                             .foregroundStyle(.white)
-                            .tint(Color.accent)
+                            .tint(appColor.accent)
                             .background(.black)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
 
@@ -106,7 +107,7 @@ struct UploadFileView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 10)
                             .foregroundStyle(.white)
-                            .background(Color.accent)
+                            .background(appColor.accent)
                             .clipShape(.capsule)
                     }
                 }
@@ -118,7 +119,7 @@ struct UploadFileView: View {
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 24)
-                        .strokeBorder(Color.accent, style: StrokeStyle(lineWidth: 1, dash: [5]))
+                        .strokeBorder(appColor.accent, style: StrokeStyle(lineWidth: 1, dash: [5]))
                         .opacity(0.5)
                         .zIndex(10)
 
@@ -150,7 +151,7 @@ struct UploadFileView: View {
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 10)
                                 .foregroundStyle(.white)
-                                .background(Color.accent)
+                                .background(appColor.accent)
                                 .clipShape(.capsule)
                         }
                         .frame(maxHeight: .infinity, alignment: .top)

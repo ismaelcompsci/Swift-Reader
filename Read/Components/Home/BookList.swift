@@ -13,6 +13,14 @@ struct BookList: View {
     
     var sortedBooks: [Book]
     
+    private var bookWidth: CGFloat {
+        60
+    }
+    
+    private var bookHeight: CGFloat {
+        90
+    }
+    
     var body: some View {
         VStack {
             ForEach(sortedBooks) { book in
@@ -23,38 +31,48 @@ struct BookList: View {
                     }) {
                         HStack {
                             BookCover(coverPath: book.coverPath)
-                                .frame(width: 34.5, height: 52)
+                                .frame(width: bookWidth, height: bookHeight)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                 .overlay {
                                     RoundedRectangle(cornerRadius: 6)
                                         .stroke(.gray, lineWidth: 0.2)
                                 }
-                            
+                                
                             VStack(alignment: .leading) {
                                 Text(book.title)
-                                    .lineLimit(1)
-                                
+                                    .lineLimit(3)
+                                    .font(.title3)
+                                    .multilineTextAlignment(.leading)
+                                    
                                 Text(book.authors.first?.name ?? "Unkown Author")
                                     .font(.subheadline)
                                     .foregroundStyle(.gray)
                                     .lineLimit(1)
-                            }
-                            
-                            if let position = book.readingPosition {
-                                Spacer()
                                 
-                                HStack {
-                                    PieProgress(progress: position.progress ?? 0.0)
-                                        .frame(width: 22)
+                                Spacer()
+                                if let position = book.readingPosition {
+//                                    HStack {
+//                                        PieProgress(progress: position.progress ?? 0.0)
+//                                            .frame(width: 22)
+//
+//                                        Text("\(Int((position.progress ?? 0) * 100))%")
+//                                            .font(.system(size: 10))
+//                                            .foregroundStyle(.gray)
+//                                    }
                                     
-                                    Text("\(Int((position.progress ?? 0) * 100))%")
-                                        .font(.system(size: 10))
+                                    Text("\(Int((position.progress ?? 0) * 100))% last read \(position.updatedAt.formatted(.relative(presentation: .numeric)))")
                                         .foregroundStyle(.gray)
+                                    
+                                } else {
+                                    Text("Added on \(book.addedAt.formatted(date: .abbreviated, time: .omitted))")
+                                        .foregroundStyle(.gray)
+                                        .lineLimit(1)
                                 }
                             }
                         }
+                        .padding(.vertical, 4)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, maxHeight: 61, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.black)
                         .contextMenu {
                             Button("Share", systemImage: "square.and.arrow.up.fill") {

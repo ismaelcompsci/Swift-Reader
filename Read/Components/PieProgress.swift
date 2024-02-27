@@ -37,13 +37,14 @@ struct PieShape: Shape {
 
 struct PieProgress: View {
     var progress: Double
+    @EnvironmentObject var appColor: AppColor
 
     var body: some View {
         Circle()
-            .fill(Color.accent.opacity(0.4))
+            .fill(appColor.accent.opacity(0.4))
             .overlay(
                 PieShape(progress: Double(self.progress))
-                    .foregroundColor(Color.accent.opacity(0.6))
+                    .foregroundColor(appColor.accent.opacity(0.6))
             )
             .frame(maxWidth: .infinity)
             .aspectRatio(contentMode: .fit)

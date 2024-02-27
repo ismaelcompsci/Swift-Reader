@@ -10,6 +10,7 @@ import SwiftUI
 struct ReaderOverlay: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var appColor: AppColor
 
     var book: Book
     @StateObject var viewModel: ReaderViewModel
@@ -40,7 +41,7 @@ struct ReaderOverlay: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .foregroundStyle(Color.accent)
+                            .foregroundStyle(appColor.accent)
                             .font(.system(size: 22))
                     }
                 }
@@ -66,7 +67,7 @@ struct ReaderOverlay: View {
                     }
                     label: {
                         Image(systemName: "list.bullet")
-                            .foregroundStyle(Color.accent)
+                            .foregroundStyle(appColor.accent)
                             .font(.system(size: 22))
                             .frame(width: 48, height: 48)
                     }
@@ -81,7 +82,7 @@ struct ReaderOverlay: View {
                     }
                     label: {
                         Image(systemName: "gearshape")
-                            .foregroundStyle(Color.accent)
+                            .foregroundStyle(appColor.accent)
                             .font(.system(size: 22))
                             .frame(width: 48, height: 48)
                     }

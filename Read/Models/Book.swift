@@ -36,7 +36,7 @@ class Book: Object, ObjectKeyIdentifiable {
 }
 
 extension Book {
-    static let example1 = Book(value: ["title": "The Witcher", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff.", "language": "en"])
+    static let example1 = Book(value: ["title": "The Witcher", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. ", "language": "en"])
     static let example2 = Book(value: ["title": "The Game of Thrones", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff. But again", "language": "en"])
 
     static let exampleArray = [Book.example1, Book.example2]
