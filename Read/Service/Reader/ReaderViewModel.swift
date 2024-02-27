@@ -54,6 +54,8 @@ struct BookTocItem: Identifiable {
     Book files must be written to documents directory
  */
 class ReaderViewModel: ObservableObject {
+    // END TESTING
+
     let url: URL
     let isPDF: Bool
 
@@ -109,6 +111,10 @@ class ReaderViewModel: ObservableObject {
             self.webView = CustomWebView(frame: .zero, configuration: config)
             loadReaderHTML()
         }
+    }
+
+    deinit {
+        print("DE INITINTG THING")
     }
 
     /// Moves html from app bundle to documents, to give the webview permissions to read files
@@ -189,7 +195,7 @@ class ReaderViewModel: ObservableObject {
                 self.setHasRenderedBook(rendered: true)
 
                 Task {
-                    try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
+                    try? await Task.sleep(nanoseconds: 1000000000 / 2)
 
                     DispatchQueue.main.async {
                         self.doneWithInitalLoading = true
@@ -679,15 +685,16 @@ extension ReaderViewModel {
             """
 
             DispatchQueue.main.async {
-                webView.evaluateJavaScript(script, completionHandler: { success, error in
-                    if let success {
-                        if success as! Bool == true {
-                            continuation.resume(returning: true)
-                        }
-                    }
-
-                    if let error {
-                        continuation.resume(returning: false)
+                webView.evaluateJavaScript(script, completionHandler: { result, error in
+                    if let error = error {
+                        print("Error evaluating JavaScript: \(error)")
+                        continuation.resume(throwing: error)
+                    } else if let success = result as? Bool {
+                        continuation.resume(returning: success)
+                    } else {
+                        // Unexpected result type
+                        let unexpectedError = NSError(domain: "YourDomain", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unexpected result type"])
+                        continuation.resume(throwing: unexpectedError)
                     }
                 })
             }

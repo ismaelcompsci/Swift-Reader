@@ -75,22 +75,20 @@ struct UploadFileView: View {
                         }
                     }
                     .onDelete(perform: removeFile)
-
-                    VStack(alignment: .center) {
-                        Text("\(fileUrls.count) files")
-
-                        Text("\(ByteCountFormatter.string(fromByteCount: Int64(totalBytes), countStyle: .file))")
-                            .font(.subheadline)
-                            .foregroundStyle(.gray)
-                    }
-                    .listRowInsets(EdgeInsets())
-                    .frame(maxWidth: .infinity, minHeight: 60)
-                    .background(Color(UIColor.systemGroupedBackground))
                 }
                 .scrollIndicators(ScrollIndicatorVisibility.hidden)
 
                 Spacer()
-                    .frame(maxHeight: 44)
+                    .frame(maxHeight: 24)
+
+                VStack(alignment: .center) {
+                    Text("\(fileUrls.count) files")
+
+                    Text("\(ByteCountFormatter.string(fromByteCount: Int64(totalBytes), countStyle: .file))")
+                        .font(.subheadline)
+                        .foregroundStyle(.gray)
+                }
+                .frame(maxWidth: .infinity)
 
                 Button {
                     processBooks()

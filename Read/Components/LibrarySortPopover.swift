@@ -32,6 +32,7 @@ struct LibrarySortPopover: View {
             Text("Sort By")
             Button {
                 sortPopoverShowing.toggle()
+
             } label: {
                 HStack {
                     Text(selectedSortKey.rawValue)
