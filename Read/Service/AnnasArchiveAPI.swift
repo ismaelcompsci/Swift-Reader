@@ -112,11 +112,12 @@ enum Content: String {
 }
 
 class AnnasArchiveAPI {
-    static let baseURL = URL(string: annasArchiveURL)
+    static let shared = AnnasArchiveAPI()
+    let baseURL = URL(string: annasArchiveURL)
 
     init() {}
 
-    static func buildURLQueryParams(for url: URL, query: String, fileType: [FileType]? = nil, access: [Access]? = nil, source: [Source]? = nil, orderBy: Sort? = nil, language: [Languague]? = nil) -> URL {
+    func buildURLQueryParams(for url: URL, query: String, fileType: [FileType]? = nil, access: [Access]? = nil, source: [Source]? = nil, orderBy: Sort? = nil, language: [Languague]? = nil) -> URL {
         var queryItems = [URLQueryItem]()
 
         fileType?.forEach { type in
@@ -142,7 +143,7 @@ class AnnasArchiveAPI {
         return url.appending(queryItems: queryItems)
     }
 
-    static func fetchHTML(url: URL, completion: @escaping (Result<String, Error>) -> Void) {
+    func fetchHTML(url: URL, completion: @escaping (Result<String, Error>) -> Void) {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
@@ -164,7 +165,7 @@ class AnnasArchiveAPI {
         task.resume()
     }
 
-    static func fetchHTML(url: URL) async throws -> String {
+    func fetchHTML(url: URL) async throws -> String {
         return try await withCheckedThrowingContinuation {
             (continuation: CheckedContinuation<String, Error>) in
             fetchHTML(url: url) { result in
@@ -178,7 +179,32 @@ class AnnasArchiveAPI {
         }
     }
 
-    static func searchBooks(query: String, fileType: [FileType]? = nil, access: [Access]? = nil, source: [Source]? = nil, orderBy: Sort? = nil, language: [Languague]? = nil) async -> [SearchResult] {
+    func extractFileInfo(info: String) -> AnnasArchiveBookInfo? {
+        // https://github.com/dheison0/annas-archive-api/blob/368d71d9e2000a9e9956282585a6a012848a9011/api/extractors/generic.py#L4
+
+        var splitInfo = info.split(separator: ",")
+        var language: String?
+
+        if splitInfo[0] == "[" {
+            if let last = splitInfo.popLast() {
+                language = String(describing: last)
+            }
+        }
+
+        let ext = splitInfo.popLast()
+
+        let size = splitInfo.popLast()
+
+        guard let ext, let size else {
+            return nil
+        }
+
+        return AnnasArchiveBookInfo(language: language, ext: String(ext), size: String(size))
+    }
+}
+
+extension AnnasArchiveAPI {
+    func searchBooks(query: String, fileType: [FileType]? = nil, access: [Access]? = nil, source: [Source]? = nil, orderBy: Sort? = nil, language: [Languague]? = nil) async -> [SearchResult] {
         guard var searchUrl = baseURL?.appending(path: "search") else {
             return []
         }
@@ -233,7 +259,7 @@ class AnnasArchiveAPI {
         }
     }
 
-    static func getBookInfo(id md5: String) async -> AnnasArchiveBook? {
+    func getBookInfo(id md5: String) async -> AnnasArchiveBook? {
         // build url
         guard let bookURL = baseURL?.appending(path: "/md5/\(md5)") else {
             return nil
@@ -300,29 +326,6 @@ class AnnasArchiveAPI {
         }
 
         return nil
-    }
-
-    static func extractFileInfo(info: String) -> AnnasArchiveBookInfo? {
-        // https://github.com/dheison0/annas-archive-api/blob/368d71d9e2000a9e9956282585a6a012848a9011/api/extractors/generic.py#L4
-
-        var splitInfo = info.split(separator: ",")
-        var language: String?
-
-        if splitInfo[0] == "[" {
-            if let last = splitInfo.popLast() {
-                language = String(describing: last)
-            }
-        }
-
-        let ext = splitInfo.popLast()
-
-        let size = splitInfo.popLast()
-
-        guard let ext, let size else {
-            return nil
-        }
-
-        return AnnasArchiveBookInfo(language: language, ext: String(ext), size: String(size))
     }
 }
 

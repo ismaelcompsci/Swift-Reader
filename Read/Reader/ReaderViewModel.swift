@@ -524,7 +524,6 @@ extension ReaderViewModel {
             while !stack.isEmpty {
                 let (current, depth) = stack.removeLast()
                 if let label = current.label, !label.isEmpty {
-//                    toc.append(PDFTocItem(outline: current, depth: depth))
                     toc.append(BookTocItem(depth: depth, outline: current))
                 }
                 for i in (0 ..< current.numberOfChildren).reversed() {

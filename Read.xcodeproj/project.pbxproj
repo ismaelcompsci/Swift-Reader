@@ -15,7 +15,6 @@
 		9F0D01A72B78A8B70065C62F /* PDFKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0D01A62B78A8B70065C62F /* PDFKitView.swift */; };
 		9F0EA4592B89773900B7B009 /* ReadApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EA4582B89773900B7B009 /* ReadApp.swift */; };
 		9F14FBF32B8AA3F6001CA119 /* AnnasArchiveAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */; };
-		9F14FBF52B8AB845001CA119 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F14FBF42B8AB845001CA119 /* Test.swift */; };
 		9F31F9CD2B71C6B0000B66A3 /* ReaderWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F31F9CC2B71C6B0000B66A3 /* ReaderWebView.swift */; };
 		9F4A786E2B7832AD007B70B1 /* BookRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4A786D2B7832AD007B70B1 /* BookRemover.swift */; };
 		9F4DEB262B69ECB80046B76C /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 9F4DEB252B69ECB80046B76C /* WrappingHStack */; };
@@ -36,6 +35,7 @@
 		9F608E952B65F29D00D2B5F4 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 9F608E942B65F29D00D2B5F4 /* Realm */; };
 		9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9F608E962B65F29D00D2B5F4 /* RealmSwift */; };
 		9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F608E992B65F40A00D2B5F4 /* Book.swift */; };
+		9F86BE1F2B8EA0AE00DE3585 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9F86BE1E2B8EA0AE00DE3585 /* SDWebImageSwiftUI */; };
 		9F86C52B2B89B24300DB61A6 /* BookCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F86C52A2B89B24300DB61A6 /* BookCover.swift */; };
 		9F86C52D2B89B3F300DB61A6 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F86C52C2B89B3F300DB61A6 /* SearchBar.swift */; };
 		9FA902E22B7E17A6009B3B78 /* ReaderContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA902E12B7E17A6009B3B78 /* ReaderContextMenu.swift */; };
@@ -84,7 +84,6 @@
 		9F0D01A62B78A8B70065C62F /* PDFKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFKitView.swift; sourceTree = "<group>"; };
 		9F0EA4582B89773900B7B009 /* ReadApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadApp.swift; sourceTree = "<group>"; };
 		9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnasArchiveAPI.swift; sourceTree = "<group>"; };
-		9F14FBF42B8AB845001CA119 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		9F31F9CC2B71C6B0000B66A3 /* ReaderWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderWebView.swift; sourceTree = "<group>"; };
 		9F4A786D2B7832AD007B70B1 /* BookRemover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRemover.swift; sourceTree = "<group>"; };
 		9F4DEB272B69FB390046B76C /* HeadlessWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessWebView.swift; sourceTree = "<group>"; };
@@ -148,6 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F86BE1F2B8EA0AE00DE3585 /* SDWebImageSwiftUI in Frameworks */,
 				9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */,
 				9FEA97C42B89FFB5004AE311 /* SwiftSoup in Frameworks */,
 				9F4DEB262B69ECB80046B76C /* WrappingHStack in Frameworks */,
@@ -161,7 +161,6 @@
 		9F14FBF12B8AA3DD001CA119 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				9FD83CB02B7AF8DE0095B584 /* Reader */,
 				9FE38F022B7DE99E005A446A /* EbookMetadataExtractor */,
 				9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */,
 				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
@@ -211,6 +210,7 @@
 		9F608E7E2B65D05B00D2B5F4 /* Read */ = {
 			isa = PBXGroup;
 			children = (
+				9FD83CB02B7AF8DE0095B584 /* Reader */,
 				9F14FBF12B8AA3DD001CA119 /* Service */,
 				9FC596062B86A06A00ED3734 /* Resources */,
 				9F5954B02B6DD101009FC2F1 /* Components */,
@@ -251,7 +251,6 @@
 				9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */,
 				9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */,
 				9F608E912B65E29000D2B5F4 /* UploadFileView.swift */,
-				9F14FBF42B8AB845001CA119 /* Test.swift */,
 				9FB62D822B8D841F00A10EF5 /* SettingsView.swift */,
 			);
 			path = Views;
@@ -370,6 +369,7 @@
 				9F608E962B65F29D00D2B5F4 /* RealmSwift */,
 				9F4DEB252B69ECB80046B76C /* WrappingHStack */,
 				9FEA97C32B89FFB5004AE311 /* SwiftSoup */,
+				9F86BE1E2B8EA0AE00DE3585 /* SDWebImageSwiftUI */,
 			);
 			productName = Read;
 			productReference = 9F608E7C2B65D05B00D2B5F4 /* Read.app */;
@@ -403,6 +403,7 @@
 				9F608E932B65F29D00D2B5F4 /* XCRemoteSwiftPackageReference "realm-swift" */,
 				9F4DEB242B69ECB80046B76C /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 				9FEA97C22B89FFB5004AE311 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				9F86BE1D2B8EA0AD00DE3585 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = 9F608E7D2B65D05B00D2B5F4 /* Products */;
 			projectDirPath = "";
@@ -477,7 +478,6 @@
 				9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */,
 				9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */,
 				9F86C52B2B89B24300DB61A6 /* BookCover.swift in Sources */,
-				9F14FBF52B8AB845001CA119 /* Test.swift in Sources */,
 				9F0EA4592B89773900B7B009 /* ReadApp.swift in Sources */,
 				9F86C52D2B89B3F300DB61A6 /* SearchBar.swift in Sources */,
 				9F608E922B65E29000D2B5F4 /* UploadFileView.swift in Sources */,
@@ -721,6 +721,14 @@
 				kind = branch;
 			};
 		};
+		9F86BE1D2B8EA0AD00DE3585 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.6;
+			};
+		};
 		9FEA97C22B89FFB5004AE311 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup";
@@ -746,6 +754,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F608E932B65F29D00D2B5F4 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
+		};
+		9F86BE1E2B8EA0AE00DE3585 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F86BE1D2B8EA0AD00DE3585 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 		9FEA97C32B89FFB5004AE311 /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;

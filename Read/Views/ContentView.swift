@@ -13,73 +13,18 @@ enum LibraryDisplayMode: String, Codable {
     case list
 }
 
-class SearchViewModel: ObservableObject {
-    @Published var searchText = ""
-    @Published var debouncedSearchText = ""
-
-    init() {
-        debouncedSearchText = searchText
-
-        $searchText
-            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
-            .assign(to: &$debouncedSearchText)
-    }
-}
-
 struct ContentView: View {
     @ObservedResults(Book.self) var books
 
     @EnvironmentObject var appColor: AppColor
 
-    @StateObject var searchViewModel = SearchViewModel()
+    @StateObject var searchDebouncer = SearchDebouncer()
 
     @State var showUploadFileView: Bool = false
-    @State var searchText = ""
 
     @AppStorage("LibrarySortKey") var librarySortKey: LibrarySortKeys = .title
     @AppStorage("LibrarySortOrder") var librarySortOrder: LibrarySortOrder = .descending
     @AppStorage("LibraryDisplayMode") var libraryDisplayMode: LibraryDisplayMode = .list
-
-    var sortedBooks: [Book] {
-        if searchViewModel.debouncedSearchText.isEmpty {
-            return books.sorted { lhs, rhs in
-                switch librarySortKey {
-                case .title:
-                    if librarySortOrder == .descending {
-                        return lhs.title > rhs.title
-                    } else {
-                        return lhs.title < rhs.title
-                    }
-                case .date:
-                    if librarySortOrder == .descending {
-                        return lhs.addedAt > rhs.addedAt
-                    } else {
-                        return lhs.addedAt < rhs.addedAt
-                    }
-                case .author:
-                    if librarySortOrder == .descending {
-                        return lhs.authors.first?.name ?? "" > rhs.authors.first?.name ?? ""
-                    } else {
-                        return lhs.authors.first?.name ?? "" < rhs.authors.first?.name ?? ""
-                    }
-                case .last_read:
-                    if librarySortOrder == .descending {
-                        return lhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0) > rhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0)
-                    } else {
-                        return lhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0) < rhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0)
-                    }
-                case .progress:
-                    if librarySortOrder == .descending {
-                        return lhs.readingPosition?.progress ?? 0 > rhs.readingPosition?.progress ?? 0
-                    } else {
-                        return lhs.readingPosition?.progress ?? 0 < rhs.readingPosition?.progress ?? 0
-                    }
-                }
-            }
-        } else {
-            return books.filter { $0.title.lowercased().contains(searchViewModel.debouncedSearchText.lowercased()) }
-        }
-    }
 
     var body: some View {
         NavigationStack {
@@ -88,15 +33,9 @@ struct ContentView: View {
                     HStack {
                         // MARK: Search Bar
 
-                        SearchBar(placeholderText: "Search for book...", searchText: $searchViewModel.searchText)
-                            .onReceive(searchViewModel.$searchText, perform: { text in
-                                // force update on debounce if text is empty
-                                if text.isEmpty {
-                                    searchViewModel.debouncedSearchText = ""
-                                }
-                            })
+                        SearchBar(placeholderText: "Search for book...", searchText: $searchDebouncer.searchText)
 
-                        // MARK: Display Buttons
+                        // MARK: Display Mode Buttons
 
                         Button {
                             libraryDisplayMode = .list
@@ -132,7 +71,7 @@ struct ContentView: View {
                         // MARK: EMPTY VIEW
 
                         ContentUnavailableView(label: {
-                            Label("No Books", systemImage: "plus.circle.fill")
+                            Label("No Books", systemImage: "books.vertical.circle.fill")
                         }) {
                             Text("Add books to your library.")
                         } actions: {
@@ -181,6 +120,72 @@ struct ContentView: View {
             }
             .padding(.horizontal, 12)
             .navigationBarTitle("Home", displayMode: .inline)
+        }
+    }
+}
+
+extension ContentView {
+    var sortedBooks: [Book] {
+        if searchDebouncer.debouncedSearchText.isEmpty {
+            return books.sorted { lhs, rhs in
+                switch librarySortKey {
+                case .title:
+                    if librarySortOrder == .descending {
+                        return lhs.title > rhs.title
+                    } else {
+                        return lhs.title < rhs.title
+                    }
+                case .date:
+                    if librarySortOrder == .descending {
+                        return lhs.addedAt > rhs.addedAt
+                    } else {
+                        return lhs.addedAt < rhs.addedAt
+                    }
+                case .author:
+                    if librarySortOrder == .descending {
+                        return lhs.authors.first?.name ?? "" > rhs.authors.first?.name ?? ""
+                    } else {
+                        return lhs.authors.first?.name ?? "" < rhs.authors.first?.name ?? ""
+                    }
+                case .last_read:
+                    if librarySortOrder == .descending {
+                        return lhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0) > rhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0)
+                    } else {
+                        return lhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0) < rhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0)
+                    }
+                case .progress:
+                    if librarySortOrder == .descending {
+                        return lhs.readingPosition?.progress ?? 0 > rhs.readingPosition?.progress ?? 0
+                    } else {
+                        return lhs.readingPosition?.progress ?? 0 < rhs.readingPosition?.progress ?? 0
+                    }
+                }
+            }
+        } else {
+            return books.filter { $0.title.lowercased().contains(searchDebouncer.debouncedSearchText.lowercased()) }
+        }
+    }
+}
+
+extension ContentView {
+    class SearchDebouncer: ObservableObject {
+        @Published var searchText = "" {
+            didSet {
+                // force update on debounce if text is empty
+                if searchText.isEmpty {
+                    debouncedSearchText = ""
+                }
+            }
+        }
+
+        @Published var debouncedSearchText = ""
+
+        init() {
+            debouncedSearchText = searchText
+
+            $searchText
+                .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+                .assign(to: &$debouncedSearchText)
         }
     }
 }

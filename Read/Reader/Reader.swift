@@ -56,22 +56,7 @@ struct Reader: View {
                         viewModel.setLoading(true)
                         
                         // TODO: Change to method in viewModel on pdf start
-                        var highlightPages = [HighlightPage]()
-                        book.highlights.forEach { bookHighlight in
-                            bookHighlight.position.forEach { highlight in
-                                let page = highlight.page
-                                
-                                var ranges = [NSRange]()
-                                
-                                highlight.ranges.forEach { hRange in
-                                    let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
-                                    
-                                    ranges.append(range)
-                                }
-                                
-                                highlightPages.append(HighlightPage(page: page, ranges: ranges))
-                            }
-                        }
+                        let highlightPages = buildHighlights(highlights: Array(book.highlights))
                         
                         viewModel.addHighlightToPages(highlight: highlightPages)
                         
@@ -97,10 +82,8 @@ struct Reader: View {
             
             // MARK: Reader Menu
             
-//            if showOverlay {
             ReaderOverlay(book: book, viewModel: viewModel, showOverlay: $showOverlay)
-//            }
-            
+
             if showContextMenu && contextMenuPosition != .zero {
                 ReaderContextMenu(viewModel: viewModel, showContextMenu: $showContextMenu, position: contextMenuPosition)
             }
@@ -150,6 +133,27 @@ struct Reader: View {
                 viewModel.setBookAnnotations(annotations: annotations)
             }
         }
+    }
+    
+    private func buildHighlights(highlights: [BookHighlight]) -> [HighlightPage] {
+        var highlightPages = [HighlightPage]()
+        
+        highlights.forEach { bookHighlight in
+            bookHighlight.position.forEach { highlight in
+                let page = highlight.page
+                
+                var ranges = [NSRange]()
+                
+                highlight.ranges.forEach { hRange in
+                    let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
+                    
+                    ranges.append(range)
+                }
+                
+                highlightPages.append(HighlightPage(page: page, ranges: ranges))
+            }
+        }
+        return highlightPages
     }
     
     private func newHighlight(highlight: (String, [HighlightPage]?, String?, Int?, String?)) {
