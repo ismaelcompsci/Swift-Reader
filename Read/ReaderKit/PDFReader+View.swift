@@ -1,15 +1,12 @@
 //
-//  PDFReader.swift
+//  PDFReader+View.swift
 //  Read
 //
-//  Created by Mirna Olvera on 2/11/24.
+//  Created by Mirna Olvera on 3/5/24.
 //
 
 import PDFKit
-import RealmSwift
 import SwiftUI
-import UIKit
-import UniformTypeIdentifiers
 
 class NoContextMenuPDFView: PDFView {
     override init(frame: CGRect) {
@@ -127,9 +124,9 @@ class PDFPageCustomBackground: PDFPage {
 }
 
 class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
-    var viewModel: ReaderViewModel
+    var viewModel: PDFViewModel
 
-    init(viewModel: ReaderViewModel) {
+    init(viewModel: PDFViewModel) {
         self.viewModel = viewModel
     }
 
@@ -150,20 +147,17 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
     }
 
     @objc func selectionDidChange(notification: Notification) {
-        viewModel.selectionDidChange()
+        viewModel.selectionChanged.send(nil)
     }
 
     @objc func tapGesture(_ gestureRecognizer: UITapGestureRecognizer) {
-        guard let pdfView = viewModel.pdfView else {
-            return
-        }
-
-        guard let currentPage = viewModel.currentPage else {
+        guard let currentPage = viewModel.pdfView.currentPage else {
+            print("NO CURRENT PAGE")
             return
         }
 
         let tapPoint = gestureRecognizer.location(in: nil)
-        let convertedPoint = pdfView.convert(tapPoint, to: currentPage)
+        let convertedPoint = viewModel.pdfView.convert(tapPoint, to: currentPage)
 
         var hitAnnotation: PDFAnnotation? = nil
 
@@ -186,18 +180,17 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
 }
 
 struct PDFKitView: UIViewRepresentable {
-    let viewModel: ReaderViewModel
+    let viewModel: PDFViewModel
 
-    init(viewModel: ReaderViewModel) {
+    init(viewModel: PDFViewModel) {
         self.viewModel = viewModel
     }
 
     func makeUIView(context: Context) -> NoContextMenuPDFView {
-        guard let pdfView = viewModel.pdfView else {
-            return NoContextMenuPDFView()
-        }
+        print("MAKING UI VIEW")
+        let pdfView = viewModel.pdfView
 
-        viewModel.pdfDocument?.delegate = context.coordinator
+        viewModel.pdfDocument.delegate = context.coordinator
 
         pdfView.autoScales = true
         pdfView.displayMode = .singlePage

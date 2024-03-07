@@ -2,13 +2,12 @@
 //  ReaderContextMenu.swift
 //  Read
 //
-//  Created by Mirna Olvera on 2/15/24.
+//  Created by Mirna Olvera on 3/5/24.
 //
 
 import SwiftUI
 
 struct ReaderContextMenu: View {
-    @StateObject var viewModel: ReaderViewModel
     @Binding var showContextMenu: Bool
 
     var height: CGFloat = 44
@@ -20,11 +19,14 @@ struct ReaderContextMenu: View {
     var numberOfButtons: CGFloat = 2
 
     var position: CGPoint
+    var highlightButtonPressed: (() -> Void)?
+    var copyButtonPressed: (() -> Void)?
 
     var body: some View {
         HStack {
             Button {
-                viewModel.highlightSelection()
+//                viewModel.highlightSelection()
+                highlightButtonPressed?()
                 showContextMenu.toggle()
             }
             label: {
@@ -39,7 +41,8 @@ struct ReaderContextMenu: View {
                 .frame(height: buttonSizeHeight / 2)
 
             Button {
-                viewModel.copySelection()
+//                viewModel.copySelection()
+                copyButtonPressed?()
                 showContextMenu.toggle()
             }
 
@@ -55,12 +58,12 @@ struct ReaderContextMenu: View {
         .position(position)
         .onAppear {
             // TODO: change this
-//            viewModel.frame.width = buttonSizeWidth * numberOfButtons
-//            viewModel.frame.height = buttonSizeHeight
+            //            viewModel.frame.width = buttonSizeWidth * numberOfButtons
+            //            viewModel.frame.height = buttonSizeHeight
         }
     }
 }
 
 #Preview {
-    ReaderContextMenu(viewModel: ReaderViewModel(url: URL(string: "")!), showContextMenu: .constant(false), position: .zero)
+    ReaderContextMenu(showContextMenu: .constant(false), position: .zero)
 }

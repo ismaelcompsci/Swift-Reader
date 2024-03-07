@@ -82,6 +82,7 @@ struct Theme: Codable {
     var maxBlockSize = 1440
     var maxColumnCount = 1
     var flow = false
+    var animated = true
 
     // MARK: Style
 

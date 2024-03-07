@@ -34,7 +34,7 @@ class HeadlessWebView {
                 print("[HeadlessWebView] init: \(error.localizedDescription)")
             }
 
-            if let bundleHtml = Bundle.main.url(forResource: "Web.bundle/index", withExtension: "html") {
+            if let bundleHtml = Bundle.main.url(forResource: "scripts/index", withExtension: "html") {
                 do {
                     try FileManager.default.copyItem(at: bundleHtml, to: newLocation)
                 } catch {

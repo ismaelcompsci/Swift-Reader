@@ -10,7 +10,7 @@ import RealmSwift
 
 class BookHighlight: EmbeddedObject {
     @Persisted var cfi: String? // non-pdf
-    @Persisted var position: List<PDFHighlight> = List() // pdf
+    @Persisted var position: List<PersistedPDFHighlight> = List() // pdf
 
     @Persisted var chapter: Int?
     @Persisted var chapterTitle: String?
@@ -23,7 +23,7 @@ class BookHighlight: EmbeddedObject {
     @Persisted var updatedAt: Date = .now
 }
 
-class PDFHighlight: EmbeddedObject {
+class PersistedPDFHighlight: EmbeddedObject {
     @Persisted var page: Int
     @Persisted var ranges: List<HighlightRange> = List()
 }

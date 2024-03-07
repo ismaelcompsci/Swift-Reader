@@ -1,8 +1,8 @@
 //
-//  ReaderMenu.swift
+//  Reader+Overlay.swift
 //  Read
 //
-//  Created by Mirna Olvera on 2/12/24.
+//  Created by Mirna Olvera on 3/5/24.
 //
 
 import SwiftUI
@@ -12,10 +12,13 @@ struct ReaderOverlay: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var appColor: AppColor
 
-    var book: Book
-    @StateObject var viewModel: ReaderViewModel
+    var title: String
+    var currentLabel: String
 
     @Binding var showOverlay: Bool
+
+    var settingsButtonPressed: (() -> Void)?
+    var tocButtonPressed: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -24,10 +27,10 @@ struct ReaderOverlay: View {
             if showOverlay {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(book.title)
+                        Text(title)
                             .lineLimit(1)
 
-                        Text(viewModel.currentLabel)
+                        Text(currentLabel)
                             .lineLimit(1)
                             .font(.subheadline)
                             .foregroundStyle(.gray)
@@ -63,7 +66,7 @@ struct ReaderOverlay: View {
 
                 if showOverlay {
                     Button {
-                        viewModel.showContentSheet.toggle()
+                        tocButtonPressed?()
                     }
                     label: {
                         Image(systemName: "list.bullet")
@@ -78,7 +81,7 @@ struct ReaderOverlay: View {
                     // MARK: Settings Button
 
                     Button {
-                        viewModel.showSettingsSheet.toggle()
+                        settingsButtonPressed?()
                     }
                     label: {
                         Image(systemName: "gearshape")
@@ -92,17 +95,17 @@ struct ReaderOverlay: View {
                     .clipShape(.circle)
                 }
 
-                if !showOverlay, let location = viewModel.relocateDetails?.location {
-                    let rgba = getRGBFromHex(hex: viewModel.theme.fg.rawValue)
-                    let foregroundColor = UIColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
-
-                    Text("\(location.current) of \(location.total)")
-                        .foregroundStyle(Color(uiColor: foregroundColor))
-                        .opacity(0.6)
-                        .font(.subheadline)
-
-                    Spacer()
-                }
+//                if !showOverlay, let location = viewModel.relocateDetails?.location {
+//                    let rgba = getRGBFromHex(hex: viewModel.theme.fg.rawValue)
+//                    let foregroundColor = UIColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
+//
+//                    Text("\(location.current) of \(location.total)")
+//                        .foregroundStyle(Color(uiColor: foregroundColor))
+//                        .opacity(0.6)
+//                        .font(.subheadline)
+//
+//                    Spacer()
+//                }
             }
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, maxHeight: 58)
@@ -117,5 +120,5 @@ struct ReaderOverlay: View {
 }
 
 #Preview {
-    ReaderOverlay(book: .example1, viewModel: ReaderViewModel(url: URL(string: "")!), showOverlay: .constant(false))
+    ReaderOverlay(title: "TITLE", currentLabel: "", showOverlay: .constant(false))
 }

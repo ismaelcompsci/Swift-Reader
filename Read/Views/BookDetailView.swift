@@ -58,7 +58,8 @@ struct BookDetailView: View {
     }
 
     @State private var readMore = false
-
+    @State private var openReader = false
+    
     private func getHeightForHeaderImage(_ geometry: GeometryProxy) -> CGFloat {
         let offset = getScrollOffset(geometry)
         let imageHeight = geometry.size.height
@@ -156,8 +157,8 @@ struct BookDetailView: View {
                     //
                     
                     HStack {
-                        NavigationLink {
-                            Reader(book: book)
+                        Button {
+                            openReader = true
                         } label: {
                             HStack {
                                 Image(systemName: "book.fill")
@@ -238,6 +239,18 @@ struct BookDetailView: View {
         .scrollIndicators(.hidden)
         .edgesIgnoringSafeArea(.all)
         .navigationBarBackButtonHidden(true)
+        .fullScreenCover(isPresented: $openReader, content: {
+            let bookPathURL = URL.documentsDirectory.appending(path: book.bookPath ?? "")
+            let url = bookPathURL
+            let isPDF = bookPathURL.lastPathComponent.hasSuffix(".pdf")
+            
+            if isPDF {
+                PDF(url: url, book: book)
+            } else {
+                EBookView(url: url, book: book)
+            }
+
+        })
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: {
