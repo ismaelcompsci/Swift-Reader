@@ -55,7 +55,6 @@
 		9FC596562B86A30800ED3734 /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596432B86A30800ED3734 /* Poppins-Italic.ttf */; };
 		9FC596572B86A30800ED3734 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */; };
 		9FC596592B86A56A00ED3734 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC596582B86A56A00ED3734 /* Font+Extensions.swift */; };
-		9FD808512B980D4A0007D8F6 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 9FD808502B980D4A0007D8F6 /* scripts */; };
 		9FD8086E2B980DEE0007D8F6 /* PDFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8086D2B980DEE0007D8F6 /* PDFReader.swift */; };
 		9FD808702B980E2C0007D8F6 /* PDFReader+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8086F2B980E2C0007D8F6 /* PDFReader+ViewModel.swift */; };
 		9FD808722B980F2E0007D8F6 /* EBookReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808712B980F2E0007D8F6 /* EBookReader.swift */; };
@@ -128,7 +127,6 @@
 		9FC596432B86A30800ED3734 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Italic.ttf"; sourceTree = "<group>"; };
 		9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
 		9FC596582B86A56A00ED3734 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
-		9FD808502B980D4A0007D8F6 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../Desktop/scripts; sourceTree = "<group>"; };
 		9FD8086D2B980DEE0007D8F6 /* PDFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFReader.swift; sourceTree = "<group>"; };
 		9FD8086F2B980E2C0007D8F6 /* PDFReader+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PDFReader+ViewModel.swift"; sourceTree = "<group>"; };
 		9FD808712B980F2E0007D8F6 /* EBookReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EBookReader.swift; sourceTree = "<group>"; };
@@ -175,7 +173,6 @@
 		9F14FBF12B8AA3DD001CA119 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				9FE38F022B7DE99E005A446A /* EbookMetadataExtractor */,
 				9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */,
 				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
 			);
@@ -232,7 +229,6 @@
 				9F608E902B65E27B00D2B5F4 /* Views */,
 				9F608E8D2B65DDC300D2B5F4 /* Utils */,
 				9F0EA4582B89773900B7B009 /* ReadApp.swift */,
-				9FD808502B980D4A0007D8F6 /* scripts */,
 				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
 				9F608E832B65D05D00D2B5F4 /* Assets.xcassets */,
 				9F608E852B65D05D00D2B5F4 /* Preview Content */,
@@ -332,6 +328,7 @@
 		9FD8084F2B980C7F0007D8F6 /* ReaderKit */ = {
 			isa = PBXGroup;
 			children = (
+				9FE38F022B7DE99E005A446A /* EbookMetadataExtractor */,
 				9FD8086D2B980DEE0007D8F6 /* PDFReader.swift */,
 				9FD8086F2B980E2C0007D8F6 /* PDFReader+ViewModel.swift */,
 				9FD8087B2B98135D0007D8F6 /* PDFReader+View.swift */,
@@ -456,7 +453,6 @@
 				9FE324432B85D30E003E61F6 /* addedbooks.PNG in Resources */,
 				9FC5964F2B86A30800ED3734 /* OFL.txt in Resources */,
 				9FC5964D2B86A30800ED3734 /* Poppins-ExtraBold.ttf in Resources */,
-				9FD808512B980D4A0007D8F6 /* scripts in Resources */,
 				9FC596542B86A30800ED3734 /* Poppins-Thin.ttf in Resources */,
 				9FC5964A2B86A30800ED3734 /* Poppins-Medium.ttf in Resources */,
 				9FC596522B86A30800ED3734 /* Poppins-Bold.ttf in Resources */,
