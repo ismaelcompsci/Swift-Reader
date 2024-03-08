@@ -9,11 +9,11 @@ import SwiftUI
 
 struct EBookReader: View {
     @StateObject var viewModel: EBookReaderViewModel
-    let url: URL
+    let url: URL?
 
-    init(viewModel: EBookReaderViewModel, url: URL) {
-        self.url = url
+    init(viewModel: EBookReaderViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.url = nil
     }
 
     init(url: URL) {
@@ -30,11 +30,12 @@ struct EBookReader: View {
                     }
                 }
             }
-//            .onChange(of: viewModel.allDone) { oldValue, newValue in
-//                if oldValue == false, newValue == true {
-//                    viewModel.currentLabel = viewModel.currentLocation?.tocItem?.label ?? "..."
-//                }
-//            }
+            .onChange(of: viewModel.allDone) { oldValue, newValue in
+                if oldValue == false, newValue == true {
+                    viewModel.state = .done
+                    viewModel.currentLabel = viewModel.currentLocation?.tocItem?.label ?? "..."
+                }
+            }
     }
 }
 

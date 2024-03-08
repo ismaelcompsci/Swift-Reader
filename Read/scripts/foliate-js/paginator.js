@@ -442,7 +442,7 @@ export class Paginator extends HTMLElement {
             --_max-block-size: 1440px;
             --_max-column-count: 2;
             --_vertical: 0;
-            --_half-gap: calc(var(--_gap) / 2);
+            --_half-gap: 0;
             --_max-width: calc(
                 var(--_vertical) * var(--_max-block-size)
                 + (1 - var(--_vertical)) * var(--_max-inline-size) * var(--_max-column-count)

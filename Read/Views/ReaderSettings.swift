@@ -112,7 +112,7 @@ struct ReaderSettings: View {
                         
                         HStack {
                             Button {
-                                theme.decreaseBlockSize()
+                                theme.decreaseMargin()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "rectangle.compress.vertical")
@@ -123,7 +123,7 @@ struct ReaderSettings: View {
                                 .frame(maxHeight: 24)
                             
                             Button {
-                                theme.increaseBlockSize()
+                                theme.increaseMargin()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "rectangle.expand.vertical")

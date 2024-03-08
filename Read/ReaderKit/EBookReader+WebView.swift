@@ -46,17 +46,17 @@ struct EBookWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let webView = viewModel.webView
 
-        webView.isInspectable = true
         webView.navigationDelegate = context.coordinator
-
         let userContentController = webView.configuration.userContentController
-
         userContentController.removeAllScriptMessageHandlers()
 
+        #if DEBUG
+        webView.isInspectable = true
         let source = "function captureLog(msg) { window.webkit.messageHandlers.readerHandler.postMessage(msg); } window.console.log = captureLog;"
         let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
         userContentController.addUserScript(script)
         userContentController.add(LoggingMessageHandler(), name: "readerHandler")
+        #endif
 
         userContentController.add(context.coordinator, name: BookWebViewMessageHandlers.initiatedSwiftReader.rawValue)
 

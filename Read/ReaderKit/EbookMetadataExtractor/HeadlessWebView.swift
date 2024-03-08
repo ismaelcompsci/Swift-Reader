@@ -15,15 +15,17 @@ class HeadlessWebView {
     let webView: WKWebView
 
     init() {
-        let source = "function captureLog(msg) { window.webkit.messageHandlers.logHandler.postMessage(msg); } window.console.log = captureLog;"
-        let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-
         self.webView = WKWebView()
 
+        #if DEBUG
         webView.isInspectable = true /* DEBUG ONLY */
-        webView.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+        let source = "function captureLog(msg) { window.webkit.messageHandlers.logHandler.postMessage(msg); } window.console.log = captureLog;"
+        let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
         webView.configuration.userContentController.addUserScript(script)
         webView.configuration.userContentController.add(LoggingMessageHandler(), name: "logHandler")
+        #endif
+
+        webView.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
 
         if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let newLocation = url.appendingPathComponent("index.html")

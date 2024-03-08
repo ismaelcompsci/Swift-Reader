@@ -9,6 +9,7 @@ import RealmSwift
 import SwiftUI
 
 struct EBookView: View {
+    @Environment(\.dismiss) var dismiss
     @StateObject var ebookViewModel: EBookReaderViewModel
 
     var realm = try! Realm()
@@ -38,7 +39,7 @@ struct EBookView: View {
             Color(hex: ebookViewModel.theme.bg.rawValue)
                 .ignoresSafeArea()
 
-            EBookReader(viewModel: ebookViewModel, url: url)
+            EBookReader(viewModel: ebookViewModel)
                 .onTapGesture {
                     Task {
                         let hasSelection = try await ebookViewModel.hasSelection()
@@ -60,12 +61,28 @@ struct EBookView: View {
             }
         }
         .overlay {
-            if ebookViewModel.allDone == false {
+            switch ebookViewModel.state {
+            case .loading:
                 ZStack {
-                    Color.black
+                    Color(hex: ebookViewModel.theme.bg.rawValue)
                         .ignoresSafeArea()
 
                     ProgressView()
+                }
+            case .done:
+                EmptyView()
+            case .failure:
+                ZStack {
+                    Color(hex: ebookViewModel.theme.bg.rawValue)
+                        .ignoresSafeArea()
+
+                    VStack {
+                        Text("Something went wrong")
+
+                        Button("Return") {
+                            dismiss()
+                        }
+                    }
                 }
             }
         }

@@ -8,7 +8,6 @@
 import CoreGraphics
 import Foundation
 import SwiftUI
-import UniformTypeIdentifiers
 
 let signatures: [String: String] = [
     "iVBORw0KGgo": ".png",
@@ -24,22 +23,6 @@ func getImageType(base64: String) -> String? {
     }
     return nil
 }
-
-enum SupportedFileTypes: String, CaseIterable {
-    case EPUB = "epub"
-    case CBZ = "cbz"
-    case FB2 = "fb2"
-    case FBZ = "fbz"
-    case MOBI = "mobi"
-    case PDF = "pdf"
-    case AZW3 = "azw3"
-}
-
-let mobiFileType: UTType = .init(filenameExtension: "mobi") ?? .epub
-let azw3FileType: UTType = .init(filenameExtension: "azw3") ?? .epub
-let fb2FileType: UTType = .init(filenameExtension: "fb2") ?? .epub
-let fbzFileType: UTType = .init(filenameExtension: "fbz") ?? .epub
-let cbzFileType: UTType = .init(filenameExtension: "cbz") ?? .epub
 
 func getEmbeddedImages(ofPDFAt url: URL, pageIndex: Int) -> [UIImage]? {
     guard let document = CGPDFDocument(url as CFURL) else {

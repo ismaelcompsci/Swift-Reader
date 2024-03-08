@@ -72,17 +72,46 @@ enum ThemeForeground: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-struct Theme: Codable {
+protocol ThemeProtocol {
+    // MARK: Layout
+
+    var gap: Double { get set }
+    var maxInlineSize: Int { get set }
+    var maxBlockSize: Int { get set }
+    var maxColumnCount: Int { get set }
+    var flow: Bool { get set }
+    var animated: Bool { get set }
+    var margin: Int { get set }
+
+    // MARK: Style
+
+    var lineHeight: Double { get set }
+    var justify: Bool { get set }
+    var hyphenate: Bool { get set }
+    var fontSize: Int { get set }
+
+    // MARK: Book Theme
+
+    var bg: ThemeBackground { get set }
+    var fg: ThemeForeground { get set }
+
+    func save()
+
+    // init get saved data
+}
+
+struct Theme: ThemeProtocol, Codable {
     // MARK: Layout
 
     static let saveKey = "ReaderTheme"
 
     var gap = 0.06
-    var maxInlineSize = 720
+    var maxInlineSize = 1080
     var maxBlockSize = 1440
     var maxColumnCount = 1
     var flow = false
     var animated = true
+    var margin = 24
 
     // MARK: Style
 
@@ -107,11 +136,13 @@ struct Theme: Codable {
     }
 
     mutating func increaseGap() {
-        gap += 0.01
+        let newGap = gap + 0.01
+        gap = min(100, newGap)
     }
 
     mutating func decreaseGap() {
-        gap -= 0.01
+        let newGap = gap - 0.01
+        gap = max(0, newGap)
     }
 
     mutating func increaseBlockSize() {
@@ -126,13 +157,25 @@ struct Theme: Codable {
         maxColumnCount = count
     }
 
+    mutating func increaseMargin() {
+        let newMargin = margin + 1
+        margin = min(200, newMargin)
+    }
+
+    mutating func decreaseMargin() {
+        let newMargin = margin - 1
+        margin = max(0, newMargin)
+    }
+
     init() {
         if let decodedData = UserDefaults.standard.data(forKey: Theme.saveKey) {
             if let theme = try? JSONDecoder().decode(Theme.self, from: decodedData) {
                 self.gap = theme.gap
+                self.animated = theme.animated
                 self.maxInlineSize = theme.maxInlineSize
                 self.maxBlockSize = theme.maxBlockSize
                 self.maxColumnCount = theme.maxColumnCount
+                self.margin = theme.margin
                 self.flow = theme.flow
                 self.lineHeight = theme.lineHeight
                 self.justify = theme.justify

@@ -242,12 +242,8 @@ class Reader {
     this.initLocation = initLocation;
     console.log("INITBOOK");
 
-    // TODO: change this
-    // let bookInfoRequest = await fetch("http://localhost:6571/api/bookinfo");
-    // let bookInfo = await bookInfoRequest.json();
     let bookData = await (await fetch(bookPath)).blob();
 
-    // console.log(bookInfo);
     let bookFile = new File([bookData], "book");
     this.isPdf = await isPDF(bookFile);
     this.isCBZ = isCBZ(bookFile);
@@ -462,7 +458,7 @@ class Reader {
                 range: range,
                 value: cfi,
                 pos: getPosition(range),
-                text: range.toString(),
+                text: selectionString,
                 color: "#FFFF00"
               }
         );
@@ -481,6 +477,7 @@ class Reader {
     if (renderer) {
       renderer.setAttribute("flow", layout.flow ? "scrolled" : "paginated");
       renderer.setAttribute("gap", layout.gap * 100 + "%");
+      renderer.setAttribute("margin", layout.margin + "px");
       renderer.setAttribute("max-inline-size", layout.maxInlineSize + "px");
       renderer.setAttribute("max-block-size", layout.maxBlockSize + "px");
       renderer.setAttribute("max-column-count", layout.maxColumnCount);

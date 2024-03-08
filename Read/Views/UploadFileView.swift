@@ -177,7 +177,7 @@ struct UploadFileView: View {
             Spacer()
         }
         .padding(14)
-        .fileImporter(isPresented: $showFilePicker, allowedContentTypes: [.epub, .pdf, mobiFileType, azw3FileType, fb2FileType, fbzFileType, cbzFileType], allowsMultipleSelection: true) { result in
+        .fileImporter(isPresented: $showFilePicker, allowedContentTypes: fileTypes, allowsMultipleSelection: true) { result in
             switch result {
             case .success(let selectedFileUrls):
                 fileUrls = selectedFileUrls
@@ -195,7 +195,7 @@ struct UploadFileView: View {
             processingBook = true
             for url in fileUrls {
                 // made async instead of closure so that a large number of books are not being proccessed at the same time
-                if let metadata = try? await EBookMetadataExtractor.parseBook(from: url) {
+                if let metadata = try? await BookMetadataExtractor.parseBook(from: url) {
                     let book = Book()
 
                     book.title = metadata.title ?? "Untitled"

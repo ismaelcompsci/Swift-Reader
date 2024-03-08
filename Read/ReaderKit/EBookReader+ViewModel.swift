@@ -11,6 +11,18 @@ import SwiftUI
 import UniformTypeIdentifiers
 import WebKit
 
+enum EBookReaderError: Error {
+    case renderError(Error)
+    case serverError(Error)
+}
+
+enum EBookReaderState {
+    case loading
+    case done // do nothing whehn done
+    case failure(EBookReaderError)
+}
+
+// server: https://github.com/readium/swift-toolkit/blob/develop/Sources/Adapters/GCDWebServer/GCDHTTPServer.swift
 class EBookReaderViewModel: ObservableObject {
     let webView: NoContextMenuWebView
     let server: FileServer
@@ -22,13 +34,11 @@ class EBookReaderViewModel: ObservableObject {
     /// initial position to open the book at
     var openCfi: String?
 
+    @Published var state: EBookReaderState = .loading
+
     @Published var toc: [EBookTocItem]? = nil
     @Published var currentLocation: Relocate? = nil
     @Published var currentLabel: String = ""
-
-    var currentTocItem: RelocateTocItem? {
-        currentLocation?.tocItem
-    }
 
     @Published var theme = Theme()
 
@@ -59,6 +69,10 @@ class EBookReaderViewModel: ObservableObject {
     var bookRelocated = PassthroughSubject<Relocate, Never>()
     /// 0 text, 1 cfi,  2 index, 3 label
     var highlighted = PassthroughSubject<(String, String?, Int?, String?), Never>()
+
+    var currentTocItem: RelocateTocItem? {
+        currentLocation?.tocItem
+    }
 
     var canStartReader: Bool {
         isServerStarted && initatedSwiftReader && hasFinishedLoadingJS
@@ -112,6 +126,7 @@ class EBookReaderViewModel: ObservableObject {
             isServerStarted = true
 
         } catch {
+            state = .failure(.serverError(error))
             print("Failed to start server: \(error.localizedDescription)")
         }
     }
@@ -173,6 +188,8 @@ class EBookReaderViewModel: ObservableObject {
     }
 
     func setBookTheme() {
+        theme.save()
+
         let script = """
         var _style = {
             lineHeight: \(theme.lineHeight),
@@ -189,6 +206,7 @@ class EBookReaderViewModel: ObservableObject {
            maxColumnCount: \(theme.maxColumnCount),
            flow: \(theme.flow),
            animated: \(theme.animated),
+           margin: \(theme.margin)
         }
 
         globalReader?.setTheme({style: _style, layout: _layout})
@@ -232,6 +250,7 @@ class EBookReaderViewModel: ObservableObject {
             renderedBook = true
 
         } catch {
+            state = .failure(.renderError(error))
             print("Failed to initate book: \(error.localizedDescription)")
         }
     }
@@ -399,6 +418,7 @@ class EBookReaderViewModel: ObservableObject {
     }
 }
 
+// only for testing
 extension EBookReaderViewModel {
     func reset() {
         renderedBook = false
