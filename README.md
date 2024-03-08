@@ -11,4 +11,6 @@
   <img src="/Screenshots/upload.PNG?raw=true" width="120" />
 </p>
 
+---
+use a GCDWebServer instead of writing all js / html to documents directory 
   
