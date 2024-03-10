@@ -6,8 +6,8 @@
   <img src="/Screenshots/bookDetails.PNG?raw=true" width="120"/> 
   <img src="/Screenshots/reader.PNG?raw=true" width="120" />
   <img src="/Screenshots/addedBooks.PNG?raw=true" width="120" />
-  <img src="/Screenshots/list.JPEG?raw=true" width="120" />
-  <img src="/Screenshots/grid.JPEG?raw=true" width="120" />
+  <img src="/Screenshots/list.jpeg?raw=true" width="120" />
+  <img src="/Screenshots/grid.jpeg?raw=true" width="120" />
   <img src="/Screenshots/upload.PNG?raw=true" width="120" />
 </p>
 
