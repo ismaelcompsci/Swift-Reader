@@ -42,9 +42,9 @@ class EBookReaderViewModel: ObservableObject {
 
     @Published var theme = Theme()
 
-    @Published var hasFinishedLoadingJS = false
-    @Published private(set) var isServerStarted = false
-    @Published private(set) var initatedSwiftReader = false
+    @Published var hasFinishedLoadingJS = false { didSet { startIfReady() }} // I need to do some work when all three bools are true
+    @Published private(set) var isServerStarted = false { didSet { startIfReady() }} // only when all three are true can i render the book
+    @Published private(set) var initatedSwiftReader = false { didSet { startIfReady() }} //
     @Published private(set) var renderedBook = false
     @Published private(set) var finishedSettingUpBook = false
     @Published private(set) var didSetTheme = false {
@@ -64,36 +64,22 @@ class EBookReaderViewModel: ObservableObject {
         }
     }
 
-    var tapped = PassthroughSubject<CGPoint, Never>()
-    var selectionChanged = PassthroughSubject<Selection?, Never>()
-    var bookRelocated = PassthroughSubject<Relocate, Never>()
+    var onTappedHighlight = PassthroughSubject<Void, Never>()
+    var onTapped = PassthroughSubject<CGPoint, Never>()
+    var onSelectionChanged = PassthroughSubject<Selection?, Never>()
+    var onRelocated = PassthroughSubject<Relocate, Never>()
     /// 0 text, 1 cfi,  2 index, 3 label
-    var highlighted = PassthroughSubject<(String, String?, Int?, String?), Never>()
+    var onHighlighted = PassthroughSubject<(String, String?, Int?, String?), Never>()
 
     var currentTocItem: RelocateTocItem? {
         currentLocation?.tocItem
-    }
-
-    var canStartReader: Bool {
-        isServerStarted && initatedSwiftReader && hasFinishedLoadingJS
     }
 
     var allDone: Bool {
         isServerStarted && initatedSwiftReader && renderedBook && didSetTheme && finishedSettingUpBook && hasFinishedLoadingJS
     }
 
-    init(file: URL, delay: Duration? = nil) {
-        self.server = FileServer.sharedInstance
-        self.bookFile = file
-        self.delay = delay
-        self.webView = NoContextMenuWebView.shared
-
-        setupServer()
-
-        loadUrl(url: URL(string: server.base)!)
-    }
-
-    init(file: URL, delay: Duration? = nil, startCfi: String) {
+    init(file: URL, delay: Duration? = nil, startCfi: String? = nil) {
         self.server = FileServer.sharedInstance
         self.webView = NoContextMenuWebView.shared
         self.bookFile = file
@@ -102,6 +88,17 @@ class EBookReaderViewModel: ObservableObject {
 
         setupServer()
         loadUrl(url: URL(string: server.base)!)
+    }
+
+    private var renderTaskHasStarted = false
+    private func startIfReady() {
+        let start = isServerStarted && initatedSwiftReader && hasFinishedLoadingJS
+        if start == true && renderedBook == false && renderTaskHasStarted == false {
+            Task {
+                renderTaskHasStarted = true
+                await self.startReader()
+            }
+        }
     }
 
     func setupServer() {
@@ -159,7 +156,7 @@ class EBookReaderViewModel: ObservableObject {
             {
                 let point = CGPoint(x: x, y: y)
 
-                tapped.send(point)
+                onTapped.send(point)
             }
         case .selectedText:
             if let rectData = message as? [String: Any],
@@ -170,14 +167,14 @@ class EBookReaderViewModel: ObservableObject {
                let text = rectData["text"] as? String
             {
                 let selection = Selection(bounds: CGRect(x: x, y: y, width: width, height: height), string: text)
-                selectionChanged.send(selection)
+                onSelectionChanged.send(selection)
             }
         case .relocate:
 
             if let jsonData = try? JSONSerialization.data(withJSONObject: message),
                let relocateDetails = try? JSONDecoder().decode(Relocate.self, from: jsonData)
             {
-                bookRelocated.send(relocateDetails)
+                onRelocated.send(relocateDetails)
                 currentLocation = relocateDetails
                 currentLabel = relocateDetails.tocItem?.label ?? ""
             }
@@ -266,22 +263,6 @@ class EBookReaderViewModel: ObservableObject {
         setBookTheme()
     }
 
-    func goTo(cfi: String) {
-        let script = """
-        globalReader?.view.goTo("\(cfi)")
-        """
-
-        webView.evaluateJavaScript(script)
-    }
-
-    func goToFraction(position: Double) {
-        let script = """
-        globalReader?.view.goToFraction(\(position))
-        """
-
-        webView.evaluateJavaScript(script)
-    }
-
     @MainActor
     func getToc() async -> [EBookTocItem]? {
         let script = """
@@ -323,66 +304,19 @@ class EBookReaderViewModel: ObservableObject {
         return toc
     }
 
-    func copySelection() {
-        let script = """
-        globalReader?.doc?.getSelection()?.toString()
-        """
-
-        webView.evaluateJavaScript(script, completionHandler: { success, error in
-            if let success {
-                UIPasteboard.general.setValue(success as! String, forPasteboardType: UTType.plainText.identifier)
-
-                self.clearWebViewSelection()
-            }
-
-            if let error {
-                print("copySelection: \(error)")
-            }
-        })
-    }
-
     func setBookAnnotations(annotations: [Annotation]) {
         do {
             let jsonAnnotations = try JSONEncoder().encode(annotations)
             let stringJSONAnnotations = String(data: jsonAnnotations, encoding: .utf8) ?? "{}"
 
             let script = """
-                            globalReader?.setAnnotations(\(stringJSONAnnotations))
+            globalReader?.setAnnotations(\(stringJSONAnnotations))
             """
 
             webView.evaluateJavaScript(script)
 
         } catch {
             print("[ReaderViewModel] setBookAnnotations: Failed to set annotations - \(error.localizedDescription)")
-        }
-    }
-
-    func highlightSelection() {
-        let script = """
-        var hPromise = globalReader?.makeHighlight()
-
-        await hPromise
-        return hPromise
-        """
-
-        webView.callAsyncJavaScript(script, in: nil, in: .page) { result in
-
-            switch result {
-            case .success(let success):
-                if let data = success as? [String: Any],
-                   let index = data["index"] as? Int,
-                   let label = data["label"] as? String,
-                   let cfi = data["cfi"] as? String,
-                   let text = data["text"] as? String
-                {
-                    self.highlighted.send((text, cfi, index, label))
-                }
-
-            case .failure(let error):
-                print("highlightSelection error: \(error.localizedDescription)")
-            }
-
-            self.clearWebViewSelection()
         }
     }
 
@@ -418,17 +352,68 @@ class EBookReaderViewModel: ObservableObject {
     }
 }
 
-// only for testing
+// actions
 extension EBookReaderViewModel {
-    func reset() {
-        renderedBook = false
-        finishedSettingUpBook = false
-        didSetTheme = false
-
+    func goTo(cfi: String) {
         let script = """
-        globalReader?.view?.remove()
+        globalReader?.view.goTo("\(cfi)")
         """
 
         webView.evaluateJavaScript(script)
+    }
+
+    func goToFraction(position: Double) {
+        let script = """
+        globalReader?.view.goToFraction(\(position))
+        """
+
+        webView.evaluateJavaScript(script)
+    }
+
+    func highlightSelection() {
+        let script = """
+        var hPromise = globalReader?.makeHighlight()
+
+        await hPromise
+        return hPromise
+        """
+
+        webView.callAsyncJavaScript(script, in: nil, in: .page) { result in
+
+            switch result {
+            case .success(let success):
+                if let data = success as? [String: Any],
+                   let index = data["index"] as? Int,
+                   let label = data["label"] as? String,
+                   let cfi = data["cfi"] as? String,
+                   let text = data["text"] as? String
+                {
+                    self.onHighlighted.send((text, cfi, index, label))
+                }
+
+            case .failure(let error):
+                print("highlightSelection error: \(error.localizedDescription)")
+            }
+
+            self.clearWebViewSelection()
+        }
+    }
+
+    func copySelection() {
+        let script = """
+        globalReader?.doc?.getSelection()?.toString()
+        """
+
+        webView.evaluateJavaScript(script, completionHandler: { success, error in
+            if let success {
+                UIPasteboard.general.setValue(success as! String, forPasteboardType: UTType.plainText.identifier)
+
+                self.clearWebViewSelection()
+            }
+
+            if let error {
+                print("copySelection: \(error)")
+            }
+        })
     }
 }

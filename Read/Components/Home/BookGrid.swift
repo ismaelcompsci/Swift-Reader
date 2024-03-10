@@ -61,6 +61,36 @@ struct BookGridItem: View {
                     Button("Delete", systemImage: "trash.fill", role: .destructive) {
                         onEvent(.onDelete)
                     }
+                } preview: {
+                    HStack {
+                        BookCover(coverPath: book.coverPath)
+                            .frame(width: bookWidth, height: bookHeight)
+
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                                .lineLimit(1)
+
+                            Text(book.authors.first?.name ?? "Unkown Author")
+                                .font(.subheadline)
+                                .foregroundStyle(.gray)
+                                .lineLimit(1)
+
+                            Spacer()
+
+                            if let position = book.readingPosition {
+                                Text("\(Int((position.progress ?? 0) * 100))% last read \(position.updatedAt.formatted(.relative(presentation: .numeric)))")
+                                    .foregroundStyle(.gray)
+
+                            } else {
+                                Text("Added on \(book.addedAt.formatted(date: .abbreviated, time: .omitted))")
+                                    .foregroundStyle(.gray)
+                                    .lineLimit(1)
+                            }
+                        }
+                    }
+                    .frame(maxHeight: bookHeight * 1.2)
+                    .padding()
+                    .background(.black)
                 }
         }
     }

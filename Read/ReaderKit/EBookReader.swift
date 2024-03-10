@@ -23,13 +23,6 @@ struct EBookReader: View {
 
     var body: some View {
         EBookWebView(viewModel: viewModel)
-            .onChange(of: viewModel.canStartReader) { oldValue, newValue in
-                if oldValue == false, newValue == true {
-                    Task {
-                        await viewModel.startReader()
-                    }
-                }
-            }
             .onChange(of: viewModel.allDone) { oldValue, newValue in
                 if oldValue == false, newValue == true {
                     viewModel.state = .done

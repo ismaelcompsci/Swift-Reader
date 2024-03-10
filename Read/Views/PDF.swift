@@ -5,9 +5,12 @@
 //  Created by Mirna Olvera on 3/5/24.
 //
 
+import PDFKit
+import RealmSwift
 import SwiftUI
 
 struct PDF: View {
+    var realm = try! Realm()
     let url: URL
     let book: Book
 
@@ -56,10 +59,34 @@ struct PDF: View {
             })
 
         })
-        .onReceive(pdfViewModel.selectionChanged, perform: selectionChanged)
-        .onReceive(pdfViewModel.tapped, perform: handleTap)
+        .onReceive(pdfViewModel.onSelectionChanged, perform: selectionChanged)
+        .onReceive(pdfViewModel.onRelocated, perform: relocated)
+        .onReceive(pdfViewModel.onTapped, perform: handleTap)
         .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
+    }
+
+    func relocated(_ currentPage: PDFPage) {
+        let pdfDocument = pdfViewModel.pdfDocument
+
+        let totalPages = CGFloat(pdfDocument.pageCount)
+        let currentPageIndex = CGFloat(pdfDocument.index(for: currentPage))
+        let updatedAt: Date = .now
+
+        let thawedBook = book.thaw()
+        try! realm.write {
+            if thawedBook?.readingPosition == nil {
+                thawedBook?.readingPosition = ReadingPosition()
+                thawedBook?.readingPosition?.progress = currentPageIndex / totalPages
+                thawedBook?.readingPosition?.updatedAt = updatedAt
+                thawedBook?.readingPosition?.chapter = Int(currentPageIndex)
+
+            } else {
+                thawedBook?.readingPosition?.progress = currentPageIndex / totalPages
+                thawedBook?.readingPosition?.updatedAt = updatedAt
+                thawedBook?.readingPosition?.chapter = Int(currentPageIndex)
+            }
+        }
     }
 
     func selectionChanged(_ _: Any?) {

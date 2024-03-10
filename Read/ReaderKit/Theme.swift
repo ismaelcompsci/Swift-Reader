@@ -158,12 +158,12 @@ struct Theme: ThemeProtocol, Codable {
     }
 
     mutating func increaseMargin() {
-        let newMargin = margin + 1
+        let newMargin = margin + 2
         margin = min(200, newMargin)
     }
 
     mutating func decreaseMargin() {
-        let newMargin = margin - 1
+        let newMargin = margin - 2
         margin = max(0, newMargin)
     }
 

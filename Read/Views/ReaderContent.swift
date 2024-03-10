@@ -42,6 +42,8 @@ struct ReaderContent<T: TocItem>: View {
                         } label: {
                             HStack {
                                 Text(tocItem.label)
+                                    .lineLimit(2)
+                                    .multilineTextAlignment(.leading)
 
                                 Spacer()
 

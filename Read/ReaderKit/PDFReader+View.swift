@@ -147,9 +147,10 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
     }
 
     @objc func selectionDidChange(notification: Notification) {
-        viewModel.selectionChanged.send(nil)
+        viewModel.onSelectionChanged.send()
     }
 
+    /// skips taps that hit a annotation
     @objc func tapGesture(_ gestureRecognizer: UITapGestureRecognizer) {
         guard let currentPage = viewModel.pdfView.currentPage else {
             print("NO CURRENT PAGE")
@@ -175,7 +176,7 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
             return
         }
 
-        viewModel.tapped.send(convertedPoint)
+        viewModel.onTapped.send(convertedPoint)
     }
 }
 

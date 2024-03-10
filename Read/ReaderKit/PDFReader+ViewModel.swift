@@ -26,12 +26,12 @@ class PDFViewModel: ObservableObject {
         getPdfToc()
     }
 
-    var pdfRelocated = PassthroughSubject<PDFPage, Never>()
+    var onRelocated = PassthroughSubject<PDFPage, Never>()
     // pdf selection event nothing is passed through
     // highlighting can be accessed by pdfview.currentSelection
-    var selectionChanged = PassthroughSubject<Any?, Never>()
-    var highlighted = PassthroughSubject<(String, [PDFHighlight]), Never>()
-    var tapped = PassthroughSubject<CGPoint, Never>()
+    var onSelectionChanged = PassthroughSubject<Void, Never>()
+    var onHighlighted = PassthroughSubject<(String, [PDFHighlight]), Never>()
+    var onTapped = PassthroughSubject<CGPoint, Never>()
 
     init(pdfFile: URL, pdfInitialPageIndex: Int? = nil) {
         self.pdfFile = pdfFile
@@ -68,7 +68,7 @@ class PDFViewModel: ObservableObject {
         currentTocItem = getPDFCurrentTocItem(from: page)
         currentLabel = currentTocItem?.outline?.label ?? ""
 
-        pdfRelocated.send(page)
+        onRelocated.send(page)
     }
 
     func goTo(pageIndex: Int) {
@@ -145,7 +145,7 @@ class PDFViewModel: ObservableObject {
         addHighlightToPages(highlight: pdfHighlightPageLocations)
 
         let selectedString = currentSelection.string ?? ""
-        highlighted.send((selectedString, pdfHighlightPageLocations))
+        onHighlighted.send((selectedString, pdfHighlightPageLocations))
     }
 
     func addHighlightToPages(highlight: [PDFHighlight]) {

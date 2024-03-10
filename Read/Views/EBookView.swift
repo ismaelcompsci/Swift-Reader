@@ -100,10 +100,10 @@ struct EBookView: View {
             }
 
         })
-        .onReceive(ebookViewModel.tapped, perform: handleTap)
-        .onReceive(ebookViewModel.bookRelocated, perform: relocated)
-        .onReceive(ebookViewModel.selectionChanged, perform: selectionChanged)
-        .onReceive(ebookViewModel.highlighted, perform: newHighlight)
+        .onReceive(ebookViewModel.onTapped, perform: handleTap)
+        .onReceive(ebookViewModel.onRelocated, perform: relocated)
+        .onReceive(ebookViewModel.onSelectionChanged, perform: selectionChanged)
+        .onReceive(ebookViewModel.onHighlighted, perform: newHighlight)
         .onChange(of: ebookViewModel.renderedBook) { oldValue, newValue in
             if oldValue == false, newValue == true {
                 // inject highlights
