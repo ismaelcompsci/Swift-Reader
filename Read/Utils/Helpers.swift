@@ -95,6 +95,7 @@ func getPDFCover(ofPDFAt: URL) -> UIImage? {
 
         return image
     }
+
     return nil
 }
 

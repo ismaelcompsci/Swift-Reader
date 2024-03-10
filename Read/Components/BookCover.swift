@@ -5,40 +5,44 @@
 //  Created by Mirna Olvera on 2/23/24.
 //
 
+import NukeUI
 import SwiftUI
 
 struct BookCover: View {
-    var image: Image
-
+    var imageURL: URL?
     var isPlaceholderImage: Bool = false
 
     init(coverPath: String? = nil) {
-        let image = getBookCover(path: coverPath)
-
-        if let image {
-            self.image = Image(uiImage: image)
+        if let path = coverPath {
             isPlaceholderImage = false
+            let documentsPath = URL.documentsDirectory
+            imageURL = documentsPath.appending(path: path)
         } else {
-            self.image = Image(systemName: "book")
             isPlaceholderImage = true
+            imageURL = nil
         }
+    }
+
+    var placeholder: some View {
+        Image(systemName: "book")
+            .resizable()
+            .scaledToFit()
+            .padding(.horizontal, 10)
     }
 
     var body: some View {
         if isPlaceholderImage {
-            image
-                .resizable()
-                .scaledToFit()
-                .padding(.horizontal, 10)
+            placeholder
         } else {
-            ZStack {
-                image
-                    .resizable()
-                    .blur(radius: 8, opaque: true)
-
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
+            LazyImage(url: imageURL) { phase in
+                if let image = phase.image {
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    Image(systemName: "ellipsis")
+                        .symbolEffect(.variableColor)
+                }
             }
         }
     }

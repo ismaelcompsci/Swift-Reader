@@ -29,7 +29,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVStack(alignment: .leading) {
+                VStack(alignment: .leading) {
                     HStack {
                         // MARK: Search Bar
 

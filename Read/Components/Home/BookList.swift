@@ -16,15 +16,15 @@ enum ListItemEvent {
 struct BookListItem: View {
     var book: Book
     let onEvent: (ListItemEvent) -> Void
-    
+
     private var bookWidth: CGFloat {
         60
     }
-    
+
     private var bookHeight: CGFloat {
         90
     }
-    
+
     var compactBookView: some View {
         HStack {
             BookCover(coverPath: book.coverPath)
@@ -34,24 +34,24 @@ struct BookListItem: View {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(.gray, lineWidth: 0.2)
                 }
-                
+
             VStack(alignment: .leading) {
                 Text(book.title)
                     .lineLimit(3)
                     .font(.title3)
                     .multilineTextAlignment(.leading)
-                    
+
                 Text(book.authors.first?.name ?? "Unkown Author")
                     .font(.subheadline)
                     .foregroundStyle(.gray)
                     .lineLimit(1)
-                
+
                 Spacer()
-                
+
                 if let position = book.readingPosition {
                     Text("\(Int((position.progress ?? 0) * 100))% last read \(position.updatedAt.formatted(.relative(presentation: .numeric)))")
                         .foregroundStyle(.gray)
-                    
+
                 } else {
                     Text("Added on \(book.addedAt.formatted(date: .abbreviated, time: .omitted))")
                         .foregroundStyle(.gray)
@@ -64,7 +64,7 @@ struct BookListItem: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.black)
     }
-    
+
     var body: some View {
         NavigationLink(destination: {
             BookDetailView(book: book)
@@ -89,23 +89,22 @@ struct BookListItem: View {
 
 struct BookList: View {
     @Environment(\.realm) var realm
-    
     var sortedBooks: [Book]
-    
+
     var body: some View {
-        VStack {
+        LazyVStack {
             ForEach(sortedBooks) { book in
-                
+
                 BookListItem(book: book) { event in
                     switch event {
                     case .onDelete:
                         let thawedBook = book.thaw()
-                        
+
                         if let thawedBook, let bookRealm = thawedBook.realm {
                             try! bookRealm.write {
                                 bookRealm.delete(thawedBook)
                             }
-                        
+
                             BookRemover.removeBook(book: book)
                         }
                     case .onClearProgress:
@@ -117,7 +116,7 @@ struct BookList: View {
                         }
                     }
                 }
-                
+
                 if sortedBooks.last?.id != book.id {
                     Divider()
                 }

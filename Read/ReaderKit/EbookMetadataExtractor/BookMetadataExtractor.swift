@@ -84,10 +84,37 @@ class BookMetadataExtractor {
                 let metadata = document?.documentAttributes!
 
                 let author = metadata?[PDFDocumentAttribute.authorAttribute] ?? metadata?["Author"] ?? "Unknown Author"
-                let title = metadata?[PDFDocumentAttribute.titleAttribute]
+                let title = metadata?[PDFDocumentAttribute.titleAttribute] ?? destinationBookURL.deletingPathExtension().lastPathComponent
                 let description = metadata?[PDFDocumentAttribute.subjectAttribute]
 
-                let coverImage = getPDFCover(ofPDFAt: destinationBookURL)
+                var coverImage: UIImage?
+                if let cover = getPDFCover(ofPDFAt: destinationBookURL) {
+                    coverImage = cover
+                } else {
+                    // https://pspdfkit.com/blog/2020/convert-pdf-to-image-in-swift/
+                    if let page = document?.page(at: 0)?.pageRef {
+                        // Fetch the page rect for the page we want to render.
+                        let pageRect = page.getBoxRect(.mediaBox)
+
+                        let cropRect = pageRect
+
+                        let renderer = UIGraphicsImageRenderer(size: cropRect.size)
+                        coverImage = renderer.image { ctx in
+                            // Set the background color.
+                            UIColor.black.set()
+                            ctx.fill(CGRect(x: 0, y: 0, width: cropRect.width, height: cropRect.height))
+
+                            // Translate the context so that we only draw the `cropRect`.
+                            ctx.cgContext.translateBy(x: -cropRect.origin.x, y: pageRect.size.height - cropRect.origin.y)
+
+                            // Flip the context vertically because the Core Graphics coordinate system starts from the bottom.
+                            ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
+
+                            // Draw the PDF page.
+                            ctx.cgContext.drawPDFPage(page)
+                        }
+                    }
+                }
 
                 let fullAuthor = MetadataAuthor(name: String(describing: author))
 

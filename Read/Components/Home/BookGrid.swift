@@ -88,7 +88,7 @@ struct BookGridItem: View {
                             }
                         }
                     }
-                    .frame(maxHeight: bookHeight * 1.2)
+                    .frame(maxWidth: UIScreen.main.bounds.width, maxHeight: bookHeight * 1.2)
                     .padding()
                     .background(.black)
                 }

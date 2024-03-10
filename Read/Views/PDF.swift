@@ -62,8 +62,72 @@ struct PDF: View {
         .onReceive(pdfViewModel.onSelectionChanged, perform: selectionChanged)
         .onReceive(pdfViewModel.onRelocated, perform: relocated)
         .onReceive(pdfViewModel.onTapped, perform: handleTap)
+        .onReceive(pdfViewModel.onHighlighted, perform: handleHighlight)
+        .onAppear {
+            // convert stored highlights to pdfhighlihgs
+
+            var highlights = [PDFHighlight]()
+
+            Array(book.highlights).forEach { bH in
+                bH.position.forEach { pdfHighlight in
+                    let page = pdfHighlight.page
+                    var ranges = [NSRange]()
+
+                    pdfHighlight.ranges.forEach { hRange in
+                        let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
+
+                        ranges.append(range)
+                    }
+
+                    highlights.append(PDFHighlight(page: page, ranges: ranges))
+                }
+            }
+
+            pdfViewModel.addHighlightToPages(highlight: highlights)
+        }
         .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
+    }
+
+    func handleHighlight(_ highlight: (String, [PDFHighlight])) {
+        let (text, newHighlight) = highlight
+
+        guard let thawedBook = book.thaw() else {
+            return
+        }
+
+        var pageNumber: Int?
+
+        try! realm.write {
+            let pHighlight = BookHighlight()
+
+            newHighlight.forEach { hPage in
+                let pdfHighlight = PersistedPDFHighlight()
+                pdfHighlight.page = hPage.page
+
+                if pageNumber != nil {
+                    pageNumber = hPage.page
+                }
+
+                _ = hPage.ranges.map { range in
+                    let highlightRange = HighlightRange()
+                    highlightRange.lowerBound = range.lowerBound
+                    highlightRange.uppperBound = range.upperBound
+
+                    pdfHighlight.ranges.append(highlightRange)
+                }
+
+                pHighlight.position.append(pdfHighlight)
+            }
+
+            pHighlight.addedAt = .now
+            pHighlight.updatedAt = .now
+            pHighlight.chapter = pageNumber
+            pHighlight.chapterTitle = pdfViewModel.currentLabel
+            pHighlight.highlightText = text
+
+            thawedBook.highlights.append(pHighlight)
+        }
     }
 
     func relocated(_ currentPage: PDFPage) {
