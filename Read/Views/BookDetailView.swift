@@ -157,25 +157,12 @@ struct BookDetailView: View {
                     //
                     
                     HStack {
-                        Button {
+                        let text: String = book.readingPosition != nil ? "Continue Reading \(Int((book.readingPosition?.progress ?? 0.0) * 100))%" : "Read"
+                 
+                        AppButton(systemName: "book.fill", text: text) {
                             openReader = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "book.fill")
-                                
-                                if let position = book.readingPosition {
-                                    Text("Continue Reading \(Int((position.progress ?? 0.0) * 100))%")
-                                } else {
-                                    Text("Read")
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 12)
-                            .foregroundStyle(.white)
-                            .background(appColor.accent)
-                            .clipShape(.capsule)
                         }
+                        .frame(maxWidth: .infinity)
                     }
                     .padding(.horizontal, 12)
                     
@@ -201,7 +188,7 @@ struct BookDetailView: View {
                                 .padding(.horizontal, 12)
                             }
                         }
-                        .frame(width: proxy.size.width)
+                        .frame(width: proxy.size.width + 12)
                         .background(.black)
                     }
                     

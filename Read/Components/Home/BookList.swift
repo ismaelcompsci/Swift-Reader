@@ -8,14 +8,15 @@
 import RealmSwift
 import SwiftUI
 
-enum ListItemEvent {
+enum BookItemEvent {
     case onDelete
     case onClearProgress
+    case onEdit
 }
 
 struct BookListItem: View {
     var book: Book
-    let onEvent: (ListItemEvent) -> Void
+    let onEvent: (BookItemEvent) -> Void
 
     private var bookWidth: CGFloat {
         60
@@ -74,11 +75,17 @@ struct BookListItem: View {
                     Button("Share", systemImage: "square.and.arrow.up.fill") {
                         showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
                     }
+
+                    Button("Edit", systemImage: "pencil") {
+                        onEvent(.onEdit)
+                    }
+
                     if book.readingPosition != nil {
                         Button("Clear progress", systemImage: "clear.fill") {
                             onEvent(.onClearProgress)
                         }
                     }
+
                     Button("Delete", systemImage: "trash.fill", role: .destructive) {
                         onEvent(.onDelete)
                     }
@@ -88,6 +95,7 @@ struct BookListItem: View {
 }
 
 struct BookList: View {
+    @EnvironmentObject var editViewModel: EditViewModel
     @Environment(\.realm) var realm
     var sortedBooks: [Book]
 
@@ -114,6 +122,12 @@ struct BookList: View {
                                 thawedBook?.readingPosition = nil
                             }
                         }
+
+                    case .onEdit:
+                        editViewModel.reset()
+
+                        editViewModel.book = book
+                        editViewModel.showEditView = true
                     }
                 }
 

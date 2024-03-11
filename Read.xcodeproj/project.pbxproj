@@ -40,6 +40,13 @@
 		9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9FB84A612B9D6681005D7915 /* NukeExtensions */; };
 		9FB84A642B9D6681005D7915 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9FB84A632B9D6681005D7915 /* NukeUI */; };
 		9FB84A662B9D6681005D7915 /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = 9FB84A652B9D6681005D7915 /* NukeVideo */; };
+		9FBC72672B9E7B820054A7B0 /* SheetHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC72662B9E7B820054A7B0 /* SheetHeader.swift */; };
+		9FBC726A2B9E91950054A7B0 /* TagForm in Frameworks */ = {isa = PBXBuildFile; productRef = 9FBC72692B9E91950054A7B0 /* TagForm */; };
+		9FBC726C2B9EA17D0054A7B0 /* FormInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726B2B9EA17D0054A7B0 /* FormInput.swift */; };
+		9FBC726E2B9EA1920054A7B0 /* AdaptiveStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */; };
+		9FBC72702B9EA5B70054A7B0 /* AppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726F2B9EA5B70054A7B0 /* AppButton.swift */; };
+		9FBC72732B9EA6B80054A7B0 /* EditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC72722B9EA6B80054A7B0 /* EditViewModel.swift */; };
+		9FBC72752B9EA6C60054A7B0 /* AppColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC72742B9EA6C60054A7B0 /* AppColor.swift */; };
 		9FC34B5C2B99754A001E8C38 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 9FC34B5B2B99754A001E8C38 /* scripts */; };
 		9FC596452B86A30800ED3734 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596322B86A30700ED3734 /* Poppins-ExtraLight.ttf */; };
 		9FC596462B86A30800ED3734 /* Poppins-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596332B86A30700ED3734 /* Poppins-ThinItalic.ttf */; };
@@ -61,6 +68,7 @@
 		9FC596562B86A30800ED3734 /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596432B86A30800ED3734 /* Poppins-Italic.ttf */; };
 		9FC596572B86A30800ED3734 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */; };
 		9FC596592B86A56A00ED3734 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC596582B86A56A00ED3734 /* Font+Extensions.swift */; };
+		9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */; };
 		9FD8086E2B980DEE0007D8F6 /* PDFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8086D2B980DEE0007D8F6 /* PDFReader.swift */; };
 		9FD808702B980E2C0007D8F6 /* PDFReader+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8086F2B980E2C0007D8F6 /* PDFReader+ViewModel.swift */; };
 		9FD808722B980F2E0007D8F6 /* EBookReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808712B980F2E0007D8F6 /* EBookReader.swift */; };
@@ -113,6 +121,12 @@
 		9F86C52A2B89B24300DB61A6 /* BookCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCover.swift; sourceTree = "<group>"; };
 		9F86C52C2B89B3F300DB61A6 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		9FB62D822B8D841F00A10EF5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9FBC72662B9E7B820054A7B0 /* SheetHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetHeader.swift; sourceTree = "<group>"; };
+		9FBC726B2B9EA17D0054A7B0 /* FormInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormInput.swift; sourceTree = "<group>"; };
+		9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveStack.swift; sourceTree = "<group>"; };
+		9FBC726F2B9EA5B70054A7B0 /* AppButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButton.swift; sourceTree = "<group>"; };
+		9FBC72722B9EA6B80054A7B0 /* EditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewModel.swift; sourceTree = "<group>"; };
+		9FBC72742B9EA6C60054A7B0 /* AppColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColor.swift; sourceTree = "<group>"; };
 		9FC34B5B2B99754A001E8C38 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
 		9FC596322B86A30700ED3734 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		9FC596332B86A30700ED3734 /* Poppins-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ThinItalic.ttf"; sourceTree = "<group>"; };
@@ -134,6 +148,7 @@
 		9FC596432B86A30800ED3734 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Italic.ttf"; sourceTree = "<group>"; };
 		9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
 		9FC596582B86A56A00ED3734 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
+		9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDetailsView.swift; sourceTree = "<group>"; };
 		9FD8086D2B980DEE0007D8F6 /* PDFReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFReader.swift; sourceTree = "<group>"; };
 		9FD8086F2B980E2C0007D8F6 /* PDFReader+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PDFReader+ViewModel.swift"; sourceTree = "<group>"; };
 		9FD808712B980F2E0007D8F6 /* EBookReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EBookReader.swift; sourceTree = "<group>"; };
@@ -164,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F47BD322B95CA65005A3851 /* GCDWebServers in Frameworks */,
+				9FBC726A2B9E91950054A7B0 /* TagForm in Frameworks */,
 				9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */,
 				9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */,
 				9FEA97C42B89FFB5004AE311 /* SwiftSoup in Frameworks */,
@@ -195,6 +211,10 @@
 				9FF92A8C2B788C9400025405 /* PieProgress.swift */,
 				9F86C52A2B89B24300DB61A6 /* BookCover.swift */,
 				9F86C52C2B89B3F300DB61A6 /* SearchBar.swift */,
+				9FBC72662B9E7B820054A7B0 /* SheetHeader.swift */,
+				9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */,
+				9FBC726B2B9EA17D0054A7B0 /* FormInput.swift */,
+				9FBC726F2B9EA5B70054A7B0 /* AppButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -236,6 +256,7 @@
 				9F608E982B65F3F700D2B5F4 /* Models */,
 				9F608E902B65E27B00D2B5F4 /* Views */,
 				9F608E8D2B65DDC300D2B5F4 /* Utils */,
+				9FBC72712B9EA6A80054A7B0 /* Global */,
 				9F0EA4582B89773900B7B009 /* ReadApp.swift */,
 				9FC34B5B2B99754A001E8C38 /* scripts */,
 				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
@@ -267,16 +288,12 @@
 		9F608E902B65E27B00D2B5F4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9FCFBE202B9D84D800BD9E3D /* Reader */,
 				9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */,
+				9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */,
 				9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */,
 				9F608E912B65E29000D2B5F4 /* UploadFileView.swift */,
 				9FB62D822B8D841F00A10EF5 /* SettingsView.swift */,
-				9FD8087F2B9814540007D8F6 /* PDF.swift */,
-				9FD8088B2B983F790007D8F6 /* EBookView.swift */,
-				9FD808852B981E020007D8F6 /* ReaderSettings.swift */,
-				9FD808812B9816B60007D8F6 /* ReaderOverlay.swift */,
-				9FD808832B9819510007D8F6 /* ReaderContextMenu.swift */,
-				9FD808892B982CE40007D8F6 /* ReaderContent.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -290,6 +307,15 @@
 				9FE38F032B7DFB50005A446A /* BookMetadata.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		9FBC72712B9EA6A80054A7B0 /* Global */ = {
+			isa = PBXGroup;
+			children = (
+				9FBC72722B9EA6B80054A7B0 /* EditViewModel.swift */,
+				9FBC72742B9EA6C60054A7B0 /* AppColor.swift */,
+			);
+			path = Global;
 			sourceTree = "<group>";
 		};
 		9FC596062B86A06A00ED3734 /* Resources */ = {
@@ -332,6 +358,19 @@
 				9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */,
 			);
 			path = Poppins;
+			sourceTree = "<group>";
+		};
+		9FCFBE202B9D84D800BD9E3D /* Reader */ = {
+			isa = PBXGroup;
+			children = (
+				9FD8087F2B9814540007D8F6 /* PDF.swift */,
+				9FD8088B2B983F790007D8F6 /* EBookView.swift */,
+				9FD808852B981E020007D8F6 /* ReaderSettings.swift */,
+				9FD808812B9816B60007D8F6 /* ReaderOverlay.swift */,
+				9FD808832B9819510007D8F6 /* ReaderContextMenu.swift */,
+				9FD808892B982CE40007D8F6 /* ReaderContent.swift */,
+			);
+			path = Reader;
 			sourceTree = "<group>";
 		};
 		9FD8084F2B980C7F0007D8F6 /* ReaderKit */ = {
@@ -400,6 +439,7 @@
 				9FB84A612B9D6681005D7915 /* NukeExtensions */,
 				9FB84A632B9D6681005D7915 /* NukeUI */,
 				9FB84A652B9D6681005D7915 /* NukeVideo */,
+				9FBC72692B9E91950054A7B0 /* TagForm */,
 			);
 			productName = Read;
 			productReference = 9F608E7C2B65D05B00D2B5F4 /* Read.app */;
@@ -435,6 +475,7 @@
 				9FEA97C22B89FFB5004AE311 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				9F47BD302B95CA65005A3851 /* XCRemoteSwiftPackageReference "GCDWebServer" */,
 				9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */,
+				9FBC72682B9E91950054A7B0 /* XCRemoteSwiftPackageReference "tagform" */,
 			);
 			productRefGroup = 9F608E7D2B65D05B00D2B5F4 /* Products */;
 			projectDirPath = "";
@@ -493,16 +534,21 @@
 				9FD8087C2B98135D0007D8F6 /* PDFReader+View.swift in Sources */,
 				9FD8086E2B980DEE0007D8F6 /* PDFReader.swift in Sources */,
 				9FD8087E2B9813A10007D8F6 /* ReaderHelpers.swift in Sources */,
+				9FBC72672B9E7B820054A7B0 /* SheetHeader.swift in Sources */,
 				9FD808782B9812B80007D8F6 /* EBookReader+WebView.swift in Sources */,
 				9FD808802B9814540007D8F6 /* PDF.swift in Sources */,
 				9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */,
 				9FD8087A2B98130D0007D8F6 /* EBookReader+FileServer.swift in Sources */,
 				9F4DEB282B69FB390046B76C /* HeadlessWebView.swift in Sources */,
+				9FBC72702B9EA5B70054A7B0 /* AppButton.swift in Sources */,
 				9F14FBF32B8AA3F6001CA119 /* AnnasArchiveAPI.swift in Sources */,
+				9FBC726C2B9EA17D0054A7B0 /* FormInput.swift in Sources */,
 				9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */,
+				9FBC72732B9EA6B80054A7B0 /* EditViewModel.swift in Sources */,
 				9FE38F042B7DFB50005A446A /* BookMetadata.swift in Sources */,
 				9FD808742B980F440007D8F6 /* EBookReader+ViewModel.swift in Sources */,
 				9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */,
+				9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */,
 				9FD8088C2B983F790007D8F6 /* EBookView.swift in Sources */,
 				9F608E8F2B65DDD100D2B5F4 /* Extensions.swift in Sources */,
 				9FD8088A2B982CE40007D8F6 /* ReaderContent.swift in Sources */,
@@ -512,6 +558,7 @@
 				9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */,
 				9FD808722B980F2E0007D8F6 /* EBookReader.swift in Sources */,
 				9F5AADEF2B82CA1400712230 /* MockRealm.swift in Sources */,
+				9FBC72752B9EA6C60054A7B0 /* AppColor.swift in Sources */,
 				9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */,
 				9FD808842B9819510007D8F6 /* ReaderContextMenu.swift in Sources */,
 				9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */,
@@ -522,6 +569,7 @@
 				9F608E922B65E29000D2B5F4 /* UploadFileView.swift in Sources */,
 				9F5AADF42B82CB9D00712230 /* BookList.swift in Sources */,
 				9F5954A92B6C7A70009FC2F1 /* BookMetadataExtractor.swift in Sources */,
+				9FBC726E2B9EA1920054A7B0 /* AdaptiveStack.swift in Sources */,
 				9FD808822B9816B60007D8F6 /* ReaderOverlay.swift in Sources */,
 				9F54EE2D2B7327FD001DB7D7 /* Theme.swift in Sources */,
 				9FC596592B86A56A00ED3734 /* Font+Extensions.swift in Sources */,
@@ -774,6 +822,14 @@
 				minimumVersion = 12.4.0;
 			};
 		};
+		9FBC72682B9E91950054A7B0 /* XCRemoteSwiftPackageReference "tagform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/issetwo/tagform";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		9FEA97C22B89FFB5004AE311 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup";
@@ -824,6 +880,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeVideo;
+		};
+		9FBC72692B9E91950054A7B0 /* TagForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FBC72682B9E91950054A7B0 /* XCRemoteSwiftPackageReference "tagform" */;
+			productName = TagForm;
 		};
 		9FEA97C32B89FFB5004AE311 /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;

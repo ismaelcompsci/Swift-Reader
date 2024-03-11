@@ -16,6 +16,7 @@ enum LibraryDisplayMode: String, Codable {
 struct ContentView: View {
     @ObservedResults(Book.self) var books
 
+    @EnvironmentObject var editViewModel: EditViewModel
     @EnvironmentObject var appColor: AppColor
 
     @StateObject var searchDebouncer = SearchDebouncer()
@@ -121,6 +122,11 @@ struct ContentView: View {
             .padding(.horizontal, 12)
             .navigationBarTitle("Home", displayMode: .inline)
         }
+        .sheet(isPresented: $editViewModel.editBookReady) {
+            if let book = editViewModel.book {
+                EditDetailsView(book: book)
+            }
+        }
     }
 }
 
@@ -196,4 +202,5 @@ extension ContentView {
         .environment(\.font, Font.custom("Poppins-Regular", size: 16))
         .environmentObject(AppColor())
         .environmentObject(OrientationInfo())
+        .environmentObject(EditViewModel())
 }

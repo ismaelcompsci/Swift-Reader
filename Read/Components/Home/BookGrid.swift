@@ -10,7 +10,7 @@ import SwiftUI
 
 struct BookGridItem: View {
     var book: Book
-    let onEvent: (ListItemEvent) -> Void
+    let onEvent: (BookItemEvent) -> Void
 
     let bookHeight: CGFloat = 170
     let bookWidth: CGFloat = 115
@@ -53,11 +53,17 @@ struct BookGridItem: View {
                     Button("Share", systemImage: "square.and.arrow.up.fill") {
                         showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
                     }
+
+                    Button("Edit", systemImage: "pencil") {
+                        onEvent(.onEdit)
+                    }
+
                     if book.readingPosition != nil {
                         Button("Clear progress", systemImage: "clear.fill") {
                             onEvent(.onClearProgress)
                         }
                     }
+
                     Button("Delete", systemImage: "trash.fill", role: .destructive) {
                         onEvent(.onDelete)
                     }
@@ -97,6 +103,7 @@ struct BookGridItem: View {
 }
 
 struct BookGrid: View {
+    @EnvironmentObject var editViewModel: EditViewModel
     @Environment(\.realm) var realm
 
     var sortedBooks: [Book]
@@ -128,6 +135,12 @@ struct BookGrid: View {
                                 thawedBook?.readingPosition = nil
                             }
                         }
+
+                    case .onEdit:
+                        editViewModel.reset()
+
+                        editViewModel.book = book
+                        editViewModel.showEditView = true
                     }
                 }
             }

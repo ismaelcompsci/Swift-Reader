@@ -15,14 +15,16 @@ enum BookMetadataError: Error {
 }
 
 class BookMetadataExtractor {
-    static let extracterInstance: Int = 0
+    static let shared = BookMetadataExtractor()
+
+    let extracterInstance: Int = 0
 
     init() {}
 
     /**
      TODO: remove the instance of meatadataextractore after its done to save memeory
      */
-    static func getMetadata(path bookPath: String, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
+    func getMetadata(path bookPath: String, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
         let extracterName = "metadata\(extracterInstance)"
         let function = """
         var \(extracterName) = new MetaDataExtractor()
@@ -56,7 +58,7 @@ class BookMetadataExtractor {
         }
     }
 
-    static func parseBook(from url: URL, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
+    func parseBook(from url: URL, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
         let accessing = url.startAccessingSecurityScopedResource()
         let isPdf = url.lastPathComponent.hasSuffix(".pdf")
 
@@ -80,11 +82,12 @@ class BookMetadataExtractor {
             var bookMetadata = BookMetadata()
 
             if isPdf {
+                let optionalTitle = destinationBookURL.deletingPathExtension().lastPathComponent
                 let document = PDFDocument(url: destinationBookURL)
                 let metadata = document?.documentAttributes!
 
                 let author = metadata?[PDFDocumentAttribute.authorAttribute] ?? metadata?["Author"] ?? "Unknown Author"
-                let title = metadata?[PDFDocumentAttribute.titleAttribute] ?? destinationBookURL.deletingPathExtension().lastPathComponent
+                let title = metadata?[PDFDocumentAttribute.titleAttribute] ?? (optionalTitle != "" ? optionalTitle : "Unknown Title")
                 let description = metadata?[PDFDocumentAttribute.subjectAttribute]
 
                 var coverImage: UIImage?
@@ -191,11 +194,11 @@ class BookMetadataExtractor {
 
     // async version
     // the callback version caused issues when importin a large amount of files
-    static func parseBook(from url: URL) async throws -> BookMetadata {
+    func parseBook(from url: URL) async throws -> BookMetadata {
         return try await withCheckedThrowingContinuation {
             (continuation: CheckedContinuation<BookMetadata, Error>) in
 
-            BookMetadataExtractor.parseBook(from: url) { result in
+            self.parseBook(from: url) { result in
                 switch result {
                 case .success(let success):
                     continuation.resume(returning: success)

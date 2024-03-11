@@ -122,17 +122,10 @@ struct UploadFileView: View {
                     .font(.subheadline)
                     .foregroundStyle(.gray)
 
-                Button {
+                AppButton(text: "Select Files") {
                     showFilePicker = true
-                } label: {
-                    Text("Select Files")
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .foregroundStyle(.white)
-                        .background(appColor.accent)
-                        .clipShape(.capsule)
                 }
-                .frame(maxHeight: .infinity, alignment: .top)
+                .frame(maxWidth: 120, maxHeight: .infinity, alignment: .top)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundSecondary)
@@ -146,20 +139,7 @@ struct UploadFileView: View {
         VStack(alignment: .leading) {
             // MARK: Header
 
-            HStack {
-                Text("Upload a book")
-                    .font(.title.weight(.semibold))
-
-                Spacer()
-
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 24))
-                        .foregroundStyle(appColor.accent.opacity(0.7))
-                }
-            }
+            SheetHeader(title: "Upload a book")
 
             Spacer()
 
@@ -195,7 +175,7 @@ struct UploadFileView: View {
             processingBook = true
             for url in fileUrls {
                 // made async instead of closure so that a large number of books are not being proccessed at the same time
-                if let metadata = try? await BookMetadataExtractor.parseBook(from: url) {
+                if let metadata = try? await BookMetadataExtractor.shared.parseBook(from: url) {
                     let book = Book()
 
                     book.title = metadata.title ?? "Untitled"

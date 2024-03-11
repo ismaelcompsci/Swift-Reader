@@ -16,7 +16,7 @@ class Tag: EmbeddedObject {
     @Persisted var name: String = ""
 }
 
-class Book: Object, ObjectKeyIdentifiable, Identifiable {
+class Book: Object, ObjectKeyIdentifiable {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var title = ""
     @Persisted var authors: List<Author> = List()

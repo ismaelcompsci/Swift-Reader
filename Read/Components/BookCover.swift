@@ -8,6 +8,11 @@
 import NukeUI
 import SwiftUI
 
+func getCoverFullPath(for path: String) -> URL {
+    let documentsPath = URL.documentsDirectory
+    return documentsPath.appending(path: path)
+}
+
 struct BookCover: View {
     var imageURL: URL?
     var isPlaceholderImage: Bool = false
@@ -15,8 +20,7 @@ struct BookCover: View {
     init(coverPath: String? = nil) {
         if let path = coverPath {
             isPlaceholderImage = false
-            let documentsPath = URL.documentsDirectory
-            imageURL = documentsPath.appending(path: path)
+            imageURL = getCoverFullPath(for: path)
         } else {
             isPlaceholderImage = true
             imageURL = nil
