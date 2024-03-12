@@ -7,8 +7,28 @@
 
 import SwiftUI
 
+struct ReaderContextMenuButton: ButtonStyle {
+    let width: CGFloat
+    let height: CGFloat
+    let backgroundColor: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: width, height: height)
+            .contentShape(.rect)
+            .background(configuration.isPressed ? Color.secondary : Color.black)
+    }
+}
+
+enum ContextMenuEvent {
+    case highlight
+    case copy
+    case delete
+}
+
 struct ReaderContextMenu: View {
     @Binding var showContextMenu: Bool
+    @Binding var editMode: Bool
 
     var height: CGFloat = 44
     var buttonSizeWidth: CGFloat = 44
@@ -19,51 +39,62 @@ struct ReaderContextMenu: View {
     var numberOfButtons: CGFloat = 2
 
     var position: CGPoint
-    var highlightButtonPressed: (() -> Void)?
-    var copyButtonPressed: (() -> Void)?
+    var onEvent: ((ContextMenuEvent) -> Void)?
+
+    var editMenu: some View {
+        VStack {
+            Button {
+                onEvent?(.delete)
+            } label: {
+                Image(systemName: "trash")
+                    .foregroundStyle(.red)
+            }
+            .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
+        }
+    }
+
+    var menu: some View {
+        VStack {
+            HStack(spacing: 0) {
+                Button {
+                    onEvent?(.highlight)
+                }
+                label: {
+                    Circle()
+                        .fill(.yellow)
+                        .frame(width: buttonSizeWidth / 2, height: buttonSizeHeight / 2)
+                }
+                .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
+
+                Divider()
+                    .frame(width: 1, height: buttonSizeHeight / 2)
+
+                Button {
+                    onEvent?(.copy)
+                }
+                label: {
+                    Image(systemName: "doc.on.doc.fill")
+                }
+                .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
+            }
+        }
+    }
 
     var body: some View {
         HStack {
-            Button {
-//                viewModel.highlightSelection()
-                highlightButtonPressed?()
-                showContextMenu.toggle()
+            if editMode {
+                editMenu
+            } else {
+                menu
             }
-            label: {
-                Circle()
-                    .fill(.yellow)
-                    .frame(width: buttonSizeWidth / 2, height: buttonSizeHeight / 2)
-            }
-            .frame(width: buttonSizeWidth, height: buttonSizeHeight)
-            .background(.black)
-
-            Divider()
-                .frame(height: buttonSizeHeight / 2)
-
-            Button {
-//                viewModel.copySelection()
-                copyButtonPressed?()
-                showContextMenu.toggle()
-            }
-
-            label: {
-                Image(systemName: "doc.on.doc.fill")
-            }
-            .frame(width: buttonSizeWidth, height: buttonSizeHeight)
-            .background(.black)
         }
         .background(.black)
         .clipShape(RoundedRectangle(cornerRadius: 4))
-        .frame(width: buttonSizeWidth * numberOfButtons, height: buttonSizeHeight)
         .position(position)
-        .onAppear {
-            // TODO: change this
-            //            viewModel.frame.width = buttonSizeWidth * numberOfButtons
-            //            viewModel.frame.height = buttonSizeHeight
-        }
     }
 }
 
 #Preview {
-    ReaderContextMenu(showContextMenu: .constant(false), position: .zero)
+    ReaderContextMenu(showContextMenu: .constant(false), editMode: .constant(true), position: .init(x: 100, y: 300), onEvent: { print($0) })
+        .background(.white)
 }

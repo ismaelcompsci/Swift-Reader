@@ -14,6 +14,12 @@ protocol TocItem: Identifiable {
     var label: String { get }
 }
 
+protocol BaseAnnotation: Codable {
+    var index: Int { get } // index of loaded document in foliate-js
+    var value: String { get } // cfi range  "epubcfi(/6/12!/4/12,/1:16,/1:354)"
+    var color: String { get }
+}
+
 struct PDFTocItem: TocItem {
     var id: Int {
         outline.hashValue
@@ -48,10 +54,21 @@ struct PDFHighlight {
     var ranges: [NSRange]
 }
 
-struct Annotation: Codable {
+// minimal info to inject saved annotation into book
+struct Annotation: BaseAnnotation {
+    var index: Int // index of loaded document in foliate-js
+    var value: String // cfi range  "epubcfi(/6/12!/4/12,/1:16,/1:354)"
+    var color: String
+}
+
+struct TappedHighlight: BaseAnnotation {
     var index: Int
     var value: String
     var color: String
+    var dir: String
+    var text: String
+    var x: Double
+    var y: Double
 }
 
 struct Selection {

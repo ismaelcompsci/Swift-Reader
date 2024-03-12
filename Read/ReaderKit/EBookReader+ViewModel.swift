@@ -64,7 +64,7 @@ class EBookReaderViewModel: ObservableObject {
         }
     }
 
-    var onTappedHighlight = PassthroughSubject<Void, Never>()
+    var onTappedHighlight = PassthroughSubject<TappedHighlight, Never>()
     var onTapped = PassthroughSubject<CGPoint, Never>()
     var onSelectionChanged = PassthroughSubject<Selection?, Never>()
     var onRelocated = PassthroughSubject<Relocate, Never>()
@@ -180,7 +180,11 @@ class EBookReaderViewModel: ObservableObject {
             }
 
         case .didTapHighlight:
-            print(message)
+            if let json = try? JSONSerialization.data(withJSONObject: message),
+               let highlight = try? JSONDecoder().decode(TappedHighlight.self, from: json)
+            {
+                onTappedHighlight.send(highlight)
+            }
         }
     }
 
@@ -415,5 +419,19 @@ extension EBookReaderViewModel {
                 print("copySelection: \(error)")
             }
         })
+    }
+
+    /// value is highlight cfi range
+    func removeHighlight(_ value: String) {
+        let script = """
+        globalReader?.view.addAnnotation(
+        {
+            value: "\(value)",
+        },
+        true
+        )
+        """
+
+        webView.evaluateJavaScript(script)
     }
 }

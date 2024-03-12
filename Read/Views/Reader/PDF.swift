@@ -21,6 +21,7 @@ struct PDF: View {
     @State var showOverlay = false
     @State var showContextMenu: Bool = false
     @State var contextMenuPosition: CGPoint = .zero
+    @State var editMode = false
 
     init(url: URL, book: Book) {
         self.book = book
@@ -42,7 +43,7 @@ struct PDF: View {
             }
 
             if showContextMenu && contextMenuPosition != .zero {
-                ReaderContextMenu(showContextMenu: $showContextMenu, position: contextMenuPosition, highlightButtonPressed: pdfViewModel.highlightSelection, copyButtonPressed: pdfViewModel.copySelection)
+                ReaderContextMenu(showContextMenu: $showContextMenu, editMode: $editMode, position: contextMenuPosition, onEvent: handleContentMenuEvent)
             }
         }
         .sheet(isPresented: $showContentSheet, content: {
@@ -87,6 +88,19 @@ struct PDF: View {
         }
         .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
+    }
+
+    private func handleContentMenuEvent(_ event: ContextMenuEvent) {
+        switch event {
+        case .highlight:
+            pdfViewModel.highlightSelection()
+        case .copy:
+            pdfViewModel.copySelection()
+        case .delete:
+            // delete selection
+
+            print("SELECTION")
+        }
     }
 
     func handleHighlight(_ highlight: (String, [PDFHighlight])) {

@@ -75,10 +75,10 @@ struct EditDetailsView: View {
                         thawedBook.title = title
                         thawedBook.summary = description
 
-                        var updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
+                        let updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
 
                         tagInfoList.forEach { tag in
-                            var author = Author()
+                            let author = Author()
                             author.name = tag.label
 
                             updatedAuthors.append(author)

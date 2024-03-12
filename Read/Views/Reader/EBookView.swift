@@ -18,10 +18,12 @@ struct EBookView: View {
     var url: URL
 
     @State var contextMenuPosition: CGPoint = .zero
+    @State var editMode = false
     @State var showContentSheet = false
     @State var showSettingsSheet = false
     @State var showContextMenu = false
     @State var showOverlay = false
+    @State var currentHighlight: TappedHighlight? = nil
 
     init(url: URL, book: Book) {
         self.book = book
@@ -57,7 +59,7 @@ struct EBookView: View {
             }
 
             if showContextMenu && contextMenuPosition != .zero {
-                ReaderContextMenu(showContextMenu: $showContextMenu, position: contextMenuPosition, highlightButtonPressed: ebookViewModel.highlightSelection, copyButtonPressed: ebookViewModel.copySelection)
+                ReaderContextMenu(showContextMenu: $showContextMenu, editMode: $editMode, position: contextMenuPosition, onEvent: handleContentMenuEvent)
             }
         }
         .overlay {
@@ -104,6 +106,7 @@ struct EBookView: View {
         .onReceive(ebookViewModel.onRelocated, perform: relocated)
         .onReceive(ebookViewModel.onSelectionChanged, perform: selectionChanged)
         .onReceive(ebookViewModel.onHighlighted, perform: newHighlight)
+        .onReceive(ebookViewModel.onTappedHighlight, perform: handleTappedHighlight)
         .onChange(of: ebookViewModel.renderedBook) { oldValue, newValue in
             if oldValue == false, newValue == true {
                 // inject highlights
@@ -122,6 +125,57 @@ struct EBookView: View {
                 ebookViewModel.setBookAnnotations(annotations: annotations)
             }
         }
+        .onChange(of: showContextMenu) { oldValue, newValue in
+            if oldValue == true, newValue == false {
+                editMode = false
+            }
+        }
+    }
+
+    private func handleContentMenuEvent(_ event: ContextMenuEvent) {
+        switch event {
+        case .highlight:
+            ebookViewModel.highlightSelection()
+        case .copy:
+            ebookViewModel.copySelection()
+        case .delete:
+            if let value = currentHighlight?.value {
+                ebookViewModel.removeHighlight(value)
+                deleteHighlight(value: value)
+            }
+        }
+
+        showContextMenu = false
+        currentHighlight = nil
+    }
+
+    private func deleteHighlight(value: String) {
+        guard let thawedBook = book.thaw(), let realm = thawedBook.realm else {
+            return
+        }
+
+        if let index = book.highlights.firstIndex(where: { bookhighlight in
+            bookhighlight.cfi == value
+        }) {
+            try? realm.write {
+                thawedBook.highlights.remove(at: index)
+            }
+        }
+    }
+
+    private func handleTappedHighlight(_ highlight: TappedHighlight) {
+        showContextMenu = false
+
+        let yPad = highlight.dir == "down" ? 70.0 : 0.0
+        let annotationViewPosition = CGPoint(
+            x: highlight.x,
+            y: highlight.y + yPad
+        )
+
+        editMode = true
+        currentHighlight = highlight
+        contextMenuPosition = annotationViewPosition
+        showContextMenu = true
     }
 
     private func newHighlight(highlight: (String, String?, Int?, String?)) {
@@ -154,6 +208,7 @@ struct EBookView: View {
 
     private func selectionChanged(selectionSelected: Selection?) {
         showContextMenu = false
+        editMode = false
 
         guard let selectedText = selectionSelected?.string, selectedText.count > 0 else {
             showContextMenu = false

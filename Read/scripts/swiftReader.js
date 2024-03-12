@@ -394,9 +394,19 @@ class Reader {
         ?.overlayer?.hitTest({ x: event.clientX, y: event.clientY });
 
       if (hit.length > 0) {
+        let annotation = this.annotationsByValue.get(hit[0])
+        let range = hit[1]
+        if (!annotation || !range) { return }
+        let pos = getPosition(range)
+          
         window.webkit.messageHandlers.didTapHighlight.postMessage({
-          x: event.clientX,
-          y: event.clientY,
+          x: pos.point.x,
+          y: pos.point.y,
+          dir: pos.dir,
+          value: annotation.value,
+          text: range.toString(),
+          color: annotation.color,
+          index: annotation.index
         });
         return;
       }
@@ -455,10 +465,7 @@ class Reader {
               cfi,
               {
                 index: chap.index,
-                range: range,
                 value: cfi,
-                pos: getPosition(range),
-                text: selectionString,
                 color: "#FFFF00"
               }
         );
