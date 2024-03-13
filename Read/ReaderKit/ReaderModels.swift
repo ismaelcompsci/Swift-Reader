@@ -50,8 +50,14 @@ struct EBookTocItem: Codable, Identifiable, TocItem {
 }
 
 struct PDFHighlight {
-    var page: Int
-    var ranges: [NSRange]
+    struct PageLocation: Codable {
+        var page: Int
+        var ranges: [NSRange]
+    }
+
+    var uuid: UUID
+    var pos: [PageLocation]
+    var content: String?
 }
 
 // minimal info to inject saved annotation into book

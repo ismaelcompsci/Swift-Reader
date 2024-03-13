@@ -8,7 +8,16 @@
 import PDFKit
 import SwiftUI
 
+/**
+ https://github.com/drearycold/YetAnotherEBookReader/blob/6b1c67cee92917d53aea418956e5fbbd46342420/YetAnotherEBookReader/Views/PDFView/YabrPDFView.swift#L160
+ */
+
 class NoContextMenuPDFView: PDFView {
+    var singleTapGestureRecognizer: UITapGestureRecognizer?
+    var doubleTapGestureRecognizer: UITapGestureRecognizer?
+
+    var viewModel: PDFViewModel?
+
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
@@ -16,6 +25,70 @@ class NoContextMenuPDFView: PDFView {
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func setupGestureRecognizers() {
+        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tappedGestureHandler(sender:)))
+
+        singleTapGestureRecognizer.numberOfTapsRequired = 1
+        singleTapGestureRecognizer.delegate = self
+        singleTapGestureRecognizer.delaysTouchesEnded = true
+        addGestureRecognizer(singleTapGestureRecognizer)
+        self.singleTapGestureRecognizer = singleTapGestureRecognizer
+    }
+
+    @objc func tappedGestureHandler(sender: UITapGestureRecognizer) {
+        if sender.state == .ended {
+            let tapPoint = sender.location(in: self)
+
+            let aoi = areaOfInterest(for: tapPoint)
+
+            guard aoi.contains(.annotationArea) else {
+                viewModel?.onTapped.send(tapPoint)
+                return
+            }
+
+            let tappedHighlightsValues = viewModel?.highlights.reduce(into: [HighlightValue]()) { partialResult, entry in
+                entry.value.forEach { highlightValue in
+                    if highlightValue.annotations.filter({
+                        guard let page = $0.page else { return false }
+
+                        let pageLocation = self.convert(tapPoint, to: page)
+
+                        return $0.bounds.contains(pageLocation)
+                    }).isEmpty == false {
+                        partialResult.append(highlightValue)
+                    }
+                }
+            }
+
+            if let tappedHighlight = tappedHighlightsValues?.first,
+               let tappedAnnotation = tappedHighlight.annotations.first,
+               let tappedUUIDString = tappedAnnotation.value(forAnnotationKey: .highlightId) as? String,
+               let tappedUUID = UUID(uuidString: tappedUUIDString),
+               let tappedHighlightValue = viewModel?.highlights[tappedUUID],
+               let tappedAnnotationFirst = tappedHighlightValue.first?.annotations.first,
+               let page = tappedAnnotationFirst.page
+            {
+                viewModel?.tappedHighlight = tappedUUID
+
+                let bounds = convert(tappedAnnotationFirst.bounds, from: page)
+                viewModel?.onTappedHighlight.send(TappedPDFHighlight(bounds: bounds, UUID: tappedUUID))
+            }
+        }
+    }
+
+    override func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == singleTapGestureRecognizer || gestureRecognizer == doubleTapGestureRecognizer {
+            if otherGestureRecognizer is UILongPressGestureRecognizer { return false }
+            if otherGestureRecognizer is UIPanGestureRecognizer { return false }
+
+            if gestureRecognizer == doubleTapGestureRecognizer && otherGestureRecognizer == singleTapGestureRecognizer { return false }
+            if gestureRecognizer == singleTapGestureRecognizer && otherGestureRecognizer == doubleTapGestureRecognizer { return false }
+            return true
+        }
+
+        return super.gestureRecognizer(gestureRecognizer, shouldRecognizeSimultaneouslyWith: otherGestureRecognizer)
     }
 
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
@@ -140,43 +213,10 @@ class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelegate {
         viewModel.pdfPageChanged()
     }
 
-    @objc func handleAnnotationHit(notification: Notification) {
-        guard let annotation = notification.userInfo?["PDFAnnotationHit"] as? PDFAnnotation else { return }
-
-        print("annotation Hit: \(annotation)")
-    }
-
     @objc func selectionDidChange(notification: Notification) {
-        viewModel.onSelectionChanged.send()
-    }
-
-    /// skips taps that hit a annotation
-    @objc func tapGesture(_ gestureRecognizer: UITapGestureRecognizer) {
-        guard let currentPage = viewModel.pdfView.currentPage else {
-            print("NO CURRENT PAGE")
-            return
+        if viewModel.pdfView.currentSelection != nil {
+            viewModel.onSelectionChanged.send()
         }
-
-        let tapPoint = gestureRecognizer.location(in: nil)
-        let convertedPoint = viewModel.pdfView.convert(tapPoint, to: currentPage)
-
-        var hitAnnotation: PDFAnnotation? = nil
-
-        for annotation in currentPage.annotations {
-            let bounds = annotation.bounds
-
-            if bounds.contains(convertedPoint) {
-                hitAnnotation = annotation
-                break
-            }
-        }
-
-        if let annotation = hitAnnotation {
-            handleAnnotationHit(notification: Notification(name: .PDFViewAnnotationHit, object: hitAnnotation, userInfo: ["PDFAnnotationHit": annotation]))
-            return
-        }
-
-        viewModel.onTapped.send(convertedPoint)
     }
 }
 
@@ -188,10 +228,10 @@ struct PDFKitView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> NoContextMenuPDFView {
-        print("MAKING UI VIEW")
         let pdfView = viewModel.pdfView
 
         viewModel.pdfDocument.delegate = context.coordinator
+        pdfView.viewModel = viewModel
 
         pdfView.autoScales = true
         pdfView.displayMode = .singlePage
@@ -199,17 +239,14 @@ struct PDFKitView: UIViewRepresentable {
         pdfView.usePageViewController(true, withViewOptions: nil)
         pdfView.document = viewModel.pdfDocument
 
+        pdfView.setupGestureRecognizers()
+
         NotificationCenter.default.addObserver(context.coordinator, selector: #selector(context.coordinator.handlePageChange(notification:)), name: .PDFViewPageChanged, object: nil)
 
         NotificationCenter.default.addObserver(context.coordinator, selector: #selector(context.coordinator.handleVisiblePagesChanged(notification:)), name: .PDFViewVisiblePagesChanged, object: nil)
 
-        NotificationCenter.default.addObserver(context.coordinator, selector: #selector(context.coordinator.handleAnnotationHit(notification:)), name: .PDFViewAnnotationHit, object: nil)
-
         NotificationCenter.default.addObserver(context.coordinator, selector: #selector(context.coordinator.selectionDidChange(notification:)), name: .PDFViewSelectionChanged, object: nil)
 
-        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.tapGesture(_:)))
-
-        pdfView.addGestureRecognizer(tap)
         pdfView.delegate = context.coordinator
 
         return pdfView

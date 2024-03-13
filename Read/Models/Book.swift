@@ -45,3 +45,24 @@ extension Book {
 extension Author {
     static let exampleAuthor = Author(value: ["name": "Andrew Spacewalwoaski"])
 }
+
+extension Book {
+    var fileType: String? {
+        if let type = bookPath?.split(separator: ".").last {
+            return String(type)
+        }
+
+        return nil
+    }
+
+    var fileSize: Double? {
+        let documentsDir = URL.documentsDirectory
+        guard let bookPath else {
+            return nil
+        }
+
+        let path = documentsDir.appending(path: bookPath)
+
+        return path.size
+    }
+}

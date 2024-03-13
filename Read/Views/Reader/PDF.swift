@@ -9,6 +9,10 @@ import PDFKit
 import RealmSwift
 import SwiftUI
 
+public extension PDFAnnotationKey {
+    static let highlightId: PDFAnnotationKey = .init(rawValue: "/HID")
+}
+
 struct PDF: View {
     var realm = try! Realm()
     let url: URL
@@ -46,6 +50,7 @@ struct PDF: View {
                 ReaderContextMenu(showContextMenu: $showContextMenu, editMode: $editMode, position: contextMenuPosition, onEvent: handleContentMenuEvent)
             }
         }
+
         .sheet(isPresented: $showContentSheet, content: {
             ReaderContent(toc: pdfViewModel.toc ?? [], isSelected: { item in pdfViewModel.isBookTocItemSelected(item: item) }, tocItemPressed: { item in
                 guard let page = item.outline?.destination?.page else {
@@ -64,30 +69,29 @@ struct PDF: View {
         .onReceive(pdfViewModel.onRelocated, perform: relocated)
         .onReceive(pdfViewModel.onTapped, perform: handleTap)
         .onReceive(pdfViewModel.onHighlighted, perform: handleHighlight)
+        .onReceive(pdfViewModel.onTappedHighlight, perform: handleTappedHighlight)
         .onAppear {
             // convert stored highlights to pdfhighlihgs
-
-            var highlights = [PDFHighlight]()
-
-            Array(book.highlights).forEach { bH in
-                bH.position.forEach { pdfHighlight in
-                    let page = pdfHighlight.page
-                    var ranges = [NSRange]()
-
-                    pdfHighlight.ranges.forEach { hRange in
-                        let range = NSRange(location: hRange.lowerBound, length: hRange.uppperBound - hRange.lowerBound)
-
-                        ranges.append(range)
-                    }
-
-                    highlights.append(PDFHighlight(page: page, ranges: ranges))
-                }
+            book.highlights.compactMap { $0.toPDFHighlight() }.forEach { pdfHighlight in
+                pdfViewModel.addHighlightToPages(highlight: pdfHighlight)
             }
-
-            pdfViewModel.addHighlightToPages(highlight: highlights)
         }
         .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
+    }
+
+    private func handleTappedHighlight(_ highlight: TappedPDFHighlight) {
+        showContextMenu = false
+        let topPadding = 36.0
+
+        let annotationViewPosition = CGPoint(
+            x: highlight.bounds.midX,
+            y: highlight.bounds.maxY - topPadding
+        )
+
+        editMode = true
+        contextMenuPosition = annotationViewPosition
+        showContextMenu = true
     }
 
     private func handleContentMenuEvent(_ event: ContextMenuEvent) {
@@ -97,54 +101,44 @@ struct PDF: View {
         case .copy:
             pdfViewModel.copySelection()
         case .delete:
-            // delete selection
 
-            print("SELECTION")
+            if let tappedHighlight = pdfViewModel.tappedHighlight, let thawedBook = book.thaw(), let realm = thawedBook.realm {
+                if let highlightIndex = book.highlights.firstIndex(where: { $0.highlightId == tappedHighlight.uuidString }) {
+                    try! realm.write {
+                        thawedBook.highlights.remove(at: highlightIndex)
+                    }
+                    if let deleteHighlight = book.highlights[highlightIndex].toPDFHighlight() {
+                        pdfViewModel.removeHighlight(highlight: deleteHighlight)
+                    }
+                }
+            }
         }
+
+        showContextMenu = false
+        editMode = false
+        pdfViewModel.tappedHighlight = nil
     }
 
-    func handleHighlight(_ highlight: (String, [PDFHighlight])) {
-        let (text, newHighlight) = highlight
-
+    func handleHighlight(_ newHighlight: PDFHighlight) {
         guard let thawedBook = book.thaw() else {
             return
         }
 
-        var pageNumber: Int?
-
         try! realm.write {
-            let pHighlight = BookHighlight()
+            let newHighlight = BookHighlight(pdfHighlight: newHighlight)
+            newHighlight?.chapterTitle = pdfViewModel.currentLabel // add info to PDFHighlight struct
 
-            newHighlight.forEach { hPage in
-                let pdfHighlight = PersistedPDFHighlight()
-                pdfHighlight.page = hPage.page
-
-                if pageNumber != nil {
-                    pageNumber = hPage.page
-                }
-
-                _ = hPage.ranges.map { range in
-                    let highlightRange = HighlightRange()
-                    highlightRange.lowerBound = range.lowerBound
-                    highlightRange.uppperBound = range.upperBound
-
-                    pdfHighlight.ranges.append(highlightRange)
-                }
-
-                pHighlight.position.append(pdfHighlight)
+            if let newHighlight {
+                thawedBook.highlights.append(newHighlight)
             }
-
-            pHighlight.addedAt = .now
-            pHighlight.updatedAt = .now
-            pHighlight.chapter = pageNumber
-            pHighlight.chapterTitle = pdfViewModel.currentLabel
-            pHighlight.highlightText = text
-
-            thawedBook.highlights.append(pHighlight)
         }
     }
 
     func relocated(_ currentPage: PDFPage) {
+        showContextMenu = false
+        editMode = false
+        pdfViewModel.pdfView.clearSelection()
+
         let pdfDocument = pdfViewModel.pdfDocument
 
         let totalPages = CGFloat(pdfDocument.pageCount)
@@ -169,6 +163,7 @@ struct PDF: View {
 
     func selectionChanged(_ _: Any?) {
         showContextMenu = false
+        editMode = false
 
         guard let selection = pdfViewModel.pdfView.currentSelection,
               let selectionString = selection.string,
@@ -212,13 +207,17 @@ struct PDF: View {
             }
 
             pdfViewModel.pdfView.clearSelection()
+            showContextMenu = false
 
             return
         }
 
         withAnimation {
-            showOverlay.toggle()
+            if showContextMenu == false {
+                showOverlay.toggle()
+            }
         }
+        showContextMenu = false
     }
 }
 
