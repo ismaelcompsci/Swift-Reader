@@ -92,8 +92,20 @@ struct EditDetailsView: View {
 
                 Spacer()
 
-                AppButton(text: "Cancel") {
+                Button {
                     dismiss()
+                } label: {
+                    Text("Cancel")
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(
+                                cornerRadius: 20,
+                                style: .continuous
+                            )
+                            .stroke(.pink, lineWidth: 2)
+                        )
+                        .foregroundStyle(.white)
                 }
             }
         }

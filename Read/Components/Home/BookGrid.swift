@@ -70,7 +70,8 @@ struct BookGridItem: View {
                 } preview: {
                     HStack {
                         BookCover(coverPath: book.coverPath)
-                            .frame(width: bookWidth, height: bookHeight)
+                            .scaledToFit()
+                            .frame(width: bookWidth * 0.8, height: bookHeight * 0.8)
 
                         VStack(alignment: .leading) {
                             Text(book.title)
@@ -92,6 +93,20 @@ struct BookGridItem: View {
                                     .foregroundStyle(.gray)
                                     .lineLimit(1)
                             }
+
+                            HStack {
+                                if let type = book.fileType {
+                                    Text("FORMAT\n\(type)")
+                                }
+
+                                if let size = book.fileSize {
+                                    Text("SIZE\n\(ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file))")
+                                }
+                            }
+                            .foregroundStyle(.gray)
+                            .font(.system(size: 10))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
                         }
                     }
                     .frame(maxWidth: UIScreen.main.bounds.width, maxHeight: bookHeight * 1.2)
