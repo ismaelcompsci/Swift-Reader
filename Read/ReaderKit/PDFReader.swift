@@ -25,17 +25,9 @@ struct PDFReader: View {
         PDFKitView(viewModel: viewModel)
             .onAppear {
                 guard let pageIndex = viewModel.pdfInitialPageIndex else {
-                    let page = viewModel.pdfDocument.outlineRoot?.child(at: 0)?.destination?.page
-
-                    viewModel.currentPage = page
-                    viewModel.currentLabel = page?.label ?? ""
-
                     return
                 }
 
-                let page = viewModel.pdfDocument.page(at: pageIndex)
-                viewModel.currentPage = page
-                viewModel.currentLabel = page?.label ?? ""
                 viewModel.goTo(pageIndex: pageIndex)
             }
     }

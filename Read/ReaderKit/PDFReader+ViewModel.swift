@@ -45,7 +45,7 @@ class PDFViewModel: ObservableObject {
     init(pdfFile: URL, pdfInitialPageIndex: Int? = nil) {
         self.pdfFile = pdfFile
         self.pdfDocument = PDFDocument(url: pdfFile) ?? PDFDocument()
-        self.pdfView = NoContextMenuPDFView()
+        self.pdfView = NoContextMenuPDFView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         self.pdfInitialPageIndex = pdfInitialPageIndex
 
         setTheme()
@@ -65,7 +65,6 @@ class PDFViewModel: ObservableObject {
 
     func pdfPageChanged() {
         currentPage = pdfView.currentPage
-
         // Disable popup menu
         pdfView.disableMenuInteractions()
 
@@ -74,8 +73,12 @@ class PDFViewModel: ObservableObject {
             return
         }
 
-        currentTocItem = getPDFCurrentTocItem(from: page)
-        currentLabel = currentTocItem?.outline?.label ?? ""
+        if let pageNumber = page.pageRef?.pageNumber,
+           let tocItem = getTocItem(for: pageNumber)
+        {
+            currentTocItem = tocItem
+            currentLabel = tocItem.label
+        }
 
         onRelocated.send(page)
     }
@@ -86,23 +89,39 @@ class PDFViewModel: ObservableObject {
         }
     }
 
-    private var currentTocItemHolder: PDFTocItem?
-    private func getPDFCurrentTocItem(from: PDFPage) -> PDFTocItem? {
-        guard let toc else {
+    func getTocItem(for pageIndex: Int) -> PDFTocItem? {
+        guard let page = pdfView.currentPage else {
+            print(" pdfPageChanged: No page")
             return nil
         }
 
-        let first = toc.last { tocItem in
-            tocItem.outline?.destination?.page?.pageRef?.pageNumber == from.pageRef?.pageNumber
+        if let toc {
+            for i in 0 ..< toc.count - 1 {
+                let nextIndex = i + 1
+                let nextTocItem = toc[nextIndex]
+
+                let currentTocItem = toc[i]
+
+                let currentTocPageNumber = currentTocItem.pageNumber
+                let nextTocPageNumber = nextTocItem.pageNumber
+
+                if let currentTocPageNumber, let nextTocPageNumber {
+                    if currentTocPageNumber == pageIndex {
+                        return currentTocItem
+                    }
+
+                    if currentTocPageNumber < pageIndex && pageIndex < nextTocPageNumber {
+                        return currentTocItem
+                    }
+
+                    if nextTocPageNumber == pageIndex {
+                        return nextTocItem
+                    }
+                }
+            }
         }
 
-        if first == nil {
-            return currentTocItemHolder
-        }
-
-        currentTocItemHolder = first
-
-        return first
+        return nil
     }
 
     func isBookTocItemSelected(item: PDFTocItem) -> Bool {
