@@ -80,6 +80,7 @@ struct TappedHighlight: BaseAnnotation {
 struct Selection {
     var bounds: CGRect
     var string: String?
+    var dir: String?
 }
 
 struct Relocate: Codable, Equatable, Identifiable {

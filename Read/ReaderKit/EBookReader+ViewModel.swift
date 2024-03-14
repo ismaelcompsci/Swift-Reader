@@ -164,9 +164,10 @@ class EBookReaderViewModel: ObservableObject {
                let y = rectData["y"] as? Double,
                let width = rectData["width"] as? Double,
                let height = rectData["height"] as? Double,
-               let text = rectData["text"] as? String
+               let text = rectData["text"] as? String,
+               let dir = rectData["dir"] as? String
             {
-                let selection = Selection(bounds: CGRect(x: x, y: y, width: width, height: height), string: text)
+                let selection = Selection(bounds: CGRect(x: x, y: y, width: width, height: height), string: text, dir: dir)
                 onSelectionChanged.send(selection)
             }
         case .relocate:

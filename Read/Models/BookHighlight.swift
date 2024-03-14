@@ -8,7 +8,9 @@
 import Foundation
 import RealmSwift
 
-class BookHighlight: EmbeddedObject {
+class BookHighlight: Object, ObjectKeyIdentifiable {
+    @Persisted(primaryKey: true) var _id: ObjectId
+
     @Persisted var cfi: String? = nil // non-pdf
     @Persisted var ranges: String? // pdf
 
@@ -23,6 +25,10 @@ class BookHighlight: EmbeddedObject {
     @Persisted var updatedAt: Date = .now
 
     @Persisted var highlightId: String?
+
+    // Backlink to the book. This is automatically updated whenever
+    // this highlight is added to or removed from a book's highlights list.
+    @Persisted(originProperty: "highlights") var assignee: LinkingObjects<Book>
 
     override init() {}
 

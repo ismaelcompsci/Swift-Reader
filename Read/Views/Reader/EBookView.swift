@@ -5,14 +5,11 @@
 //  Created by Mirna Olvera on 3/6/24.
 //
 
-import RealmSwift
 import SwiftUI
 
 struct EBookView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var ebookViewModel: EBookReaderViewModel
-
-    var realm = try! Realm()
 
     var book: Book
     var url: URL
@@ -141,26 +138,12 @@ struct EBookView: View {
         case .delete:
             if let value = currentHighlight?.value {
                 ebookViewModel.removeHighlight(value)
-                deleteHighlight(value: value)
+                book.removeHighlight(withValue: value)
             }
         }
 
         showContextMenu = false
         currentHighlight = nil
-    }
-
-    private func deleteHighlight(value: String) {
-        guard let thawedBook = book.thaw(), let realm = thawedBook.realm else {
-            return
-        }
-
-        if let index = book.highlights.firstIndex(where: { bookhighlight in
-            bookhighlight.cfi == value
-        }) {
-            try? realm.write {
-                thawedBook.highlights.remove(at: index)
-            }
-        }
     }
 
     private func handleTappedHighlight(_ highlight: TappedHighlight) {
@@ -186,24 +169,7 @@ struct EBookView: View {
             return
         }
 
-        guard let thawedBook = book.thaw() else {
-            print("Unable to thaw book")
-            return
-        }
-
-        if let bookRealm = book.realm?.thaw() {
-            try! bookRealm.write {
-                let pHighlight = BookHighlight()
-                pHighlight.highlightText = text
-                pHighlight.cfi = cfi
-                pHighlight.chapter = index
-                pHighlight.chapterTitle = label
-                pHighlight.addedAt = .now
-                pHighlight.updatedAt = .now
-
-                thawedBook.highlights.append(pHighlight)
-            }
-        }
+        book.addHighlight(text: text, cfi: cfi, index: index, label: label, addedAt: .now, updatedAt: .now)
     }
 
     private func selectionChanged(selectionSelected: Selection?) {
@@ -220,9 +186,10 @@ struct EBookView: View {
             return
         }
 
+        let yPadding = selectionSelected?.dir == "down" ? 70.0 : 0.0
         let annotationViewPosition = CGPoint(
             x: bounds.origin.x,
-            y: bounds.origin.y
+            y: bounds.origin.y + yPadding
         )
 
         contextMenuPosition = annotationViewPosition
@@ -230,19 +197,7 @@ struct EBookView: View {
     }
 
     private func relocated(relocate: Relocate) {
-        let thawedBook = book.thaw()
-        try! realm.write {
-            if thawedBook?.readingPosition == nil {
-                thawedBook?.readingPosition = ReadingPosition()
-                thawedBook?.readingPosition?.progress = relocate.fraction
-                thawedBook?.readingPosition?.updatedAt = relocate.updatedAt ?? .now
-                thawedBook?.readingPosition?.epubCfi = relocate.cfi
-            } else {
-                thawedBook?.readingPosition?.progress = relocate.fraction
-                thawedBook?.readingPosition?.updatedAt = relocate.updatedAt ?? .now
-                thawedBook?.readingPosition?.epubCfi = relocate.cfi
-            }
-        }
+        book.updateReadingPosition(with: relocate)
     }
 
     private func handleTap(point: CGPoint) {

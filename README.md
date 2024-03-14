@@ -18,5 +18,5 @@ TODO
 
 - [ ] show error when metadata extraction fails
 - [X] edit book details: title, authors, etc...
-- [ ] make context menu popup on annotation hit
-- [ ] make theme color persistent 
+- [X] make context menu popup on annotation hit
+- [X] make theme color persistent 

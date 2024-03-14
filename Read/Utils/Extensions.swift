@@ -8,13 +8,6 @@
 import Foundation
 import SwiftUI
 
-extension Color {
-    static let accent = Color("Main")
-    static let accentBackground = Color("Main").opacity(0.12)
-
-    static let backgroundSecondary = Color(red: 0.10, green: 0.10, blue: 0.10)
-}
-
 // https://stackoverflow.com/a/43250864
 public extension Data {
     var fileExtension: String {

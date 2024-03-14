@@ -435,7 +435,7 @@ class Reader {
         this.view.renderer.pause = false;
       }
 
-      const selected = { text, x: pos.point.x, y: pos.point.y, width, height };
+      const selected = { text, x: pos.point.x, y: pos.point.y, width, height, dir: pos.dir };
 
       if (selected && !!range) {
         window.webkit.messageHandlers.selectedText.postMessage(selected);

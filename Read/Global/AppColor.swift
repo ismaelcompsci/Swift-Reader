@@ -9,5 +9,5 @@ import Foundation
 import SwiftUI
 
 class AppColor: ObservableObject {
-    @Published var accent: Color = .accent
+    @AppStorage("ThemeColor") var accent: Color = .accent
 }

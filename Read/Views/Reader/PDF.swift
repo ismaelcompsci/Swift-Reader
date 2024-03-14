@@ -6,7 +6,6 @@
 //
 
 import PDFKit
-import RealmSwift
 import SwiftUI
 
 public extension PDFAnnotationKey {
@@ -14,7 +13,6 @@ public extension PDFAnnotationKey {
 }
 
 struct PDF: View {
-    var realm = try! Realm()
     let url: URL
     let book: Book
 
@@ -102,15 +100,9 @@ struct PDF: View {
             pdfViewModel.copySelection()
         case .delete:
 
-            if let tappedHighlight = pdfViewModel.tappedHighlight, let thawedBook = book.thaw(), let realm = thawedBook.realm {
-                if let highlightIndex = book.highlights.firstIndex(where: { $0.highlightId == tappedHighlight.uuidString }) {
-                    try! realm.write {
-                        thawedBook.highlights.remove(at: highlightIndex)
-                    }
-                    if let deleteHighlight = book.highlights[highlightIndex].toPDFHighlight() {
-                        pdfViewModel.removeHighlight(highlight: deleteHighlight)
-                    }
-                }
+            if let tappedHighlight = pdfViewModel.tappedHighlight {
+                book.removeHighlight(withId: tappedHighlight.uuidString)
+                pdfViewModel.removeHighlight(withUUIDString: tappedHighlight.uuidString)
             }
         }
 
@@ -120,18 +112,7 @@ struct PDF: View {
     }
 
     func handleHighlight(_ newHighlight: PDFHighlight) {
-        guard let thawedBook = book.thaw() else {
-            return
-        }
-
-        try! realm.write {
-            let newHighlight = BookHighlight(pdfHighlight: newHighlight)
-            newHighlight?.chapterTitle = pdfViewModel.currentLabel // add info to PDFHighlight struct
-
-            if let newHighlight {
-                thawedBook.highlights.append(newHighlight)
-            }
-        }
+        book.addHighlight(pdfHighlight: newHighlight)
     }
 
     func relocated(_ currentPage: PDFPage) {
@@ -139,26 +120,7 @@ struct PDF: View {
         editMode = false
         pdfViewModel.pdfView.clearSelection()
 
-        let pdfDocument = pdfViewModel.pdfDocument
-
-        let totalPages = CGFloat(pdfDocument.pageCount)
-        let currentPageIndex = CGFloat(pdfDocument.index(for: currentPage))
-        let updatedAt: Date = .now
-
-        let thawedBook = book.thaw()
-        try! realm.write {
-            if thawedBook?.readingPosition == nil {
-                thawedBook?.readingPosition = ReadingPosition()
-                thawedBook?.readingPosition?.progress = currentPageIndex / totalPages
-                thawedBook?.readingPosition?.updatedAt = updatedAt
-                thawedBook?.readingPosition?.chapter = Int(currentPageIndex)
-
-            } else {
-                thawedBook?.readingPosition?.progress = currentPageIndex / totalPages
-                thawedBook?.readingPosition?.updatedAt = updatedAt
-                thawedBook?.readingPosition?.chapter = Int(currentPageIndex)
-            }
-        }
+        book.updateReadingPosition(page: currentPage, document: pdfViewModel.pdfDocument)
     }
 
     func selectionChanged(_ _: Any?) {

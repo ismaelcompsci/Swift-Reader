@@ -208,6 +208,16 @@ class PDFViewModel: ObservableObject {
             annotation.page?.removeAnnotation(annotation)
         }
     }
+
+    func removeHighlight(withUUIDString uuid: String) {
+        guard let uuid = UUID(uuidString: uuid), let highlightValue = highlights.removeValue(forKey: uuid) else {
+            return
+        }
+
+        highlightValue.flatMap { $0.annotations }.forEach { annotation in
+            annotation.page?.removeAnnotation(annotation)
+        }
+    }
 }
 
 struct HighlightValue {
