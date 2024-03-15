@@ -26,8 +26,22 @@ struct SettingsView: View {
     var body: some View {
         VStack {
             List {
-                HStack {
-                    ColorPicker("Set the theme color", selection: $viewModel.selectedColor, supportsOpacity: false)
+                SwiftUI.Section {
+                    HStack {
+                        ColorPicker("Set the theme color", selection: $viewModel.selectedColor, supportsOpacity: false)
+                    }
+
+                    Button {
+                        appColor.accent = .accent
+                        selectedColor = .accent
+                    } label: {
+                        Text("Reset")
+                    }
+                    .tint(.red)
+                    .frame(width: .infinity, height: .infinity)
+
+                } header: {
+                    Text("Theme")
                 }
             }
             .navigationTitle("Settings")

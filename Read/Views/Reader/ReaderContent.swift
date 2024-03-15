@@ -17,52 +17,58 @@ struct ReaderContent<T: TocItem>: View {
     var currentTocItemId: Int?
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                HStack {
-                    Text("Contents")
-                        .font(.setCustom(fontStyle: .title, fontWeight: .bold))
-                    Spacer()
+        NavigationView {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    ForEach(toc) { tocItem in
+                        let selected = isSelected?(tocItem) ?? false
 
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .foregroundStyle(appColor.accent)
-                }
-                .padding(.horizontal)
-                .padding(.vertical)
+                        VStack {
+                            Button {
+                                tocItemPressed?(tocItem)
 
-                ForEach(toc) { tocItem in
-                    let selected = isSelected?(tocItem) ?? false
+                            } label: {
+                                HStack {
+                                    Text(tocItem.label)
+                                        .lineLimit(2)
+                                        .multilineTextAlignment(.leading)
+                                        .fontWeight(tocItem.depth == 0 ? .semibold : .light)
 
-                    VStack {
-                        Button {
-                            tocItemPressed?(tocItem)
+                                    Spacer()
 
-                        } label: {
-                            HStack {
-                                Text(tocItem.label)
-                                    .lineLimit(2)
-                                    .multilineTextAlignment(.leading)
-
-                                Spacer()
-
-                                Image(systemName: "chevron.right")
+                                    if let pageNumber = tocItem.pageNumber {
+                                        Text("\(pageNumber)")
+                                    }
+                                    Image(systemName: "chevron.right")
+                                }
+                                .foregroundStyle(selected ? appColor.accent : .white)
                             }
-                            .foregroundStyle(selected ? appColor.accent : .white)
-                            .fontWeight(tocItem.depth == 0 ? .semibold : .light)
+                            .padding(.leading, CGFloat(tocItem.depth ?? 0) * 10)
                         }
-                        .padding(.leading, CGFloat(tocItem.depth ?? 0) * 10)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .id(tocItem.id)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .id(tocItem.id)
+                }
+                .scrollIndicators(.hidden)
+                .onAppear {
+                    if let currentTocItemId {
+                        proxy.scrollTo(currentTocItemId, anchor: .center)
+                    }
                 }
             }
-            .scrollIndicators(.hidden)
-            .onAppear {
-                if let currentTocItemId {
-                    proxy.scrollTo(currentTocItemId)
+            .navigationTitle("Content")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    }
+                    label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16))
+                            .foregroundStyle(appColor.accent.opacity(0.7))
+                    }
                 }
             }
         }

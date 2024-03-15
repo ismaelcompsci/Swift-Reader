@@ -46,6 +46,12 @@ struct ReaderSettings: View {
                                 .padding(14)
                                 .background(Color(hex: themeBg.rawValue))
                                 .clipShape(.circle)
+                                .overlay {
+                                    if themeBg == theme.bg {
+                                        Circle()
+                                            .stroke(appColor.accent, lineWidth: 1.0)
+                                    }
+                                }
                                 .foregroundStyle(Color(hex: themeBg.fromBackground(background: themeBg).rawValue))
                                 
                                 if themeBg == theme.bg {
@@ -53,7 +59,7 @@ struct ReaderSettings: View {
                                         .stroke(appColor.accent)
                                         .fill(appColor.accent)
                                         .frame(width: 8, height: 8)
-                                        .offset(x: -14, y: -18)
+                                        .offset(x: 12, y: -18)
                                 }
                             }
                         }

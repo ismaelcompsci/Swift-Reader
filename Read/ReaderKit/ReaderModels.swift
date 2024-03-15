@@ -12,6 +12,8 @@ protocol TocItem: Identifiable {
     var id: Int { get }
     var depth: Int? { get }
     var label: String { get }
+
+    var pageNumber: Int? { get }
 }
 
 protocol BaseAnnotation: Codable {
@@ -44,12 +46,15 @@ struct EBookTocItem: Codable, Identifiable, TocItem {
 
     var depth: Int?
 
+    var pageNumber: Int?
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.label = try container.decode(String.self, forKey: .label)
         self.href = try container.decode(String.self, forKey: .href)
         self.id = try container.decode(Int.self, forKey: .id)
         self.depth = try container.decode(Int.self, forKey: .depth)
+        self.pageNumber = try container.decode(Int.self, forKey: .pageNumber)
     }
 }
 

@@ -35,81 +35,98 @@ struct EditDetailsView: View {
     }
 
     var body: some View {
-        VStack {
-            SheetHeader(title: "Edit your book")
-
-            ScrollView {
-                BookCover(coverPath: book.coverPath)
-                    .frame(width: 100, height: 140)
-                    .padding(.vertical)
-
-                FormInput(text: $title, inputTitle: "Title")
-
+        NavigationView {
+            VStack {
+                ScrollView {
+                    BookCover(coverPath: book.coverPath)
+                        .frame(width: 100, height: 140)
+                        .padding(.vertical)
+                    
+                    FormInput(text: $title, inputTitle: "Title")
+                    
+                    HStack {
+                        Text("Authors")
+                            .foregroundStyle(.gray)
+                        
+                        TagForm(tagInfoList: $tagInfoList, placeholder: "name...", tagColer: .black)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(Color.backgroundSecondary)
+                    .clipShape(.rect(cornerRadius: 12))
+                    
+                    FormInput(text: $description, inputTitle: "Description", axis: .vertical)
+                    
+                    Spacer()
+                }
+                
                 HStack {
-                    Text("Authors")
-                        .foregroundStyle(.gray)
-
-                    TagForm(tagInfoList: $tagInfoList, placeholder: "name...", tagColer: .black)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
-                .background(Color.backgroundSecondary)
-                .clipShape(.rect(cornerRadius: 12))
-
-                FormInput(text: $description, inputTitle: "Description", axis: .vertical)
-
-                Spacer()
-            }
-
-            HStack {
-                AppButton(text: "Save") {
-                    guard let realm = book.realm?.thaw() else {
-                        return
-                    }
-
-                    guard let thawedBook = book.thaw() else {
-                        return
-                    }
-
-                    try? realm.write {
-                        thawedBook.title = title
-                        thawedBook.summary = description
-
-                        let updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
-
-                        tagInfoList.forEach { tag in
-                            let author = Author()
-                            author.name = tag.label
-
-                            updatedAuthors.append(author)
+                    AppButton(text: "Save") {
+                        guard let realm = book.realm?.thaw() else {
+                            return
                         }
-
-                        thawedBook.authors = updatedAuthors
+                        
+                        guard let thawedBook = book.thaw() else {
+                            return
+                        }
+                        
+                        try? realm.write {
+                            thawedBook.title = title
+                            thawedBook.summary = description
+                            
+                            let updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
+                            
+                            tagInfoList.forEach { tag in
+                                let author = Author()
+                                author.name = tag.label
+                                
+                                updatedAuthors.append(author)
+                            }
+                            
+                            thawedBook.authors = updatedAuthors
+                        }
+                        
+                        dismiss()
                     }
-
-                    dismiss()
+                    
+                    Spacer()
+                    
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Cancel")
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(
+                                    cornerRadius: 20,
+                                    style: .continuous
+                                )
+                                .stroke(.pink, lineWidth: 2)
+                            )
+                            .foregroundStyle(.white)
+                    }
+                }
+                
+                .padding()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Edit your book")
                 }
 
-                Spacer()
-
-                Button {
-                    dismiss()
-                } label: {
-                    Text("Cancel")
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(
-                                cornerRadius: 20,
-                                style: .continuous
-                            )
-                            .stroke(.pink, lineWidth: 2)
-                        )
-                        .foregroundStyle(.white)
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    }
+                    label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16))
+                            .foregroundStyle(appColor.accent.opacity(0.7))
+                    }
                 }
             }
         }
-        .padding()
     }
 }
 

@@ -102,7 +102,7 @@ enum Languague: String {
     case Welsh = "cy"
 }
 
-enum Content: String {
+enum ContentType: String {
     case BookNonFiction = "book_nonfiction"
     case BookFiction = "book_fiction"
     case BookUnknown = "book_unknown"

@@ -55,6 +55,7 @@ struct PDF: View {
                     return
                 }
                 pdfViewModel.pdfView.go(to: page)
+                showContentSheet = false
             }, currentTocItemId: pdfViewModel.currentTocItem?.id)
         })
         .sheet(isPresented: $showSettingsSheet, content: {

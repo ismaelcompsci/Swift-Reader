@@ -12,6 +12,8 @@ import WrappingHStack
 struct UploadFileView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var appColor: AppColor
+    @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     @ObservedResults(Book.self) var books
 
@@ -95,77 +97,98 @@ struct UploadFileView: View {
     }
 
     var fileUploadCard: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 24)
-                .strokeBorder(appColor.accent, style: StrokeStyle(lineWidth: 1, dash: [5]))
-                .opacity(0.5)
-                .zIndex(10)
+        GeometryReader { geo in
+            VStack(alignment: .center) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(appColor.accent, style: StrokeStyle(lineWidth: 1, dash: [5]))
+                        .opacity(0.5)
+                        .zIndex(10)
 
-            VStack {
-                // MARK: Upload File Button
+                    VStack {
+                        // MARK: Upload File Button
 
-                WrappingHStack(SupportedFileTypes.allCases, id: \.self, alignment: .center) { type in
-                    Text(".\(type.rawValue.uppercased())")
-                        .font(.system(size: 10))
-                        .lineLimit(1)
-                        .padding(.vertical, 2)
-                        .padding(.horizontal, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.gray.opacity(0.7), lineWidth: 1)
-                        )
-                        .padding(2)
+                        WrappingHStack(SupportedFileTypes.allCases, id: \.self, alignment: .center) { type in
+                            Text(".\(type.rawValue.uppercased())")
+                                .font(.system(size: 10))
+                                .lineLimit(1)
+                                .padding(.vertical, 2)
+                                .padding(.horizontal, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 24)
+                                        .stroke(Color.gray.opacity(0.7), lineWidth: 1)
+                                )
+                                .padding(2)
+                        }
+                        .frame(maxWidth: geo.size.width * 0.7, maxHeight: .infinity, alignment: .center)
+
+                        Text("Add files from your phone")
+                            .font(.subheadline)
+                            .foregroundStyle(.gray)
+
+                        AppButton(text: "Select Files") {
+                            showFilePicker = true
+                        }
+                        .frame(maxWidth: 120, maxHeight: .infinity, alignment: .top)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.backgroundSecondary)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
                 }
-                .frame(maxWidth: UIScreen.main.bounds.size.width * 0.7, maxHeight: .infinity, alignment: .center)
-
-                Text("Add files from your phone")
-                    .font(.subheadline)
-                    .foregroundStyle(.gray)
-
-                AppButton(text: "Select Files") {
-                    showFilePicker = true
-                }
-                .frame(maxWidth: 120, maxHeight: .infinity, alignment: .top)
+                .transition(.move(edge: .bottom))
+                .frame(maxHeight: horizontalSizeClass == .compact ? geo.size.height * 0.35 : geo.size.height * 0.5, alignment: .bottomTrailing)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.backgroundSecondary)
-            .clipShape(RoundedRectangle(cornerRadius: 24))
         }
-        .frame(maxHeight: UIScreen.main.bounds.size.height * 0.30)
-        .transition(.move(edge: .bottom))
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            // MARK: Header
+        NavigationView {
+            VStack(alignment: .leading) {
+                // MARK: Header
 
-            SheetHeader(title: "Upload a book")
+                Spacer()
 
-            Spacer()
+                if hasFilesToProccess {
+                    // MARK: Files to Process List
 
-            if hasFilesToProccess {
-                // MARK: Files to Process List
+                    fileList
 
-                fileList
+                } else {
+                    // MARK: File Upload Card
 
-            } else {
-                // MARK: File Upload Card
-
-                fileUploadCard
-            }
-
-            Spacer()
-        }
-        .padding(14)
-        .fileImporter(isPresented: $showFilePicker, allowedContentTypes: fileTypes, allowsMultipleSelection: true) { result in
-            switch result {
-            case .success(let selectedFileUrls):
-                fileUrls = selectedFileUrls
-                for fileUrl in fileUrls {
-                    totalBytes += fileUrl.size
+                    fileUploadCard
                 }
-            case .failure(let failure):
-                print("No file selected: \(failure.localizedDescription)")
+
+                Spacer()
+            }
+            .padding(14)
+            .fileImporter(isPresented: $showFilePicker, allowedContentTypes: fileTypes, allowsMultipleSelection: true) { result in
+                switch result {
+                case .success(let selectedFileUrls):
+                    fileUrls = selectedFileUrls
+                    for fileUrl in fileUrls {
+                        totalBytes += fileUrl.size
+                    }
+                case .failure(let failure):
+                    print("No file selected: \(failure.localizedDescription)")
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Upload a book")
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    }
+                    label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16))
+                            .foregroundStyle(appColor.accent.opacity(0.7))
+                    }
+                }
             }
         }
     }

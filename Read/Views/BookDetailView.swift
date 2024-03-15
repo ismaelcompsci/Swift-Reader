@@ -8,48 +8,11 @@
 import RealmSwift
 import SwiftUI
 
-final class OrientationInfo: ObservableObject {
-    enum Orientation {
-        case portrait
-        case landscape
-    }
-    
-    @Published var orientation: Orientation
-    
-    private var _observer: NSObjectProtocol?
-    
-    init() {
-        // fairly arbitrary starting value for 'flat' orientations
-        if UIDevice.current.orientation.isLandscape {
-            self.orientation = .landscape
-        } else {
-            self.orientation = .portrait
-        }
-        
-        // unowned self because we unregister before self becomes invalid
-        self._observer = NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: nil) { [unowned self] note in
-            guard let device = note.object as? UIDevice else {
-                return
-            }
-            if device.orientation.isPortrait {
-                self.orientation = .portrait
-            } else if device.orientation.isLandscape {
-                self.orientation = .landscape
-            }
-        }
-    }
-    
-    deinit {
-        if let observer = _observer {
-            NotificationCenter.default.removeObserver(observer)
-        }
-    }
-}
-
 struct BookDetailView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var appColor: AppColor
-    @EnvironmentObject var orientationInfo: OrientationInfo
+    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
     
     var book: Book
     
@@ -119,14 +82,13 @@ struct BookDetailView: View {
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
-                // 1
                 GeometryReader { geometry in
                     ZStack {
                         bookImage
                             .resizable()
                             .scaledToFill()
-                            .frame(width: orientationInfo.orientation == .landscape ? (geometry.size.width / 2) / 1.4 : geometry.size.width, height: self.getHeightForHeaderImage(geometry))
-                            .offset(x: 0, y: self.getOffsetForHeaderImage(geometry))
+                            .frame(width: horizontalSizeClass == .regular ? (geometry.size.width / 2) / 1.4 : geometry.size.width, height: self.getHeightForHeaderImage(geometry))
+                            .offset(x: 0 - proxy.safeAreaInsets.trailing, y: self.getOffsetForHeaderImage(geometry))
                         
                         LinearGradient(gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.30), Color.black.opacity(0.70), Color.black, Color.black]), startPoint: .top, endPoint: .bottom)
                     }
@@ -165,7 +127,9 @@ struct BookDetailView: View {
                         .frame(maxWidth: .infinity)
                     }
                     .padding(.horizontal, 12)
+                    .frame(maxWidth: proxy.safeAreaInsets.trailing == 0 ? proxy.size.width : proxy.size.width)
                     
+                    let _ = print(proxy.safeAreaInsets)
                     let isEmpty = book.summary?.stripHTML().isEmpty
                     if let isEmpty, isEmpty == false {
                         VStack(alignment: .leading) {
@@ -224,7 +188,7 @@ struct BookDetailView: View {
             }
         }
         .scrollIndicators(.hidden)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea(.container, edges: .top)
         .navigationBarBackButtonHidden(true)
         .fullScreenCover(isPresented: $openReader, content: {
             let bookPathURL = URL.documentsDirectory.appending(path: book.bookPath ?? "")

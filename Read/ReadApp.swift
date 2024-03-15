@@ -14,7 +14,6 @@ struct ReadApp: App {
             ContentView()
                 .environment(\.font, Font.custom("Poppins-Regular", size: 16))
                 .environmentObject(AppColor())
-                .environmentObject(OrientationInfo())
                 .environmentObject(EditViewModel())
                 .preferredColorScheme(.dark)
         }
