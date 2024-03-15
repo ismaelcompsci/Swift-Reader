@@ -17,6 +17,3 @@ use a GCDWebServer instead of writing all js / html to documents directory
 TODO
 
 - [ ] show error when metadata extraction fails
-- [X] edit book details: title, authors, etc...
-- [X] make context menu popup on annotation hit
-- [X] make theme color persistent 

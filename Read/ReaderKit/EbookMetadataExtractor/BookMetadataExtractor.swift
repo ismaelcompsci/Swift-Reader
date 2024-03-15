@@ -21,9 +21,6 @@ class BookMetadataExtractor {
 
     init() {}
 
-    /**
-     TODO: remove the instance of meatadataextractore after its done to save memeory
-     */
     func getMetadata(path bookPath: String, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
         let extracterName = "metadata\(extracterInstance)"
         let function = """

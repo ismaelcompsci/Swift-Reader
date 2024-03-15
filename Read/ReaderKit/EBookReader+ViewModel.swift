@@ -233,10 +233,12 @@ class EBookReaderViewModel: ObservableObject {
     private func renderBook() async {
         var args: String
 
+        let ext = bookFile.pathExtension
+
         if let openCfi {
-            args = "`\(server.base)/api/book`, `\(openCfi)`"
+            args = "`\(server.base)/api/book`, `\(openCfi)`, `.\(ext)`"
         } else {
-            args = "`\(server.base)/api/book`"
+            args = "`\(server.base)/api/book`, undefined, `.\(ext)`"
         }
 
         let script = """
@@ -294,7 +296,8 @@ class EBookReaderViewModel: ObservableObject {
           return flattenedItems
         }
 
-        JSON.stringify(flattenTocItems(globalReader?.book?.toc));
+
+         JSON.stringify(flattenTocItems(globalReader?.book?.toc ?? []));
         """
 
         let stringToc = try? await (webView.evaluateJavaScript(script) as! String?)

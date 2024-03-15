@@ -60,6 +60,36 @@ struct ReaderSettings: View {
                     }
                     
                     if !isPDF {
+                        // MARK: Reader Line Height
+                        
+                        HStack(spacing: 12) {
+                            Button {
+                                // decrease line height
+                                theme.decreaseLineHeight()
+                                updateTheme?()
+                            } label: {
+                                Image(systemName: "blinds.horizontal.closed")
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.white, .black)
+                                    .font(.system(size: 24))
+                            }
+                            
+                            Divider()
+                                .frame(maxHeight: 24)
+                            
+                            Button {
+                                theme.increaseLineHeight()
+                                updateTheme?()
+                            } label: {
+                                Image(systemName: "blinds.horizontal.open")
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.white, .black)
+                                    .font(.system(size: 24))
+                            }
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: 74, maxHeight: 52)
+
                         // MARK: Reader Font Size
                         
                         HStack(spacing: 12) {

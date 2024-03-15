@@ -90,11 +90,6 @@ class PDFViewModel: ObservableObject {
     }
 
     func getTocItem(for pageIndex: Int) -> PDFTocItem? {
-        guard let page = pdfView.currentPage else {
-            print(" pdfPageChanged: No page")
-            return nil
-        }
-
         if let toc {
             for i in 0 ..< toc.count - 1 {
                 let nextIndex = i + 1

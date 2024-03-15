@@ -48,13 +48,13 @@ const getCSS = ({ lineHeight, justify, hyphenate, theme, fontSize }) => `
 html, body {
   background: none !important;
   color: ${theme.fg};
-  font-size: ${fontSize}%;
 }
 body *{
   background-color: ${theme.bg} !important;
   color: inherit !important;
 }
 html, body, p, li, blockquote, dd {
+    font-size: ${fontSize}%;
     line-height: ${lineHeight};
     text-align: ${justify ? "justify" : "start"};
     -webkit-hyphens: ${hyphenate ? "auto" : "manual"};
@@ -237,14 +237,14 @@ class Reader {
       window.webkit.messageHandlers.initiatedSwiftReader?.postMessage("true");
       
   }
-  async initBook(bookPath, initLocation) {
+  async initBook(bookPath, initLocation, ext) {
     this.path = bookPath;
     this.initLocation = initLocation;
     console.log("INITBOOK");
 
     let bookData = await (await fetch(bookPath)).blob();
 
-    let bookFile = new File([bookData], "book");
+    let bookFile = new File([bookData],  ext ? "book" + ext : ext);
     this.isPdf = await isPDF(bookFile);
     this.isCBZ = isCBZ(bookFile);
     this.book = await getBook(bookFile);
@@ -262,7 +262,7 @@ class Reader {
         : this.view.renderer.next();
     } else {
       this.initLocation
-        ? this.view.goTo(Number(this.initLocation))
+        ? this.view.goTo(this.initLocation)
         : this.view.renderer.next();
     }
 
@@ -393,9 +393,9 @@ class Reader {
         .getContents()[0]
         ?.overlayer?.hitTest({ x: event.clientX, y: event.clientY });
 
-      if (hit.length > 0) {
-        let annotation = this.annotationsByValue.get(hit[0])
-        let range = hit[1]
+      if (hit?.length > 0) {
+        let annotation = this.annotationsByValue.get(hit?.[0])
+        let range = hit?.[1]
         if (!annotation || !range) { return }
         let pos = getPosition(range)
           

@@ -167,6 +167,18 @@ struct Theme: ThemeProtocol, Codable {
         margin = max(0, newMargin)
     }
 
+    mutating func increaseLineHeight() {
+        let new = lineHeight + 0.1
+
+        lineHeight = min(7, new)
+    }
+
+    mutating func decreaseLineHeight() {
+        let new = lineHeight - 0.1
+
+        lineHeight = max(0.8, new)
+    }
+
     init() {
         if let decodedData = UserDefaults.standard.data(forKey: Theme.saveKey) {
             if let theme = try? JSONDecoder().decode(Theme.self, from: decodedData) {

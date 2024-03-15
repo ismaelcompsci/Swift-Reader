@@ -31,6 +31,10 @@ struct PDFTocItem: TocItem {
     var label: String {
         outline?.label ?? ""
     }
+
+    var pageNumber: Int? {
+        outline?.destination?.page?.pageRef?.pageNumber
+    }
 }
 
 struct EBookTocItem: Codable, Identifiable, TocItem {
