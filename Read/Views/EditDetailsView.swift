@@ -102,7 +102,7 @@ struct EditDetailsView: View {
                                     cornerRadius: 20,
                                     style: .continuous
                                 )
-                                .stroke(.pink, lineWidth: 2)
+                                .stroke(appColor.accent, lineWidth: 2)
                             )
                             .foregroundStyle(.white)
                     }
