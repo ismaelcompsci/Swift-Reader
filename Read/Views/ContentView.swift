@@ -44,17 +44,11 @@ struct ContentView: View {
             HStack {
                 Spacer()
 
-                Button {
+                XButton {
                     withAnimation(.snappy) {
                         self.showMenu = false
                     }
-                } label: {
-                    Image(systemName: "xmark")
-                        .padding(.all, 8)
                 }
-                .background(.bar)
-                .clipShape(.circle)
-                .tint(self.appColor.accent)
             }
 
             Button {

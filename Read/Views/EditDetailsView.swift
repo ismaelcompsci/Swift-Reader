@@ -116,13 +116,8 @@ struct EditDetailsView: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
+                    XButton {
                         dismiss()
-                    }
-                    label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16))
-                            .foregroundStyle(appColor.accent.opacity(0.7))
                     }
                 }
             }

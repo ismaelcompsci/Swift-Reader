@@ -24,6 +24,16 @@ struct SideMenu<Menu: View>: ViewModifier {
                     content
                         .disabled(self.isShowing)
                         .frame(width: geometry.size.width, height: geometry.size.height)
+                        .overlay {
+                            if self.isShowing {
+                                Color.black.opacity(0.4)
+                                    .onTapGesture {
+                                        withAnimation(.snappy) {
+                                            self.isShowing.toggle()
+                                        }
+                                    }
+                            }
+                        }
 
                     self.menu()
                         .frame(width: geometry.size.width / 2)
