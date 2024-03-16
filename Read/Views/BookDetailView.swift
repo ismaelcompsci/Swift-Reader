@@ -59,14 +59,14 @@ struct BookDetailView: View {
     }
     
     var bookImage: Image {
-        let image = getBookCover(path: book.coverPath)
-        
-        if let image {
-            return Image(uiImage: image)
-               
-        } else {
-            return Image(systemName: "book.pages.fill")
+        if let bookImagePath = book.coverPath {
+            if let data = try? Data(contentsOf: URL.documentsDirectory.appending(path: bookImagePath)) {
+                if let image = UIImage(data: data) {
+                    return Image(uiImage: image)
+                }
+            }
         }
+        return Image(systemName: "book.pages.fill")
     }
     
     func getImageHeight(proxy: GeometryProxy) -> CGFloat {
@@ -129,7 +129,6 @@ struct BookDetailView: View {
                     .padding(.horizontal, 12)
                     .frame(maxWidth: proxy.safeAreaInsets.trailing == 0 ? proxy.size.width : proxy.size.width)
                     
-                    let _ = print(proxy.safeAreaInsets)
                     let isEmpty = book.summary?.stripHTML().isEmpty
                     if let isEmpty, isEmpty == false {
                         VStack(alignment: .leading) {

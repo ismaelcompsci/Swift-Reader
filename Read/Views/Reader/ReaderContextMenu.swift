@@ -24,6 +24,7 @@ enum ContextMenuEvent {
     case highlight
     case copy
     case delete
+    case lookup
 }
 
 struct ReaderContextMenu: View {
@@ -41,42 +42,73 @@ struct ReaderContextMenu: View {
     var position: CGPoint
     var onEvent: ((ContextMenuEvent) -> Void)?
 
-    var editMenu: some View {
-        VStack {
-            Button {
-                onEvent?(.delete)
-            } label: {
-                Image(systemName: "trash")
-                    .foregroundStyle(.red)
-            }
-            .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
+    var delete: some View {
+        Button {
+            onEvent?(.delete)
+        } label: {
+            Image(systemName: "trash")
+                .foregroundStyle(.red)
         }
     }
 
+    var highlight: some View {
+        Button {
+            onEvent?(.highlight)
+        }
+        label: {
+            Circle()
+                .fill(.yellow)
+                .frame(width: buttonSizeWidth / 2, height: buttonSizeHeight / 2)
+        }
+    }
+
+    var copy: some View {
+        Button {
+            onEvent?(.copy)
+        }
+        label: {
+            Image(systemName: "doc.on.doc.fill")
+        }
+    }
+
+    var lookup: some View {
+        Button {
+            onEvent?(.lookup)
+        } label: {
+            Image(systemName: "character.magnify")
+        }
+    }
+
+    var editMenu: some View {
+        HStack(spacing: 0) {
+            copy
+
+            divider
+
+            lookup
+
+            divider
+
+            delete
+        }
+    }
+
+    var divider: some View {
+        Divider()
+            .frame(width: 1, height: buttonSizeHeight / 2)
+    }
+
     var menu: some View {
-        VStack {
-            HStack(spacing: 0) {
-                Button {
-                    onEvent?(.highlight)
-                }
-                label: {
-                    Circle()
-                        .fill(.yellow)
-                        .frame(width: buttonSizeWidth / 2, height: buttonSizeHeight / 2)
-                }
-                .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
+        HStack(spacing: 0) {
+            highlight
 
-                Divider()
-                    .frame(width: 1, height: buttonSizeHeight / 2)
+            divider
 
-                Button {
-                    onEvent?(.copy)
-                }
-                label: {
-                    Image(systemName: "doc.on.doc.fill")
-                }
-                .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
-            }
+            lookup
+
+            divider
+
+            copy
         }
     }
 
@@ -88,6 +120,7 @@ struct ReaderContextMenu: View {
                 menu
             }
         }
+        .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
         .background(.black)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .position(position)

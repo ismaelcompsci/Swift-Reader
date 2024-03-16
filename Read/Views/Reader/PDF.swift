@@ -24,6 +24,8 @@ struct PDF: View {
     @State var showContextMenu: Bool = false
     @State var contextMenuPosition: CGPoint = .zero
     @State var editMode = false
+    @State var showRefrenceLibrary = false
+    @State var refrenceLibraryText = ""
 
     init(url: URL, book: Book) {
         self.book = book
@@ -64,6 +66,7 @@ struct PDF: View {
             })
 
         })
+        .refrenceLibrary(isPresented: $showRefrenceLibrary, term: $refrenceLibraryText)
         .onReceive(pdfViewModel.onSelectionChanged, perform: selectionChanged)
         .onReceive(pdfViewModel.onRelocated, perform: relocated)
         .onReceive(pdfViewModel.onTapped, perform: handleTap)
@@ -98,12 +101,36 @@ struct PDF: View {
         case .highlight:
             pdfViewModel.highlightSelection()
         case .copy:
-            pdfViewModel.copySelection()
+            if editMode == true,
+               let tappedHighlight = pdfViewModel.tappedHighlight,
+               let high = pdfViewModel.getHighlight(with: tappedHighlight),
+               let text = high.selection.string
+            {
+                pdfViewModel.setPastboardText(with: text)
+
+            } else {
+                pdfViewModel.copySelection()
+            }
         case .delete:
 
             if let tappedHighlight = pdfViewModel.tappedHighlight {
                 book.removeHighlight(withId: tappedHighlight.uuidString)
                 pdfViewModel.removeHighlight(withUUIDString: tappedHighlight.uuidString)
+            }
+
+        case .lookup:
+            if editMode == true,
+               let tappedHighlight = pdfViewModel.tappedHighlight,
+               let high = pdfViewModel.getHighlight(with: tappedHighlight),
+               let text = high.selection.string
+            {
+                refrenceLibraryText = text
+                showRefrenceLibrary = true
+            } else {
+                if let text = pdfViewModel.getSelection() {
+                    refrenceLibraryText = text
+                    showRefrenceLibrary = true
+                }
             }
         }
 

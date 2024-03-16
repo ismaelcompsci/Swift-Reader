@@ -407,22 +407,42 @@ extension EBookReaderViewModel {
         }
     }
 
-    func copySelection() {
+    func getSelection(completionHandler: @escaping (_ text: String?) -> Void) {
         let script = """
         globalReader?.doc?.getSelection()?.toString()
         """
 
-        webView.evaluateJavaScript(script, completionHandler: { success, error in
-            if let success {
-                UIPasteboard.general.setValue(success as! String, forPasteboardType: UTType.plainText.identifier)
+        webView.evaluateJavaScript(script, completionHandler: { success, _ in
+
+            if let success, let text = success as? String {
+                completionHandler(text)
+            } else {
+                completionHandler(nil)
+            }
+
+        })
+    }
+
+    func getSelection() async -> String? {
+        let script = """
+        globalReader?.doc?.getSelection()?.toString()
+        """
+
+        return try? await webView.evaluateJavaScript(script) as? String
+    }
+
+    func copySelection() {
+        getSelection { text in
+            if let text {
+                self.setPastboardText(with: text)
 
                 self.clearWebViewSelection()
             }
+        }
+    }
 
-            if let error {
-                print("copySelection: \(error)")
-            }
-        })
+    func setPastboardText(with text: String) {
+        UIPasteboard.general.setValue(text, forPasteboardType: UTType.plainText.identifier)
     }
 
     /// value is highlight cfi range

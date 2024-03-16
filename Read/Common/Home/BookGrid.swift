@@ -165,5 +165,4 @@ struct BookGrid: View {
 
 #Preview {
     BookGrid(sortedBooks: Book.exampleArray)
-        .environment(\.realmConfiguration, MockRealms.config)
 }

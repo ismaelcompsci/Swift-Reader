@@ -21,6 +21,8 @@ struct EBookView: View {
     @State var showContextMenu = false
     @State var showOverlay = false
     @State var currentHighlight: TappedHighlight? = nil
+    @State var showRefrenceLibrary = false
+    @State var refrenceLibraryText = "" { didSet { showRefrenceLibrary = true }}
 
     init(url: URL, book: Book) {
         self.book = book
@@ -99,6 +101,7 @@ struct EBookView: View {
             }
 
         })
+        .refrenceLibrary(isPresented: $showRefrenceLibrary, term: $refrenceLibraryText)
         .onReceive(ebookViewModel.onTapped, perform: handleTap)
         .onReceive(ebookViewModel.onRelocated, perform: relocated)
         .onReceive(ebookViewModel.onSelectionChanged, perform: selectionChanged)
@@ -134,11 +137,26 @@ struct EBookView: View {
         case .highlight:
             ebookViewModel.highlightSelection()
         case .copy:
-            ebookViewModel.copySelection()
+            if editMode == true, let currentHighlight {
+                ebookViewModel.setPastboardText(with: currentHighlight.text)
+
+            } else {
+                ebookViewModel.copySelection()
+            }
         case .delete:
             if let value = currentHighlight?.value {
                 ebookViewModel.removeHighlight(value)
                 book.removeHighlight(withValue: value)
+            }
+        case .lookup:
+            if editMode == true {
+                refrenceLibraryText = currentHighlight?.text ?? ""
+            } else {
+                Task {
+                    if let text = await ebookViewModel.getSelection() {
+                        self.refrenceLibraryText = text
+                    }
+                }
             }
         }
 

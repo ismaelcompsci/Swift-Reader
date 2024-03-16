@@ -15,6 +15,11 @@ struct TappedPDFHighlight {
     var UUID: UUID
 }
 
+struct HighlightValue {
+    let selection: PDFSelection
+    var annotations: [PDFAnnotation] = []
+}
+
 class PDFViewModel: ObservableObject {
     var pdfFile: URL
 
@@ -206,15 +211,29 @@ class PDFViewModel: ObservableObject {
         }
     }
 
+    func getHighlight(with uuid: UUID) -> HighlightValue? {
+        highlights[uuid]?.first
+    }
+
+    func getSelection() -> String? {
+        pdfView.currentSelection?.string
+    }
+
     func copySelection() {
-        let selections = pdfView.currentSelection?.string
+        let selections = getSelection()
         guard let text = selections else {
             return
         }
-        UIPasteboard.general.setValue(text, forPasteboardType: UTType.plainText.identifier)
+        setPastboardText(with: text)
         pdfView.clearSelection()
     }
 
+    func setPastboardText(with text: String) {
+        UIPasteboard.general.setValue(text, forPasteboardType: UTType.plainText.identifier)
+    }
+}
+
+extension PDFViewModel {
     func removeHighlight(highlight: PDFHighlight) {
         guard let highlightValue = highlights.removeValue(forKey: highlight.uuid) else { return }
 
@@ -232,9 +251,4 @@ class PDFViewModel: ObservableObject {
             annotation.page?.removeAnnotation(annotation)
         }
     }
-}
-
-struct HighlightValue {
-    let selection: PDFSelection
-    var annotations: [PDFAnnotation] = []
 }
