@@ -55,7 +55,7 @@ body *{
 }
 html, body, p, li, blockquote, dd {
     font-size: ${fontSize}%;
-    line-height: ${lineHeight};
+    line-height: ${lineHeight} !important;
     text-align: ${justify ? "justify" : "start"};
     -webkit-hyphens: ${hyphenate ? "auto" : "manual"};
     hyphens: ${hyphenate ? "auto" : "manual"};

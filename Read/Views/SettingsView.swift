@@ -38,7 +38,7 @@ struct SettingsView: View {
                         Text("Reset")
                     }
                     .tint(.red)
-                    .frame(width: .infinity, height: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 } header: {
                     Text("Theme")
