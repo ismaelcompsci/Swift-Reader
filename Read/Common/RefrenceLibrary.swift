@@ -17,7 +17,6 @@ struct RefrenceLibrary: UIViewControllerRepresentable {
     }
 
     func makeUIViewController(context: Context) -> UIReferenceLibraryViewController {
-        print("TERM: \(term)")
         let controller = UIReferenceLibraryViewController(term: term)
 
         return controller
@@ -27,9 +26,9 @@ struct RefrenceLibrary: UIViewControllerRepresentable {
 }
 
 extension View {
-    func refrenceLibrary(isPresented: Binding<Bool>, onDismiss: (() -> Void)? = nil, term: Binding<String>) -> some View {
+    func refrenceLibrary(isPresented: Binding<Bool>, onDismiss: (() -> Void)? = nil, term: String) -> some View {
         sheet(isPresented: isPresented, onDismiss: onDismiss, content: {
-            RefrenceLibrary(term: term.wrappedValue)
+            RefrenceLibrary(term: term)
                 .ignoresSafeArea()
                 .presentationDetents([.medium])
         })

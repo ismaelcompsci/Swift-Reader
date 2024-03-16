@@ -39,6 +39,7 @@ struct PDFTocItem: TocItem {
     }
 }
 
+/// no pagenumber
 struct EBookTocItem: Codable, Identifiable, TocItem {
     var label: String
     var href: String
@@ -54,7 +55,7 @@ struct EBookTocItem: Codable, Identifiable, TocItem {
         self.href = try container.decode(String.self, forKey: .href)
         self.id = try container.decode(Int.self, forKey: .id)
         self.depth = try container.decode(Int.self, forKey: .depth)
-        self.pageNumber = try container.decode(Int.self, forKey: .pageNumber)
+//        self.pageNumber = try container.decode(Int.self, forKey: .pageNumber)
     }
 }
 

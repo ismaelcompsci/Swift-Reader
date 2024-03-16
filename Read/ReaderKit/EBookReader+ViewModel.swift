@@ -423,14 +423,6 @@ extension EBookReaderViewModel {
         })
     }
 
-    func getSelection() async -> String? {
-        let script = """
-        globalReader?.doc?.getSelection()?.toString()
-        """
-
-        return try? await webView.evaluateJavaScript(script) as? String
-    }
-
     func copySelection() {
         getSelection { text in
             if let text {

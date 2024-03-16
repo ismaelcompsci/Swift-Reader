@@ -101,7 +101,7 @@ struct EBookView: View {
             }
 
         })
-        .refrenceLibrary(isPresented: $showRefrenceLibrary, term: $refrenceLibraryText)
+        .refrenceLibrary(isPresented: $showRefrenceLibrary, term: refrenceLibraryText)
         .onReceive(ebookViewModel.onTapped, perform: handleTap)
         .onReceive(ebookViewModel.onRelocated, perform: relocated)
         .onReceive(ebookViewModel.onSelectionChanged, perform: selectionChanged)
@@ -152,8 +152,8 @@ struct EBookView: View {
             if editMode == true {
                 refrenceLibraryText = currentHighlight?.text ?? ""
             } else {
-                Task {
-                    if let text = await ebookViewModel.getSelection() {
+                ebookViewModel.getSelection { text in
+                    if let text {
                         self.refrenceLibraryText = text
                     }
                 }

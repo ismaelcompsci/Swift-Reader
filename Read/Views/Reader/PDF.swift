@@ -66,7 +66,7 @@ struct PDF: View {
             })
 
         })
-        .refrenceLibrary(isPresented: $showRefrenceLibrary, term: $refrenceLibraryText)
+        .refrenceLibrary(isPresented: $showRefrenceLibrary, term: refrenceLibraryText)
         .onReceive(pdfViewModel.onSelectionChanged, perform: selectionChanged)
         .onReceive(pdfViewModel.onRelocated, perform: relocated)
         .onReceive(pdfViewModel.onTapped, perform: handleTap)
