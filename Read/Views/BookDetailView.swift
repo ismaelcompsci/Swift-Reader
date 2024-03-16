@@ -23,6 +23,8 @@ struct BookDetailView: View {
     @State private var readMore = false
     @State private var openReader = false
     
+    @State private var sImage: Image = .init(systemName: "book.pages.fill")
+    
     private func getHeightForHeaderImage(_ geometry: GeometryProxy) -> CGFloat {
         let offset = getScrollOffset(geometry)
         let imageHeight = geometry.size.height
@@ -58,17 +60,6 @@ struct BookDetailView: View {
         }
     }
     
-    var bookImage: Image {
-        if let bookImagePath = book.coverPath {
-            if let data = try? Data(contentsOf: URL.documentsDirectory.appending(path: bookImagePath)) {
-                if let image = UIImage(data: data) {
-                    return Image(uiImage: image)
-                }
-            }
-        }
-        return Image(systemName: "book.pages.fill")
-    }
-    
     func getImageHeight(proxy: GeometryProxy) -> CGFloat {
         let screenHeight = proxy.size.height
         
@@ -84,7 +75,7 @@ struct BookDetailView: View {
             ScrollView {
                 GeometryReader { geometry in
                     ZStack {
-                        bookImage
+                        sImage
                             .resizable()
                             .scaledToFill()
                             .frame(width: horizontalSizeClass == .regular ? (geometry.size.width / 2) / 1.4 : geometry.size.width, height: self.getHeightForHeaderImage(geometry))
@@ -100,6 +91,7 @@ struct BookDetailView: View {
                         VStack(alignment: .leading) {
                             Text(book.title)
                                 .font(.title)
+                                .lineLimit(2)
                             
                             HStack {
                                 Image(systemName: "person.fill")
@@ -184,6 +176,25 @@ struct BookDetailView: View {
                 .background(
                     LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
                 )
+            }
+        }
+        .onAppear {
+            guard let lastPathComponent = book.coverPath else {
+                return
+            }
+            
+            let fullBookPath = URL.documentsDirectory.appending(path: lastPathComponent)
+            
+            guard let imageData = try? Data(contentsOf: fullBookPath), let originalImage = UIImage(data: imageData) else {
+                return
+            }
+            
+            if imageData.count < 1000000 {
+                sImage = Image(uiImage: originalImage)
+            } else {
+                if let compressedImageData = originalImage.jpeg(.medium), let compressedImage = UIImage(data: compressedImageData) {
+                    sImage = Image(uiImage: compressedImage)
+                }
             }
         }
         .scrollIndicators(.hidden)
