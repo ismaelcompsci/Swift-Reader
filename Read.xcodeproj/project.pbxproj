@@ -11,7 +11,6 @@
 		9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0763622B840F09003E1351 /* ReadingPosition.swift */; };
 		9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0763642B840F59003E1351 /* BookHighlight.swift */; };
 		9F0EA4592B89773900B7B009 /* ReadApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EA4582B89773900B7B009 /* ReadApp.swift */; };
-		9F14FBF32B8AA3F6001CA119 /* AnnasArchiveAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */; };
 		9F3A8E4D2B9D81FF004732D6 /* list.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 9F3A8E4C2B9D81FF004732D6 /* list.jpeg */; };
 		9F3A8E4F2B9D823A004732D6 /* grid.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 9F3A8E4E2B9D823A004732D6 /* grid.jpeg */; };
 		9F3E18BC2BA40E85009DDE05 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */; };
@@ -101,7 +100,6 @@
 		9F0763622B840F09003E1351 /* ReadingPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPosition.swift; sourceTree = "<group>"; };
 		9F0763642B840F59003E1351 /* BookHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookHighlight.swift; sourceTree = "<group>"; };
 		9F0EA4582B89773900B7B009 /* ReadApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadApp.swift; sourceTree = "<group>"; };
-		9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnasArchiveAPI.swift; sourceTree = "<group>"; };
 		9F3A8E4C2B9D81FF004732D6 /* list.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = list.jpeg; sourceTree = "<group>"; };
 		9F3A8E4E2B9D823A004732D6 /* grid.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = grid.jpeg; sourceTree = "<group>"; };
 		9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
@@ -203,7 +201,6 @@
 		9F14FBF12B8AA3DD001CA119 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				9F14FBF22B8AA3F6001CA119 /* AnnasArchiveAPI.swift */,
 				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
 			);
 			path = Service;
@@ -551,7 +548,6 @@
 				9FD8087A2B98130D0007D8F6 /* EBookReader+FileServer.swift in Sources */,
 				9F4DEB282B69FB390046B76C /* HeadlessWebView.swift in Sources */,
 				9FBC72702B9EA5B70054A7B0 /* AppButton.swift in Sources */,
-				9F14FBF32B8AA3F6001CA119 /* AnnasArchiveAPI.swift in Sources */,
 				9FBC726C2B9EA17D0054A7B0 /* FormInput.swift in Sources */,
 				9F075A792BA501580017BFAF /* RefrenceLibrary.swift in Sources */,
 				9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */,
