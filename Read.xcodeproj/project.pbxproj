@@ -106,6 +106,7 @@
 		9FE324432B85D30E003E61F6 /* addedbooks.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243D2B85D30D003E61F6 /* addedbooks.PNG */; };
 		9FE324442B85D30E003E61F6 /* bookDetails.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243E2B85D30E003E61F6 /* bookDetails.PNG */; };
 		9FE324452B85D30E003E61F6 /* reader.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243F2B85D30E003E61F6 /* reader.PNG */; };
+		9FEEF7DC2BBD2C080079ECDB /* SwiftReader in Frameworks */ = {isa = PBXBuildFile; productRef = 9FEEF7DB2BBD2C080079ECDB /* SwiftReader */; };
 		9FF92A8D2B788C9400025405 /* PieProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF92A8C2B788C9400025405 /* PieProgress.swift */; };
 /* End PBXBuildFile section */
 
@@ -218,6 +219,7 @@
 				9FB84A602B9D6681005D7915 /* Nuke in Frameworks */,
 				9F4DEB262B69ECB80046B76C /* WrappingHStack in Frameworks */,
 				9F608E952B65F29D00D2B5F4 /* Realm in Frameworks */,
+				9FEEF7DC2BBD2C080079ECDB /* SwiftReader in Frameworks */,
 				9FB84A662B9D6681005D7915 /* NukeVideo in Frameworks */,
 				9FB84A642B9D6681005D7915 /* NukeUI in Frameworks */,
 			);
@@ -292,18 +294,18 @@
 		9F608E7E2B65D05B00D2B5F4 /* Read */ = {
 			isa = PBXGroup;
 			children = (
+				9F608E852B65D05D00D2B5F4 /* Preview Content */,
+				9F608E832B65D05D00D2B5F4 /* Assets.xcassets */,
+				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
+				9F0EA4582B89773900B7B009 /* ReadApp.swift */,
 				9F71FFDC2BBD266700ADDAC0 /* Packages */,
 				9F8F9CBD2BB4FF240081C57F /* Sources */,
-				9F14FBF12B8AA3DD001CA119 /* Service */,
-				9FC596062B86A06A00ED3734 /* Resources */,
+				9F608E902B65E27B00D2B5F4 /* Views */,
 				9F5954B02B6DD101009FC2F1 /* Common */,
 				9F608E982B65F3F700D2B5F4 /* Models */,
-				9F608E902B65E27B00D2B5F4 /* Views */,
+				9F14FBF12B8AA3DD001CA119 /* Service */,
 				9F608E8D2B65DDC300D2B5F4 /* Utils */,
-				9F0EA4582B89773900B7B009 /* ReadApp.swift */,
-				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
-				9F608E832B65D05D00D2B5F4 /* Assets.xcassets */,
-				9F608E852B65D05D00D2B5F4 /* Preview Content */,
+				9FC596062B86A06A00ED3734 /* Resources */,
 			);
 			path = Read;
 			sourceTree = "<group>";
@@ -512,6 +514,7 @@
 				9FBC72692B9E91950054A7B0 /* TagForm */,
 				9F8F9CC12BB4FF880081C57F /* ZIPFoundation */,
 				9FD119B52BBA2DE900AB097D /* PagerTabStripView */,
+				9FEEF7DB2BBD2C080079ECDB /* SwiftReader */,
 			);
 			productName = Read;
 			productReference = 9F608E7C2B65D05B00D2B5F4 /* Read.app */;
@@ -1009,6 +1012,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FD119B42BBA2DE900AB097D /* XCRemoteSwiftPackageReference "PagerTabStripView" */;
 			productName = PagerTabStripView;
+		};
+		9FEEF7DB2BBD2C080079ECDB /* SwiftReader */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftReader;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
