@@ -1,79 +1,77 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "GCDWebServer",
-        "repositoryURL": "https://github.com/nbhasin2/GCDWebServer.git",
-        "state": {
-          "branch": null,
-          "revision": "14f9eedb296c5b71fec971d8256ef3bfc20a2245",
-          "version": "3.5.5"
-        }
-      },
-      {
-        "package": "Nuke",
-        "repositoryURL": "https://github.com/kean/Nuke",
-        "state": {
-          "branch": null,
-          "revision": "8ecbfc886da39bccb01c34abef5f2ff4073ad633",
-          "version": "12.4.0"
-        }
-      },
-      {
-        "package": "PagerTabStripView",
-        "repositoryURL": "https://github.com/xmartlabs/PagerTabStripView.git",
-        "state": {
-          "branch": null,
-          "revision": "39ec00d2577adf75d82d1c7023c56950b96d2298",
-          "version": "4.0.0"
-        }
-      },
-      {
-        "package": "RealmDatabase",
-        "repositoryURL": "https://github.com/realm/realm-core.git",
-        "state": {
-          "branch": null,
-          "revision": "a5e87a39cffdcc591f3203c11cfca68100d0b9a6",
-          "version": "13.26.0"
-        }
-      },
-      {
-        "package": "Realm",
-        "repositoryURL": "https://github.com/realm/realm-swift",
-        "state": {
-          "branch": "master",
-          "revision": "bf892749c7dcc6d1714e7d47d217390a49ba1238",
-          "version": null
-        }
-      },
-      {
-        "package": "TagForm",
-        "repositoryURL": "https://github.com/issetwo/tagform",
-        "state": {
-          "branch": null,
-          "revision": "a0701a6a4c710d3111c92185456ecd7d10a6f66b",
-          "version": "1.0.0"
-        }
-      },
-      {
-        "package": "WrappingHStack",
-        "repositoryURL": "https://github.com/dkk/WrappingHStack",
-        "state": {
-          "branch": null,
-          "revision": "425d9488ba55f58f0b34498c64c054c77fc2a44b",
-          "version": "2.2.11"
-        }
-      },
-      {
-        "package": "ZIPFoundation",
-        "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
-        "state": {
-          "branch": null,
-          "revision": "b979e8b52c7ae7f3f39fa0182e738e9e7257eb78",
-          "version": "0.9.18"
-        }
+  "pins" : [
+    {
+      "identity" : "gcdwebserver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nbhasin2/GCDWebServer.git",
+      "state" : {
+        "revision" : "14f9eedb296c5b71fec971d8256ef3bfc20a2245",
+        "version" : "3.5.5"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "nuke",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kean/Nuke",
+      "state" : {
+        "revision" : "8ecbfc886da39bccb01c34abef5f2ff4073ad633",
+        "version" : "12.4.0"
+      }
+    },
+    {
+      "identity" : "pagertabstripview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/xmartlabs/PagerTabStripView.git",
+      "state" : {
+        "revision" : "39ec00d2577adf75d82d1c7023c56950b96d2298",
+        "version" : "4.0.0"
+      }
+    },
+    {
+      "identity" : "realm-core",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/realm/realm-core.git",
+      "state" : {
+        "revision" : "a5e87a39cffdcc591f3203c11cfca68100d0b9a6",
+        "version" : "13.26.0"
+      }
+    },
+    {
+      "identity" : "realm-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/realm/realm-swift",
+      "state" : {
+        "branch" : "master",
+        "revision" : "bf892749c7dcc6d1714e7d47d217390a49ba1238"
+      }
+    },
+    {
+      "identity" : "tagform",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/issetwo/tagform",
+      "state" : {
+        "revision" : "a0701a6a4c710d3111c92185456ecd7d10a6f66b",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "wrappinghstack",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dkk/WrappingHStack",
+      "state" : {
+        "revision" : "425d9488ba55f58f0b34498c64c054c77fc2a44b",
+        "version" : "2.2.11"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation.git",
+      "state" : {
+        "revision" : "b979e8b52c7ae7f3f39fa0182e738e9e7257eb78",
+        "version" : "0.9.18"
+      }
+    }
+  ],
+  "version" : 2
 }
