@@ -247,6 +247,8 @@
 		9F14FBF12B8AA3DD001CA119 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				9FBC72722B9EA6B80054A7B0 /* EditViewModel.swift */,
+				9FBC72742B9EA6C60054A7B0 /* AppColor.swift */,
 				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
 			);
 			path = Service;
@@ -309,7 +311,6 @@
 				9F608E982B65F3F700D2B5F4 /* Models */,
 				9F608E902B65E27B00D2B5F4 /* Views */,
 				9F608E8D2B65DDC300D2B5F4 /* Utils */,
-				9FBC72712B9EA6A80054A7B0 /* Global */,
 				9F0EA4582B89773900B7B009 /* ReadApp.swift */,
 				9FC34B5B2B99754A001E8C38 /* scripts */,
 				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
@@ -404,15 +405,6 @@
 				9F8F9CE32BB5151B0081C57F /* SettingsSourcesView.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		9FBC72712B9EA6A80054A7B0 /* Global */ = {
-			isa = PBXGroup;
-			children = (
-				9FBC72722B9EA6B80054A7B0 /* EditViewModel.swift */,
-				9FBC72742B9EA6C60054A7B0 /* AppColor.swift */,
-			);
-			path = Global;
 			sourceTree = "<group>";
 		};
 		9FC596062B86A06A00ED3734 /* Resources */ = {
