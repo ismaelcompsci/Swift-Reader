@@ -6,6 +6,7 @@
 //
 
 import PDFKit
+import SwiftReader
 import SwiftUI
 
 public extension PDFAnnotationKey {

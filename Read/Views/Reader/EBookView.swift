@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 3/6/24.
 //
 
+import SwiftReader
 import SwiftUI
 
 struct EBookView: View {

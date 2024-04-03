@@ -171,7 +171,7 @@ struct BookDetailView: View {
                     
                     Color.black
                         .frame(width: UIScreen.main.bounds.width, height: 300)
-                        .offset(x: 0, y: -7)
+                        .offset(x: 0, y: -9)
                 }
                 .background(
                     LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)

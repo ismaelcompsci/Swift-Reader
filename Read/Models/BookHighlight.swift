@@ -7,6 +7,7 @@
 
 import Foundation
 import RealmSwift
+import SwiftReader
 
 class BookHighlight: Object, ObjectKeyIdentifiable {
     @Persisted(primaryKey: true) var _id: ObjectId

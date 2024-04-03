@@ -8,6 +8,7 @@
 import Foundation
 import PDFKit
 import RealmSwift
+import SwiftReader
 
 class Author: EmbeddedObject {
     @Persisted var name: String = ""

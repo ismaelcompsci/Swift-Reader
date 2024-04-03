@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 3/5/24.
 //
 
+import SwiftReader
 import SwiftUI
 
 struct ReaderSettings: View {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BookMetadata: Codable {
+public struct BookMetadata: Codable {
     var title: String? = ""
     var author: [MetadataAuthor]? = []
     var description: String? = ""
@@ -25,9 +25,9 @@ struct BookMetadata: Codable {
         case subject
     }
 
-    init() {}
+    public init() {}
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
 

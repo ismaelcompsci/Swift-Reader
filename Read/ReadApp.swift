@@ -5,17 +5,34 @@
 //  Created by Mirna Olvera on 1/27/24.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
 struct ReadApp: App {
+    @State var sourceManager: SourceManager
+    var modelContainer: ModelContainer
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.font, Font.custom("Poppins-Regular", size: 16))
                 .environmentObject(AppColor())
                 .environmentObject(EditViewModel())
+                .modelContainer(modelContainer)
+                .environment(sourceManager)
                 .preferredColorScheme(.dark)
+                .environment(\.font, Font.custom("Poppins-Regular", size: 16))
+        }
+    }
+
+    init() {
+        do {
+            modelContainer = try ModelContainer(for: Source.self)
+
+            let sourceManager = SourceManager(modelContext: modelContainer.mainContext)
+            _sourceManager = State(initialValue: sourceManager)
+        } catch {
+            fatalError("Failed to create ModelContainer for Source")
         }
     }
 }

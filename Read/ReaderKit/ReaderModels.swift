@@ -102,7 +102,7 @@ struct Relocate: Codable, Equatable, Identifiable {
     var fraction: Double?
     var updatedAt: Date?
     var location: Location?
-    var section: Section?
+    var section: BookSection?
     var time: Time?
     var tocItem: RelocateTocItem?
 
@@ -119,7 +119,7 @@ struct Relocate: Codable, Equatable, Identifiable {
         }
 
         self.location = try container.decode(Location.self, forKey: .location)
-        self.section = try container.decode(Section.self, forKey: .section)
+        self.section = try container.decode(BookSection.self, forKey: .section)
         self.time = try container.decode(Time.self, forKey: .time)
         self.tocItem = try container.decode(RelocateTocItem.self, forKey: .tocItem)
     }
@@ -148,7 +148,7 @@ struct Location: Codable {
     var total: Int
 }
 
-struct Section: Codable {
+struct BookSection: Codable {
     var current: Int
     var total: Int
 }

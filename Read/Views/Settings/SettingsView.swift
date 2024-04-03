@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// only used for debounce. okay?
+// only used for debounce.
 class SettingsViewModel: ObservableObject {
     @Published var selectedColor: Color = .clear
 
@@ -26,37 +26,33 @@ struct SettingsView: View {
     var body: some View {
         VStack {
             List {
-                SwiftUI.Section {
+                Section {
                     HStack {
                         ColorPicker("Set the theme color", selection: $viewModel.selectedColor, supportsOpacity: false)
                     }
+
+                    NavigationLink {
+                        SettingsSourcesView()
+                    } label: {
+                        Text("Extensions")
+                    }
+                    .tint(appColor.accent)
 
                     Button {
                         appColor.accent = .accent
                         selectedColor = .accent
                     } label: {
-                        Text("Reset")
+                        Text("Reset theme")
                     }
                     .tint(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 } header: {
-                    Text("Theme")
+                    Text("Settings")
                 }
             }
             .navigationTitle("Settings")
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(
-                leading: Button(action: { presentationMode.wrappedValue.dismiss() }, label: {
-                    HStack(spacing: 2) {
-                        Image(systemName: "chevron.backward")
-                            .foregroundColor(appColor.accent)
-
-                        Text("Home")
-                            .foregroundColor(appColor.accent)
-                    }
-                })
-            )
         }
         .onAppear {
             viewModel.selectedColor = appColor.accent
