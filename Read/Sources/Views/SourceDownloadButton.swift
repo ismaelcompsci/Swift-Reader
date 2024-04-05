@@ -121,6 +121,7 @@ struct SourceDownloadButton: View {
     func downloadFinished(_ finished: DownloadManager.OnDownloadFinished) {
         let (download, location) = finished
         // add to library
+        print("DOWNLOAD FINSIHED: \(location.exists)")
     }
 
     func downloadFile() {

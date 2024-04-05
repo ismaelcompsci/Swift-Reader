@@ -21,34 +21,36 @@ struct ReaderContent<T: TocItem>: View {
         NavigationView {
             ScrollViewReader { proxy in
                 ScrollView {
-                    ForEach(toc) { tocItem in
-                        let selected = isSelected?(tocItem) ?? false
+                    LazyVStack {
+                        ForEach(toc) { tocItem in
+                            let selected = isSelected?(tocItem) ?? false
 
-                        VStack {
-                            Button {
-                                tocItemPressed?(tocItem)
+                            VStack {
+                                Button {
+                                    tocItemPressed?(tocItem)
 
-                            } label: {
-                                HStack {
-                                    Text(tocItem.label)
-                                        .lineLimit(2)
-                                        .multilineTextAlignment(.leading)
-                                        .fontWeight(tocItem.depth == 0 ? .semibold : .light)
+                                } label: {
+                                    HStack {
+                                        Text(tocItem.label)
+                                            .lineLimit(2)
+                                            .multilineTextAlignment(.leading)
+                                            .fontWeight(tocItem.depth == 0 ? .semibold : .light)
 
-                                    Spacer()
+                                        Spacer()
 
-                                    if let pageNumber = tocItem.pageNumber {
-                                        Text("\(pageNumber)")
+                                        if let pageNumber = tocItem.pageNumber {
+                                            Text("\(pageNumber)")
+                                        }
+                                        Image(systemName: "chevron.right")
                                     }
-                                    Image(systemName: "chevron.right")
+                                    .foregroundStyle(selected ? appColor.accent : .white)
                                 }
-                                .foregroundStyle(selected ? appColor.accent : .white)
+                                .padding(.leading, CGFloat(tocItem.depth ?? 0) * 10)
                             }
-                            .padding(.leading, CGFloat(tocItem.depth ?? 0) * 10)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .id(tocItem.id)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .id(tocItem.id)
                     }
                 }
                 .scrollIndicators(.hidden)
