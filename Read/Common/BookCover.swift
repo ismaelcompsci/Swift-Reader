@@ -43,6 +43,8 @@ struct BookCover: View {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
+                } else if phase.error != nil {
+                    Image(systemName: "xmark")
                 } else {
                     Image(systemName: "ellipsis")
                         .symbolEffect(.variableColor)

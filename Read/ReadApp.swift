@@ -10,6 +10,7 @@ import SwiftUI
 
 @main
 struct ReadApp: App {
+    @State var bookDownloader = BookDownloader()
     @State var sourceManager: SourceManager
     var modelContainer: ModelContainer
 
@@ -20,6 +21,7 @@ struct ReadApp: App {
                 .environmentObject(EditViewModel())
                 .modelContainer(modelContainer)
                 .environment(sourceManager)
+                .environment(bookDownloader)
                 .preferredColorScheme(.dark)
                 .environment(\.font, Font.custom("Poppins-Regular", size: 16))
         }

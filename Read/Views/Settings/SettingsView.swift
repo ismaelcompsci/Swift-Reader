@@ -34,7 +34,7 @@ struct SettingsView: View {
                     NavigationLink {
                         SettingsSourcesView()
                     } label: {
-                        Text("Extensions")
+                        Text("Sources")
                     }
                     .tint(appColor.accent)
 

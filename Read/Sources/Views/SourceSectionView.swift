@@ -38,8 +38,7 @@ struct SourceSectionView: View {
                         if let id = id {
                             PagedViewMoreItems(sourceId: self.sourceId, viewMoreId: id)
                         } else if let searchRequest = searchRequest {
-//                            SearchPagedResultsView
-                            Text("SEARCH")
+                            SourcesSearchPagedResultsView(searchRequest: searchRequest, sourceId: sourceId)
                         }
                     } label: {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")

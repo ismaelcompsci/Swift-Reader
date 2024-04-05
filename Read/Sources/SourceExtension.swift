@@ -155,41 +155,42 @@ class SourceExtension: NSObject, ExtensionProtocol {
     }
 
     func getSearchResults(query: SearchRequest, metadata: Any?) async throws -> PagedResults? {
-        guard let source, source.hasProperty("getSearchResults"), let context else {
+        guard let source = source, source.hasProperty("getSearchResults"), let context else {
             return nil
         }
 
-        guard let result = try await withUnsafeThrowingContinuation({ continuation in
+        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<PagedResults, Error>) in
+            let id = UUID().uuidString.replacingOccurrences(of: "-", with: "_")
 
             let callback: @convention(block) (PagedResults?) -> Void = { results in
-                if let results {
-                    continuation.resume(returning: results)
-                    return
-                }
 
-                continuation.resume(throwing: ApplicationError.getViewMoreItems("Something went wrong"))
+                if let results = results {
+                    continuation.resume(returning: results)
+                    context.evaluateScript("""
+                    delete gloablThis.getSearchResultsCallback\(id)
+                    """)
+                } else {
+                    continuation.resume(throwing: ApplicationError.getSearchResults("Something went wrong"))
+                }
             }
 
-            context.setObject(callback, forKeyedSubscript: "getSearchResultsCallback" as NSString)
+            context.setObject(callback, forKeyedSubscript: "getSearchResultsCallback\(id)" as NSString)
 
-            let promise = source.invokeMethod("getSearchResults", withArguments: [query, metadata])
+            let promise = source.invokeMethod("getSearchResults", withArguments: [query, metadata as Any])
 
             let thenWrapper = context.evaluateScript("""
             (e) => {
-                getSearchResultsCallback(e)
+                getSearchResultsCallback\(id)(e)
             };
             """)
 
             guard let thenWrapper else {
-                return continuation.resume(throwing: ApplicationError.getViewMoreItems("thenWrapper failed to execute"))
+                continuation.resume(throwing: ApplicationError.getSearchResults("Something went wrong"))
+                return
             }
 
             promise?.invokeMethod("then", withArguments: [thenWrapper])
-        }) else {
-            throw NSError(domain: "Extensable", code: 0, userInfo: [NSLocalizedDescriptionKey: "Something went wrong"])
         }
-
-        return result
     }
 
     func getHomePageSections(sectionCallback: @escaping (HomeSection?) -> Void) {
@@ -239,7 +240,7 @@ class SourceExtension: NSObject, ExtensionProtocol {
                 "getViewMoreItems",
                 withArguments: [
                     homepageSectionId,
-                    metadata
+                    metadata as Any
                 ]
             )
 

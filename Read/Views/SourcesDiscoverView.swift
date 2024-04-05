@@ -17,42 +17,52 @@ struct SourcesDiscoverView: View {
 
     var body: some View {
         VStack {
-            PagerTabStripView(swipeGestureEnabled: .constant(true), selection: $selected) {
-                ForEach(sourceManager.sources.indices, id: \.self) { index in
-                    let source = sourceManager.sources[index]
+            if sourceManager.sources.isEmpty {
+                ContentUnavailableView(
+                    "No sources",
+                    systemImage: "gear.badge",
+                    description: Text("Add a source in settings")
+                )
 
-                    Group {
-                        if selected == index || previousSelected == index {
-                            SourceExtensionView(source: source)
-                                .transition(.opacity)
-                                .animation(.easeInOut, value: selected == index)
-                        } else {
-                            ProgressView()
+            } else {
+                PagerTabStripView(swipeGestureEnabled: .constant(true), selection: $selected) {
+                    ForEach(sourceManager.sources.indices, id: \.self) { index in
+                        let source = sourceManager.sources[index]
+
+                        Group {
+                            if selected == index || previousSelected == index {
+                                SourceExtensionView(source: source)
+                                    .transition(.opacity)
+                                    .animation(.easeInOut, value: selected == index)
+                            } else {
+                                ProgressView()
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .pagerTabItem(tag: index) {
+                            Text("\(source.sourceInfo.name)")
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .pagerTabItem(tag: index) {
-                        Text("\(source.sourceInfo.name)")
-                    }
                 }
+
+                .onChange(of: selected) { oldValue, newValue in
+                    previousSelected = oldValue
+                    selected = newValue
+                }
+                .pagerTabStripViewStyle(
+                    .scrollableBarButton(tabItemSpacing: 15,
+                                         tabItemHeight: 32,
+                                         padding: .init(
+                                             top: 0,
+                                             leading: 8,
+                                             bottom: 0,
+                                             trailing: 0
+                                         ),
+                                         indicatorView: {
+                                             Rectangle().fill(Color.accent).cornerRadius(5)
+                                         })
+                )
             }
-            .onChange(of: selected) { oldValue, newValue in
-                previousSelected = oldValue
-                selected = newValue
-            }
-            .pagerTabStripViewStyle(
-                .scrollableBarButton(tabItemSpacing: 15,
-                                     tabItemHeight: 28,
-                                     padding: .init(
-                                         top: 0,
-                                         leading: 8,
-                                         bottom: 0,
-                                         trailing: 0
-                                     ),
-                                     indicatorView: {
-                                         Rectangle().fill(Color.accent).cornerRadius(5)
-                                     })
-            )
         }
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)

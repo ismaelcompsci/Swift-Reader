@@ -35,61 +35,76 @@ struct SourceSearch: View {
     @State var searchText = ""
     @State var isSearching = false
 
+    @State private var currentSearchTask: Task<Void, Never>? = nil
+
     var body: some View {
-        ScrollView {
-            ForEach(self.searchResults.keys.sorted(), id: \.self) { key in
+        if sourceManager.sources.isEmpty {
+            ContentUnavailableView(
+                "No sources",
+                systemImage: "gear.badge",
+                description: Text("Add a source in settings")
+            )
+            .navigationTitle("Search Everything")
+            .navigationBarTitleDisplayMode(.inline)
+        } else {
+            ScrollView {
+                ForEach(self.searchResults.keys.sorted(), id: \.self) { key in
 
-                if let results = searchResults[key] {
-                    switch results.state {
-                    case .loading:
-                        HStack {
-                            Text(results.source.name)
-                                .font(.title2)
-                                .lineLimit(1)
-                                .fontWeight(.semibold)
-                                .padding(.leading, 10)
+                    if let results = searchResults[key] {
+                        switch results.state {
+                        case .loading:
+                            HStack {
+                                Text(results.source.name)
+                                    .font(.title2)
+                                    .lineLimit(1)
+                                    .fontWeight(.semibold)
+                                    .padding(.leading, 10)
 
-                            Spacer()
+                                Spacer()
 
-                            ProgressView()
-                                .padding(.trailing, 8)
+                                ProgressView()
+                                    .padding(.trailing, 8)
+                            }
+
+                        case .done:
+                            let resultsItems = results.results?.results ?? []
+
+                            SourceSectionView(
+                                title: results.source.name,
+                                containsMoreItems: results.results?.metadata != nil,
+                                items: resultsItems,
+                                sourceId: results.source.id,
+                                isLoading: false,
+                                searchRequest: query
+                            )
+
+                        case .error:
+                            EmptyView()
                         }
-
-                    case .done:
-                        let resultsItems = results.results?.results ?? []
-
-                        SourceSectionView(
-                            title: results.source.name,
-                            containsMoreItems: results.results?.metadata != nil,
-                            items: resultsItems,
-                            sourceId: results.source.id,
-                            isLoading: false,
-                            searchRequest: query
-                        )
-
-                    case .error:
-                        EmptyView()
                     }
                 }
             }
-        }
-        .navigationTitle("Search Everything")
-        .searchable(text: self.$searchText, isPresented: self.$isSearching)
-        .tint(appColor.accent)
-        .onSubmit(of: .search) {
-            Task {
-                await self.search()
+            .navigationTitle("Search Everything")
+            .searchable(text: self.$searchText, isPresented: self.$isSearching)
+            .tint(appColor.accent)
+            .onSubmit(of: .search) {
+                Task {
+                    await self.search()
+                }
             }
         }
     }
 
     func search() async {
-        let query = SearchRequest(title: searchText, parameters: [:])
+        guard !searchText.isEmpty else { return }
 
+        let query = SearchRequest(title: searchText, parameters: [:])
         self.query = query
 
-        await withTaskGroup(of: (String, PagedResults?).self) { group in
-            for (key, ext) in self.sourceManager.extensions.filter({ $0.value.sourceInfo.interfaces.search == true }) {
+        for (i, (key, ext)) in sourceManager.extensions.enumerated() {
+            Task {
+                guard ext.sourceInfo.interfaces.search == true else { return }
+
                 let searchResult = SearchResults(source: ext.sourceInfo, results: nil)
                 searchResult.state = .loading
 
@@ -97,14 +112,8 @@ struct SourceSearch: View {
                     self.searchResults[key] = searchResult
                 }
 
-                group.addTask {
-                    let results = try? await ext.getSearchResults(query: query, metadata: [:])
+                let results = try? await ext.getSearchResults(query: query, metadata: [:])
 
-                    return (key, results)
-                }
-            }
-
-            for await (key, results) in group {
                 DispatchQueue.main.async {
                     if let results {
                         self.searchResults[key]?.results = results

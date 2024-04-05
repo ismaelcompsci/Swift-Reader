@@ -66,15 +66,14 @@ struct SourceBookDetailsView: View {
                     }
                 }
 
-                if loadingState == false {
-//                    DownloadButton(
-//                        downloadUrls: bookDetails.bookInfo.downloadLinks,
-//                        downloadable: self.downloadable,
-//                        book: bookDetails,
-//                        itemId: bookDetails.id
-//                    )
+                if loadingState == false, let bookDetails {
+                    SourceDownloadButton(
+                        downloadUrls: bookDetails.bookInfo.downloadLinks,
+                        downloadable: self.downloadable,
+                        book: bookDetails,
+                        itemId: bookDetails.id
+                    )
 
-                    Text("Download")
                 } else {
                     Button {} label: {
                         HStack(spacing: 8) {

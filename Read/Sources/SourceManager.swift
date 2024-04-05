@@ -53,7 +53,7 @@ class SourceManager {
             sourceInfo: source.sourceInfo
         )
 
-        let loaded = sourceExt.load()
+        let _ = sourceExt.load()
 
         return sourceExt
     }
@@ -99,6 +99,7 @@ class SourceManager {
                 if destination.exists {
                     try? FileManager.default.removeItem(at: destination)
                     sources.removeAll { $0.id == source.id }
+                    extensions.removeValue(forKey: source.id)
                 }
 
                 try? FileManager.default.moveItem(at: payload, to: destination)

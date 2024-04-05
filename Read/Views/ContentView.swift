@@ -38,7 +38,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        withAnimation {
+                        withAnimation(.snappy) {
                             self.showMenu = true
                         }
                     } label: {
@@ -126,7 +126,7 @@ struct ContentView: View {
         .tint(self.appColor.accent)
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.black)
+        .background(Color.backgroundSecondary)
     }
 }
 
