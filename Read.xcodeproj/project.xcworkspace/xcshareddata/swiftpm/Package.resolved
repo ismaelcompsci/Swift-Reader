@@ -46,15 +46,6 @@
       }
     },
     {
-      "identity" : "tagform",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/issetwo/tagform",
-      "state" : {
-        "revision" : "a0701a6a4c710d3111c92185456ecd7d10a6f66b",
-        "version" : "1.0.0"
-      }
-    },
-    {
       "identity" : "wrappinghstack",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dkk/WrappingHStack",

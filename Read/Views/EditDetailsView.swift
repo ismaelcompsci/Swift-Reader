@@ -42,7 +42,7 @@ struct EditDetailsView: View {
                         .frame(width: 100, height: 140)
                         .padding(.vertical)
                     
-                    FormInput(text: $title, inputTitle: "Title")
+                    SRFromInput(text: $title, inputTitle: "Title")
                     
                     HStack {
                         Text("Authors")
@@ -55,13 +55,13 @@ struct EditDetailsView: View {
                     .background(Color.backgroundSecondary)
                     .clipShape(.rect(cornerRadius: 12))
                     
-                    FormInput(text: $description, inputTitle: "Description", axis: .vertical)
+                    SRFromInput(text: $description, inputTitle: "Description", axis: .vertical)
                     
                     Spacer()
                 }
                 
                 HStack {
-                    AppButton(text: "Save") {
+                    SRButton(text: "Save") {
                         guard let realm = book.realm?.thaw() else {
                             return
                         }
@@ -95,17 +95,20 @@ struct EditDetailsView: View {
                         dismiss()
                     } label: {
                         Text("Cancel")
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(
-                                    cornerRadius: 20,
-                                    style: .continuous
-                                )
-                                .stroke(appColor.accent, lineWidth: 2)
-                            )
-                            .foregroundStyle(.white)
+                            .frame(minHeight: 44)
                     }
+                    .frame(minHeight: 44)
+                    .padding(.horizontal, 12)
+                    .foregroundStyle(.white)
+                    .background(
+                        RoundedRectangle(
+                            cornerRadius: 10,
+                            style: .continuous
+                        )
+                        .stroke(appColor.accent, lineWidth: 2)
+                    )
+                    .background(appColor.accent.opacity(0.15))
+                    .clipShape(.rect(cornerRadius: 10))
                 }
                 
                 .padding()
@@ -116,7 +119,7 @@ struct EditDetailsView: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    XButton {
+                    SRXButton {
                         dismiss()
                     }
                 }

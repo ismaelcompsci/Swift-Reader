@@ -1,5 +1,5 @@
 //
-//  AppButton.swift
+//  SRButton.swift
 //  Read
 //
 //  Created by Mirna Olvera on 3/10/24.
@@ -10,7 +10,7 @@ import SwiftUI
 /// TODO: can switch to a view modifer
 /// aka ButtonStyle
 
-struct AppButton: View {
+struct SRButton: View {
     @EnvironmentObject var appColor: AppColor
 
     var systemName: String?
@@ -36,16 +36,17 @@ struct AppButton: View {
                     Text(text)
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 12)
-            .padding(.vertical, 10)
             .foregroundStyle(.white)
             .background(appColor.accent)
-            .clipShape(.capsule)
+            .clipShape(.rect(cornerRadius: 10))
         }
     }
 }
 
 #Preview {
-    AppButton(systemName: "book", text: "Open")
+    SRButton(systemName: "book", text: "Open")
+        .preferredColorScheme(.dark)
+        .environmentObject(AppColor())
 }

@@ -58,7 +58,7 @@ struct ContentView: View {
             HStack {
                 Spacer()
 
-                XButton {
+                SRXButton {
                     withAnimation(.snappy) {
                         self.showMenu = false
                     }
@@ -126,7 +126,8 @@ struct ContentView: View {
         .tint(self.appColor.accent)
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.backgroundSecondary)
+        .blendMode(.colorDodge)
+        .background(.ultraThinMaterial)
     }
 }
 

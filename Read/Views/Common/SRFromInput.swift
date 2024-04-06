@@ -1,5 +1,5 @@
 //
-//  FormInput.swift
+//  SRFormInput.swift
 //  Read
 //
 //  Created by Mirna Olvera on 3/10/24.
@@ -7,9 +7,8 @@
 
 import SwiftUI
 
-struct FormInput: View {
+struct SRFromInput: View {
     @FocusState private var focus: Bool
-
     @Binding var text: String
 
     let inputTitle: String
@@ -42,5 +41,10 @@ struct FormInput: View {
 }
 
 #Preview {
-    FormInput(text: .constant("HELLO"), inputTitle: "Test", axis: .vertical)
+    SRFromInput(
+        text: .constant("HELLO"),
+        inputTitle: "Test",
+        axis: .horizontal
+    )
+    .preferredColorScheme(.dark)
 }

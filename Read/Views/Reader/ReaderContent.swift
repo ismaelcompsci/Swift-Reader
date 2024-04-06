@@ -64,7 +64,7 @@ struct ReaderContent<T: TocItem>: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    XButton {
+                    SRXButton {
                         dismiss()
                     }
                 }

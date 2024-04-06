@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct XButton: View {
+struct SRXButton: View {
     var action: (() -> Void)?
 
     var body: some View {
@@ -29,5 +29,6 @@ struct XButton: View {
 }
 
 #Preview {
-    XButton()
+    SRXButton()
+        .preferredColorScheme(.dark)
 }

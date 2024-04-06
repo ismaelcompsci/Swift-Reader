@@ -127,7 +127,7 @@ struct UploadFileView: View {
                             .font(.subheadline)
                             .foregroundStyle(.gray)
 
-                        AppButton(text: "Select Files") {
+                        SRButton(text: "Select Files") {
                             showFilePicker = true
                         }
                         .frame(maxWidth: 120, maxHeight: .infinity, alignment: .top)
@@ -181,7 +181,7 @@ struct UploadFileView: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    XButton {
+                    SRXButton {
                         dismiss()
                     }
                 }

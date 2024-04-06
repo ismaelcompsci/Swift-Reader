@@ -353,7 +353,7 @@ struct SettingsSourcesView: View {
 
                 Spacer()
 
-                AppButton(text: "Add to Read") {
+                SRButton(text: "Add to Read") {
                     Task {
                         await addSource()
                     }

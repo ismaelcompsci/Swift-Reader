@@ -40,4 +40,6 @@ struct SearchBar: View {
 
 #Preview {
     SearchBar(searchText: .constant("Hello"))
+        .environmentObject(AppColor())
+        .preferredColorScheme(.dark)
 }

@@ -113,7 +113,7 @@ struct BookDetailView: View {
                     HStack {
                         let text: String = book.readingPosition != nil ? "Continue Reading \(Int((book.readingPosition?.progress ?? 0.0) * 100))%" : "Read"
                  
-                        AppButton(systemName: "book.fill", text: text) {
+                        SRButton(systemName: "book.fill", text: text) {
                             openReader = true
                         }
                         .frame(maxWidth: .infinity)

@@ -89,5 +89,12 @@ struct LibrarySortPopover: View {
 }
 
 #Preview {
-    LibrarySortPopover(selectedSortKey: .constant(.title), selectedSortOrder: .constant(.descending))
+    LibrarySortPopover(
+        selectedSortKey: .constant(.title),
+        selectedSortOrder: .constant(
+            .descending
+        )
+    )
+    .environmentObject(AppColor())
+    .preferredColorScheme(.dark)
 }
