@@ -310,7 +310,7 @@
 				9FE38F012B7DCDC9005A446A /* README.md */,
 				9FE324212B85CE36003E61F6 /* Screenshots */,
 				9F7011892BC5F37E001E3955 /* Packages */,
-				9F608E7E2B65D05B00D2B5F4 /* Read */,
+				9F608E7E2B65D05B00D2B5F4 /* ReadApp */,
 				9F608E7D2B65D05B00D2B5F4 /* Products */,
 				9F023BC02BB69CB70061BE7A /* Frameworks */,
 			);
@@ -324,7 +324,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9F608E7E2B65D05B00D2B5F4 /* Read */ = {
+		9F608E7E2B65D05B00D2B5F4 /* ReadApp */ = {
 			isa = PBXGroup;
 			children = (
 				9F608E852B65D05D00D2B5F4 /* Preview Content */,
@@ -338,7 +338,7 @@
 				9F608E8D2B65DDC300D2B5F4 /* Utils */,
 				9FC596062B86A06A00ED3734 /* Resources */,
 			);
-			path = Read;
+			path = ReadApp;
 			sourceTree = "<group>";
 		};
 		9F608E852B65D05D00D2B5F4 /* Preview Content */ = {
