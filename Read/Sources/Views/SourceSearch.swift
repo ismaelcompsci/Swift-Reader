@@ -26,7 +26,7 @@ class SearchResults {
 }
 
 struct SourceSearch: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     @Environment(SourceManager.self) private var sourceManager
 
     @State var searchResults: [String: SearchResults] = [:]
@@ -86,7 +86,7 @@ struct SourceSearch: View {
             }
             .navigationTitle("Search Everything")
             .searchable(text: self.$searchText, isPresented: self.$isSearching)
-            .tint(appColor.accent)
+            .tint(theme.tintColor)
             .onSubmit(of: .search) {
                 Task {
                     await self.search()
@@ -101,7 +101,7 @@ struct SourceSearch: View {
         let query = SearchRequest(title: searchText, parameters: [:])
         self.query = query
 
-        for (i, (key, ext)) in sourceManager.extensions.enumerated() {
+        for (_, (key, ext)) in sourceManager.extensions.enumerated() {
             Task {
                 guard ext.sourceInfo.interfaces.search == true else { return }
 
@@ -112,16 +112,18 @@ struct SourceSearch: View {
                     self.searchResults[key] = searchResult
                 }
 
-                let results = try? await ext.getSearchResults(query: query, metadata: [:])
+                let results = await ext.getSearchResults(query: query, metadata: [:])
 
                 DispatchQueue.main.async {
-                    if let results {
-                        self.searchResults[key]?.results = results
+                    switch results {
+                    case .success(let paged):
+                        self.searchResults[key]?.results = paged
+
                         withAnimation {
                             self.searchResults[key]?.state = .done
                         }
-
-                    } else {
+                    case .failure:
+                        // TODO: ERROR
                         self.searchResults[key]?.state = .error
                     }
                 }

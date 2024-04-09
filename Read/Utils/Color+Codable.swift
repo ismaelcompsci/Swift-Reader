@@ -10,27 +10,24 @@ import SwiftUI
 import UIKit
 
 extension Color: RawRepresentable {
-    public init?(rawValue: String) {
-        guard let data = Data(base64Encoded: rawValue) else {
-            self = .accent
-            return
-        }
-
-        do {
-            let color = try NSKeyedUnarchiver.unarchivedObject(ofClass: UIColor.self, from: data) ?? UIColor(Color.accent)
-            self = Color(color)
-        } catch {
-            self = .accent
-        }
+    public init?(rawValue: Int) {
+        let red = Double((rawValue & 0xFF0000) >> 16) / 0xFF
+        let green = Double((rawValue & 0x00FF00) >> 8) / 0xFF
+        let blue = Double(rawValue & 0x0000FF) / 0xFF
+        self = Color(red: red, green: green, blue: blue)
     }
 
-    public var rawValue: String {
-        do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: UIColor(self), requiringSecureCoding: false) as Data
-            return data.base64EncodedString()
-
-        } catch {
-            return ""
+    public var rawValue: Int {
+        guard let coreImageColor else {
+            return 0
         }
+        let red = Int(coreImageColor.red * 255 + 0.5)
+        let green = Int(coreImageColor.green * 255 + 0.5)
+        let blue = Int(coreImageColor.blue * 255 + 0.5)
+        return (red << 16) | (green << 8) | blue
+    }
+
+    private var coreImageColor: CIColor? {
+        CIColor(color: .init(self))
     }
 }

@@ -136,13 +136,16 @@ extension DownloadManager: URLSessionDownloadDelegate {
             return
         }
 
-        let newDestination = moveFileToDownloadsFolder(at: location, download: download, recommendedName: downloadTask.response?.suggestedFilename)
+        let newDestination = moveFileToDownloadsFolder(
+            at: location,
+            download: download,
+            recommendedName: downloadTask.response?.suggestedFilename
+        )
 
         DispatchQueue.main.async {
-            guard let httpResponse = downloadTask.response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
-                let httpResponse = downloadTask.response as? HTTPURLResponse
-                print("DONWLOAD HTTP STATUS ERRROR: \(httpResponse?.url?.absoluteString ?? "URL")")
-                download.status = .failed(.serverError(statusCode: httpResponse?.statusCode ?? 401))
+            guard let httpResponse = downloadTask.response as? HTTPURLResponse,
+                  Set(200 ... 299).contains(httpResponse.statusCode)
+            else {
                 return
             }
 
@@ -184,7 +187,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
                 return
             }
 
-            if Set(200 ..< 300).contains(response.statusCode) {
+            if !Set(200 ..< 300).contains(response.statusCode) {
                 download.status = .failed(.serverError(statusCode: response.statusCode))
             }
         }

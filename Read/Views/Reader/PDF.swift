@@ -62,7 +62,7 @@ struct PDF: View {
             }, currentTocItemId: pdfViewModel.currentTocItem?.id)
         })
         .sheet(isPresented: $showSettingsSheet, content: {
-            ReaderSettings(theme: $pdfViewModel.theme, isPDF: true, updateTheme: {
+            ReaderSettings(bookTheme: $pdfViewModel.theme, isPDF: true, updateTheme: {
                 pdfViewModel.setTheme()
             })
 

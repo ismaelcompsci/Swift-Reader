@@ -16,8 +16,10 @@ func getCoverFullPath(for path: String) -> URL {
 struct BookCover: View {
     var imageURL: URL?
     var isPlaceholderImage: Bool = false
+    var title: String?
+    var author: String?
 
-    init(coverPath: String? = nil) {
+    init(coverPath: String? = nil, title: String? = nil, author: String? = nil) {
         if let path = coverPath {
             isPlaceholderImage = false
             imageURL = getCoverFullPath(for: path)
@@ -25,13 +27,15 @@ struct BookCover: View {
             isPlaceholderImage = true
             imageURL = nil
         }
+
+        self.title = title
+        self.author = author
     }
 
     var placeholder: some View {
-        Image(systemName: "book")
-            .resizable()
-            .scaledToFit()
-            .padding(.horizontal, 10)
+        PlaceholderCover(title: title ?? "Unknown Title", author: author ?? "Unknown Author")
+            .aspectRatio(0.7, contentMode: .fill)
+            .spine()
     }
 
     var body: some View {
@@ -43,11 +47,10 @@ struct BookCover: View {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                } else if phase.error != nil {
-                    Image(systemName: "xmark")
+                        .spine()
+
                 } else {
-                    Image(systemName: "ellipsis")
-                        .symbolEffect(.variableColor)
+                    placeholder
                 }
             }
         }
@@ -56,4 +59,6 @@ struct BookCover: View {
 
 #Preview {
     BookCover(coverPath: nil)
+        .preferredColorScheme(.light)
+        .frame(width: 100, height: 160)
 }

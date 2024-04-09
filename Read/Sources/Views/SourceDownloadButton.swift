@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SourceDownloadButton: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     @Environment(BookDownloader.self) var bookDownloader
 
     var downloadUrls: [DownloadInfo]
@@ -120,7 +120,21 @@ struct SourceDownloadButton: View {
 
     func downloadFinished(_ finished: DownloadManager.OnDownloadFinished) {
         let (download, location) = finished
-        // add to library
+
+        Task {
+            print(download.status)
+            do {
+                if let book = book {
+                    try await BookImporter.shared.process(for: location, with: book)
+
+                } else {
+                    try await BookImporter.shared.process(for: location)
+                }
+            } catch {
+                print("ERROR: \(error.localizedDescription)")
+            }
+        }
+
         print("DOWNLOAD FINSIHED: \(location.exists)")
     }
 

@@ -16,12 +16,17 @@ public enum BookMetadataError: Error {
 
 public class BookMetadataExtractor {
     public static let shared = BookMetadataExtractor()
-
+    
+    public static let saveFolderName = "books"
+    public static let basePath = URL.documentsDirectory
+    
     let extracterInstance: Int = 0
-
-    init() {}
-
-    public func getMetadata(path bookPath: String, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
+    
+    init() {
+        try? FileManager.default.createDirectory(at: Self.basePath, withIntermediateDirectories: true)
+    }
+    
+    private func getMetadata(path bookPath: String, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
         let extracterName = "metadata\(extracterInstance)"
         let function = """
         var \(extracterName) = new MetaDataExtractor()
@@ -46,7 +51,7 @@ public class BookMetadataExtractor {
                         print("[BookMetadataExtractor] getMetadata: NO DATA")
                         completion(.failure(.decodingError))
                     }
-
+                    
                 case .failure(let error):
                     print("[BookMetadataExtractor] getMetadata: \(error.localizedDescription)")
                     completion(.failure(.metadataExtractionError))
@@ -55,147 +60,107 @@ public class BookMetadataExtractor {
         }
     }
 
-    public func parseBook(from url: URL, completion: @escaping (Result<BookMetadata, BookMetadataError>) -> Void) {
-        let accessing = url.startAccessingSecurityScopedResource()
-        let isPdf = url.lastPathComponent.hasSuffix(".pdf")
-
-        if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let id = UUID()
-            let bookDirectoryString = "\(id)"
-            let lastPathComponent = "\(url.lastPathComponent)"
-
-            let destinationDirectoryURL = documentsDirectory.appending(path: bookDirectoryString, directoryHint: .isDirectory)
-            let destinationBookURL = destinationDirectoryURL.appending(path: lastPathComponent, directoryHint: .notDirectory)
-
-            do {
-                try FileManager.default.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: false)
-
-                try FileManager.default.copyItem(at: url, to: destinationBookURL)
-            } catch {
-                print("[BookMetadataExtractor] parseBook: \(error.localizedDescription)")
-                return completion(.failure(.fileError))
-            }
-
-            var bookMetadata = BookMetadata()
-
-            if isPdf {
-                let optionalTitle = destinationBookURL.deletingPathExtension().lastPathComponent
-                let document = PDFDocument(url: destinationBookURL)
-                let metadata = document?.documentAttributes!
-
-                let author = metadata?[PDFDocumentAttribute.authorAttribute] ?? metadata?["Author"] ?? "Unknown Author"
-                let title = metadata?[PDFDocumentAttribute.titleAttribute] ?? (optionalTitle != "" ? optionalTitle : "Unknown Title")
-                let description = metadata?[PDFDocumentAttribute.subjectAttribute]
-
-                var coverImage: UIImage?
-                if let cover = getPDFCover(ofPDFAt: destinationBookURL) {
-                    coverImage = cover
-                } else {
-                    // https://pspdfkit.com/blog/2020/convert-pdf-to-image-in-swift/
-                    if let page = document?.page(at: 0)?.pageRef {
-                        // Fetch the page rect for the page we want to render.
-                        let pageRect = page.getBoxRect(.mediaBox)
-
-                        let cropRect = pageRect
-
-                        let renderer = UIGraphicsImageRenderer(size: cropRect.size)
-                        coverImage = renderer.image { ctx in
-                            // Set the background color.
-                            UIColor.black.set()
-                            ctx.fill(CGRect(x: 0, y: 0, width: cropRect.width, height: cropRect.height))
-
-                            // Translate the context so that we only draw the `cropRect`.
-                            ctx.cgContext.translateBy(x: -cropRect.origin.x, y: pageRect.size.height - cropRect.origin.y)
-
-                            // Flip the context vertically because the Core Graphics coordinate system starts from the bottom.
-                            ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
-
-                            // Draw the PDF page.
-                            ctx.cgContext.drawPDFPage(page)
-                        }
-                    }
-                }
-
-                let fullAuthor = MetadataAuthor(name: String(describing: author))
-
-                bookMetadata.title = title as! String? ?? "Unknown Title"
-                bookMetadata.description = description as! String? ?? ""
-                bookMetadata.author?.append(fullAuthor)
-                bookMetadata.bookPath = "\(bookDirectoryString)/\(lastPathComponent)"
-
-                if let coverData = coverImage?.pngData() {
-                    let lastImagePathComponent = "\(UUID()).png"
-                    let imagePath = destinationDirectoryURL.appending(path: lastImagePathComponent)
-
-                    do {
-                        try coverData.write(to: imagePath)
-                        bookMetadata.bookCover = "\(bookDirectoryString)/\(lastImagePathComponent)"
-
-                    } catch {
-                        print("[BookMetadataExtractor] parseBook: Failed to write image, \(error.localizedDescription)")
-                        return completion(.failure(.fileError))
-                    }
-                }
-
-                return completion(.success(bookMetadata))
-
-            } else {
-                self.getMetadata(path: destinationBookURL.absoluteString) { result in
-                    switch result {
-                    case .success(let newBookMetadata):
-
-                        bookMetadata.title = newBookMetadata.title ?? "Unknown Title"
-                        bookMetadata.description = newBookMetadata.description
-                        bookMetadata.bookPath = "\(bookDirectoryString)/\(lastPathComponent)"
-                        bookMetadata.author = newBookMetadata.author
-                        bookMetadata.subject = newBookMetadata.subject
-
-                        // write cover to file
-                        if let cover = newBookMetadata.cover {
-                            let data = Data(base64Encoded: cover)
-                            let lastImagePathComponent = "\(UUID())\(getImageType(base64: String(cover.prefix(20))) ?? "-default.png")"
-                            let imagePath = destinationDirectoryURL.appending(path: lastImagePathComponent)
-
-                            do {
-                                try data?.write(to: imagePath)
-                                bookMetadata.bookCover = "\(bookDirectoryString)/\(lastImagePathComponent)"
-
-                            } catch {
-                                print("[BookMetadataExtractor] parseBook: Failed to write image, \(error.localizedDescription)")
-                                return completion(.failure(.fileError))
-                            }
-                        }
-
-                        completion(.success(bookMetadata))
-
-                    case .failure(let failure):
-                        print("[BookMetadataExtractor] parseBook: \(failure)")
-                        return completion(.failure(.metadataExtractionError))
-                    }
-
-                    do {
-                        if accessing {
-                            url.stopAccessingSecurityScopedResource()
-                        }
-                    }
-                }
-            }
+    /// copies book from url to documents dir with path being 'documents/{saveFolderName}/{lastPathComponent}'
+    public func copyBook(from url: URL, id bookId: UUID) -> URL? {
+        let path = Self.basePath.appending(
+            path: makeBookBasePath(
+                bookId: bookId.uuidString
+            ),
+            directoryHint: .isDirectory
+        )
+        
+        let destination = path.appending(
+            path: url.lastPathComponent,
+            directoryHint: .notDirectory
+        )
+        
+        try? FileManager.default.createDirectory(
+            at: path,
+            withIntermediateDirectories: true
+        )
+        try? FileManager.default.copyItem(
+            at: url,
+            to: destination
+        )
+       
+        if FileManager.default.fileExists(atPath: destination.path(percentEncoded: false)) == true {
+            return destination
         }
-
-        do {
-            if accessing {
-                url.stopAccessingSecurityScopedResource()
-            }
-        }
+        
+        return nil
     }
-
-    // async version
-    // the callback version caused issues when importin a large amount of files
-    public func parseBook(from url: URL) async throws -> BookMetadata {
-        return try await withCheckedThrowingContinuation {
-            (continuation: CheckedContinuation<BookMetadata, Error>) in
-
-            self.parseBook(from: url) { result in
+    
+    private func getPDFCoverPath(from pdfUrl: URL, with bookId: UUID) -> String? {
+        let coverImage = pdfToImage(from: pdfUrl, at: 1)
+        
+        var coverPath: String?
+        
+        if let pngData = coverImage?.pngData() {
+            let imageId = "\(UUID().uuidString).png"
+            
+            let base = makeBookBasePath(bookId: bookId.uuidString)
+            let documentsBase = URL.documentsDirectory.appending(path: base)
+            
+            let imagePath = documentsBase.appending(path: imageId)
+            
+            try? pngData.write(to: imagePath)
+            coverPath = "\(base)/\(imageId)"
+            
+            return coverPath
+        }
+        
+        return nil
+    }
+    
+    public func makeBookBasePath(bookId: String) -> String {
+        return "\(Self.saveFolderName)/\(bookId)"
+    }
+    
+    public func parsePDF(from url: URL) -> BookMetadata? {
+        // parse metadata
+        _ = url.startAccessingSecurityScopedResource()
+        
+        let bookId = UUID()
+        
+        guard let newPath = copyBook(from: url, id: bookId) else {
+            url.stopAccessingSecurityScopedResource()
+            return nil
+        }
+        
+        let document = PDFDocument(url: newPath)
+        let pdfMetadata = document?.documentAttributes
+        let author = (
+            pdfMetadata?[PDFDocumentAttribute.authorAttribute] ?? pdfMetadata?["Author"]
+        ) as? String ?? "Unknown Author"
+        let title = pdfMetadata?[PDFDocumentAttribute.titleAttribute] as? String ?? "Unknown Title"
+        let description = pdfMetadata?[PDFDocumentAttribute.subjectAttribute] as? String
+        
+        let metadataAuthor = MetadataAuthor(name: author)
+        let coverPath = getPDFCoverPath(from: newPath, with: bookId)
+        
+        let metadata = BookMetadata(
+            title: title,
+            author: [metadataAuthor],
+            description: description,
+            bookPath: "\(makeBookBasePath(bookId: bookId.uuidString))/\(url.lastPathComponent)",
+            bookCover: coverPath
+        )
+        
+        url.stopAccessingSecurityScopedResource()
+        return metadata
+    }
+    
+    public func parseEBook(from url: URL) async -> BookMetadata? {
+        _ = url.startAccessingSecurityScopedResource()
+        let bookId = UUID()
+        
+        guard let newPath = copyBook(from: url, id: bookId) else {
+            url.stopAccessingSecurityScopedResource()
+            return nil
+        }
+        
+        guard let metadata = try? await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BookMetadata, Error>) in
+            getMetadata(path: newPath.absoluteString) { result in
                 switch result {
                 case .success(let success):
                     continuation.resume(returning: success)
@@ -203,6 +168,40 @@ public class BookMetadataExtractor {
                     continuation.resume(throwing: failure)
                 }
             }
+        }) else {
+            url.stopAccessingSecurityScopedResource()
+            return nil
         }
+        
+        var coverPath: String?
+        
+        if let cover = metadata.cover {
+            let data = Data(base64Encoded: cover)
+            let imageId = UUID().uuidString
+            let imageType = getImageType(base64: String(cover.prefix(20))) ?? "-default.png"
+            
+            let base = makeBookBasePath(bookId: bookId.uuidString)
+            let filename = "\(base)/\(imageId)\(imageType)"
+            
+            let newImagePath = URL.documentsDirectory.appending(path: filename)
+            try? data?.write(to: newImagePath)
+            
+            coverPath = filename
+        }
+        
+        let parsedMetadata = BookMetadata(
+            title: metadata.title ?? "Unknown Title",
+            author: metadata.author,
+            description: metadata.description,
+            subject: metadata.subject,
+            bookPath: "\(makeBookBasePath(bookId: bookId.uuidString))/\(newPath.lastPathComponent)",
+            bookCover: coverPath
+        )
+        
+        url.stopAccessingSecurityScopedResource()
+        return parsedMetadata
     }
+
+    /// file is saved to 'documents/{uuid}/{lastPathComponent}' in documents directory
+    /// cover image is saved to documents/{uuid}/{uuid}.png
 }

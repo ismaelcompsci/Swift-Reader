@@ -9,17 +9,26 @@ import Foundation
 import JavaScriptCore
 
 protocol ExtensionProtocol {
-    func getBookDetails(for id: String) async throws -> SourceBook?
-    func getSearchResults(query: SearchRequest, metadata: Any?) async throws -> PagedResults?
-    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async throws -> PagedResults?
-    func getHomePageSections(sectionCallback: @escaping (_ section: HomeSection?) -> Void)
+    func getBookDetails(for id: String) async -> Result<SourceBook, ExtensionError>
+    func getSearchResults(query: SearchRequest, metadata: Any?) async -> Result<PagedResults, ExtensionError>
+    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async -> Result<PagedResults, ExtensionError>
+    func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void)
 }
 
 enum ApplicationError: Error {
-    case getBookDetailsError(String)
     case getViewMoreItems(String)
     case getSearchResults(String)
     case unexpected(String)
+}
+
+enum ExtensionError: String, Error {
+    case invalidBookDetails = "Unable to get book details from extension."
+    case invalidPagedResults = "Unable to get paged details from extension."
+    case invalidHomeSection = "Unable to get home section from extension."
+    case invalidViewMoreItems = "Unable to get more items from extension."
+    case invalidSourceExtension = "Source extension was never initialized."
+    case invalidPropertyInSource = "Source extension does not have the property."
+    case invalidContext = "JSContext failed to load."
 }
 
 @Observable
@@ -112,12 +121,16 @@ class SourceExtension: NSObject, ExtensionProtocol {
         return true
     }
 
-    func getBookDetails(for id: String) async throws -> SourceBook? {
-        guard let source, source.hasProperty("getBookDetails"), let context else {
-            return nil
+    func getBookDetails(for id: String) async -> Result<SourceBook, ExtensionError> {
+        guard let context = context else {
+            return .failure(.invalidContext)
         }
 
-        guard let result = try await withUnsafeThrowingContinuation({ continuation in
+        guard let source = source, source.hasProperty("getBookDetails") else {
+            return .failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource)
+        }
+
+        guard let result = try? await withUnsafeThrowingContinuation({ continuation in
             let callback: @convention(block) (SourceBook?) -> Void = { results in
                 if let results {
                     continuation.resume(returning: results)
@@ -125,7 +138,7 @@ class SourceExtension: NSObject, ExtensionProtocol {
                 }
 
                 continuation.resume(
-                    throwing: ApplicationError.getSearchResults("getBookDetails @convention(block) recived no data")
+                    throwing: ExtensionError.invalidBookDetails
                 )
             }
 
@@ -141,25 +154,30 @@ class SourceExtension: NSObject, ExtensionProtocol {
 
             guard let thenWrapper else {
                 return continuation.resume(
-                    throwing: ApplicationError.getBookDetailsError("thenWrapper failed to execute")
+                    throwing: ExtensionError.invalidBookDetails
                 )
             }
 
             promise?.invokeMethod("then", withArguments: [thenWrapper])
 
         }) else {
-            throw NSError(domain: "Extensable", code: 0, userInfo: [NSLocalizedDescriptionKey: "Something went wrong"])
+            print("\(#function) withUnsafeThrowingContinuation error")
+            return .failure(.invalidBookDetails)
         }
 
-        return result
+        return .success(result)
     }
 
-    func getSearchResults(query: SearchRequest, metadata: Any?) async throws -> PagedResults? {
-        guard let source = source, source.hasProperty("getSearchResults"), let context else {
-            return nil
+    func getSearchResults(query: SearchRequest, metadata: Any?) async -> Result<PagedResults, ExtensionError> {
+        guard let context = context else {
+            return .failure(.invalidContext)
         }
 
-        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<PagedResults, Error>) in
+        guard let source = source, source.hasProperty("getSearchResults") else {
+            return .failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource)
+        }
+
+        guard let results = try? await withCheckedThrowingContinuation({ continuation in
             let id = UUID().uuidString.replacingOccurrences(of: "-", with: "_")
 
             let callback: @convention(block) (PagedResults?) -> Void = { results in
@@ -170,7 +188,7 @@ class SourceExtension: NSObject, ExtensionProtocol {
                     delete gloablThis.getSearchResultsCallback\(id)
                     """)
                 } else {
-                    continuation.resume(throwing: ApplicationError.getSearchResults("Something went wrong"))
+                    continuation.resume(throwing: ExtensionError.invalidPagedResults)
                 }
             }
 
@@ -185,21 +203,36 @@ class SourceExtension: NSObject, ExtensionProtocol {
             """)
 
             guard let thenWrapper else {
-                continuation.resume(throwing: ApplicationError.getSearchResults("Something went wrong"))
+                continuation.resume(throwing: ExtensionError.invalidPagedResults)
                 return
             }
 
             promise?.invokeMethod("then", withArguments: [thenWrapper])
+        }) else {
+            return .failure(.invalidPagedResults)
         }
+
+        return .success(results)
     }
 
-    func getHomePageSections(sectionCallback: @escaping (HomeSection?) -> Void) {
-        guard let source, source.hasProperty("getHomePageSections"), let context else {
+    func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void) {
+        guard let context = context else {
+            sectionCallback(.failure(.invalidContext))
+            return
+        }
+
+        guard let source = source, source.hasProperty("getHomePageSections") else {
+            sectionCallback(.failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource))
             return
         }
 
         let callback: @convention(block) (HomeSection?) -> Void = { result in
-            sectionCallback(result)
+
+            if let result {
+                sectionCallback(.success(result))
+            } else {
+                sectionCallback(.failure(.invalidHomeSection))
+            }
         }
 
         context.setObject(callback, forKeyedSubscript: "getHomePageSectionsCallback" as NSString)
@@ -215,12 +248,16 @@ class SourceExtension: NSObject, ExtensionProtocol {
         }
     }
 
-    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async throws -> PagedResults? {
-        guard let source, source.hasProperty("getViewMoreItems"), let context else {
-            return nil
+    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async -> Result<PagedResults, ExtensionError> {
+        guard let context = context else {
+            return .failure(.invalidContext)
         }
 
-        guard let result = try await withUnsafeThrowingContinuation({ continuation in
+        guard let source = source, source.hasProperty("getViewMoreItems") else {
+            return .failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource)
+        }
+
+        guard let result = try? await withUnsafeThrowingContinuation({ continuation in
 
             let callback: @convention(block) (PagedResults?) -> Void = { results in
                 if let results {
@@ -228,7 +265,7 @@ class SourceExtension: NSObject, ExtensionProtocol {
                     return
                 }
 
-                continuation.resume(throwing: ApplicationError.getSearchResults("Something went wrong"))
+                continuation.resume(throwing: ExtensionError.invalidViewMoreItems)
             }
 
             context.setObject(
@@ -251,14 +288,14 @@ class SourceExtension: NSObject, ExtensionProtocol {
             """)
 
             guard let thenWrapper else {
-                return continuation.resume(throwing: ApplicationError.getSearchResults("thenWrapper failed to execute"))
+                return continuation.resume(throwing: ExtensionError.invalidViewMoreItems)
             }
 
             promise?.invokeMethod("then", withArguments: [thenWrapper])
         }) else {
-            throw NSError(domain: "Extensable", code: 0, userInfo: [NSLocalizedDescriptionKey: "Something went wrong"])
+            return .failure(.invalidViewMoreItems)
         }
 
-        return result
+        return .success(result)
     }
 }

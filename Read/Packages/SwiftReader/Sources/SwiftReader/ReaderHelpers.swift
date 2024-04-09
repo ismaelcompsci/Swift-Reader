@@ -81,77 +81,30 @@ public func getImageType(base64: String) -> String? {
     return nil
 }
 
-func getEmbeddedImages(ofPDFAt url: URL, pageIndex: Int) -> [UIImage]? {
-    guard let document = CGPDFDocument(url as CFURL) else {
-        print("Couldn't open PDF.")
-        return nil
-    }
-    // `page(at:)` uses pages numbered starting at 1.
-    let page = pageIndex + 1
-    guard let pdfPage = document.page(at: page), let dictionary = pdfPage.dictionary else {
-        print("Couldn't open page.")
-        return nil
-    }
-    var res: CGPDFDictionaryRef?
-    guard CGPDFDictionaryGetDictionary(dictionary, "Resources", &res), let resources = res else {
-        print("Couldn't get Resources.")
-        return nil
-    }
-    var xObj: CGPDFDictionaryRef?
-    guard CGPDFDictionaryGetDictionary(resources, "XObject", &xObj), let xObject = xObj else {
-        print("Couldn't load page XObject.")
-        return nil
-    }
+func pdfToImage(from url: URL, at page: Int) -> UIImage? {
+    guard let document = CGPDFDocument(url as CFURL) else { return nil }
 
-    var imageKeys = [String]()
-    CGPDFDictionaryApplyBlock(xObject, { key, object, _ in
-        var stream: CGPDFStreamRef?
-        guard CGPDFObjectGetValue(object, .stream, &stream),
-              let objectStream = stream,
-              let streamDictionary = CGPDFStreamGetDictionary(objectStream) else { return true }
-        var subtype: UnsafePointer<Int8>?
-        guard CGPDFDictionaryGetName(streamDictionary, "Subtype", &subtype), let subtypeName = subtype else { return true }
-        if String(cString: subtypeName) == "Image" {
-            imageKeys.append(String(cString: key))
-        }
-        return true
-    }, nil)
+    guard let page = document.page(at: page) else { return nil }
 
-    let allPageImages = imageKeys.compactMap { imageKey -> UIImage? in
-        print(imageKey)
-        var stream: CGPDFStreamRef?
-        guard CGPDFDictionaryGetStream(xObject, imageKey, &stream), let imageStream = stream else {
-            print("Couldn't get image stream.")
-            return nil
-        }
-        var format: CGPDFDataFormat = .raw
-        guard let data = CGPDFStreamCopyData(imageStream, &format) else {
-            print("Couldn't convert image stream to data.")
-            return nil
-        }
-        guard let image = UIImage(data: data as Data) else {
-            print("Couldn't convert image data to image.")
-            return nil
-        }
-        return image
+    let pageRect = page.getBoxRect(.mediaBox)
+
+    let cropRect = pageRect
+
+    let renderer = UIGraphicsImageRenderer(size: cropRect.size)
+    let img = renderer.image { ctx in
+        // Set the background color.
+        UIColor.white.set()
+        ctx.fill(CGRect(x: 0, y: 0, width: cropRect.width, height: cropRect.height))
+
+        // Translate the context so that we only draw the `cropRect`.
+        ctx.cgContext.translateBy(x: -cropRect.origin.x, y: pageRect.size.height - cropRect.origin.y)
+
+        // Flip the context vertically because the Core Graphics coordinate system starts from the bottom.
+        ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
+
+        // Draw the PDF page.
+        ctx.cgContext.drawPDFPage(page)
     }
 
-    return allPageImages
-}
-
-public func getPDFCover(ofPDFAt: URL) -> UIImage? {
-    if let images = getEmbeddedImages(ofPDFAt: ofPDFAt, pageIndex: 0) {
-        var image: UIImage?
-
-        for pdfImage in images {
-            if pdfImage as UIImage? != nil {
-                image = pdfImage
-                break
-            }
-        }
-
-        return image
-    }
-
-    return nil
+    return img
 }

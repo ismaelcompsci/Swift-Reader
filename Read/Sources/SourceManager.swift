@@ -53,7 +53,7 @@ class SourceManager {
             sourceInfo: source.sourceInfo
         )
 
-        let _ = sourceExt.load()
+        _ = sourceExt.load()
 
         return sourceExt
     }

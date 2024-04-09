@@ -9,7 +9,8 @@ import Combine
 import Foundation
 
 @Observable
-class BookDownloader {
+public class BookDownloader {
+    public static let shared = BookDownloader()
     var manager = DownloadManager()
 
     @ObservationIgnored

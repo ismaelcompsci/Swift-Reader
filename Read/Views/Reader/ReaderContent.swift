@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ReaderContent<T: TocItem>: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     var toc: [T]
     var isSelected: ((T) -> Bool)?
@@ -43,7 +43,7 @@ struct ReaderContent<T: TocItem>: View {
                                         }
                                         Image(systemName: "chevron.right")
                                     }
-                                    .foregroundStyle(selected ? appColor.accent : .white)
+                                    .foregroundStyle(selected ? theme.tintColor : .white)
                                 }
                                 .padding(.leading, CGFloat(tocItem.depth ?? 0) * 10)
                             }

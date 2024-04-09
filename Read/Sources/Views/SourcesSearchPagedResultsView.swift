@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SourcesSearchPagedResultsView: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     @Environment(SourceManager.self) private var sourceManager
     @State var extensionJS: SourceExtension?
 
@@ -60,7 +60,7 @@ struct SourcesSearchPagedResultsView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .tint(self.appColor.accent)
+        .tint(self.theme.tintColor)
         .task {
             self.checkExtension()
         }
@@ -76,20 +76,26 @@ struct SourcesSearchPagedResultsView: View {
         self.loading = true
         self.checkExtension()
 
-        let query = SearchRequest(title: searchRequest.title, parameters: [:])
-        let results = try? await self.extensionJS?.getSearchResults(
-            query: query,
-            metadata: self.metadata
-        )
+        guard let extensionJS = self.extensionJS else {
+            self.loading = false
+            return
+        }
 
-        if let results {
-            self.books.append(contentsOf: results.results)
-            if let metadata = results.metadata {
+        let query = SearchRequest(title: searchRequest.title, parameters: [:])
+        let results = await extensionJS.getSearchResults(query: query, metadata: self.metadata)
+
+        switch results {
+        case .success(let searchResults):
+            self.books.append(contentsOf: searchResults.results)
+
+            if let metadata = searchResults.metadata {
                 self.metadata = metadata
             } else {
                 self.cancel = true
             }
-        } else {
+
+        case .failure:
+            // TODO: ERROR
             self.cancel = true
         }
 

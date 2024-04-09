@@ -12,7 +12,7 @@ import WrappingHStack
 
 struct UploadFileView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
@@ -79,7 +79,7 @@ struct UploadFileView: View {
                     ProgressView()
                         .padding()
                         .foregroundStyle(.white)
-                        .tint(appColor.accent)
+                        .tint(theme.tintColor)
                         .background(.black)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
 
@@ -88,7 +88,7 @@ struct UploadFileView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                         .foregroundStyle(.white)
-                        .background(appColor.accent)
+                        .background(theme.tintColor)
                         .clipShape(.capsule)
                 }
             }
@@ -102,7 +102,7 @@ struct UploadFileView: View {
             VStack(alignment: .center) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 24)
-                        .strokeBorder(appColor.accent, style: StrokeStyle(lineWidth: 1, dash: [5]))
+                        .strokeBorder(theme.tintColor, style: StrokeStyle(lineWidth: 1, dash: [5]))
                         .opacity(0.5)
                         .zIndex(10)
 
@@ -193,38 +193,13 @@ struct UploadFileView: View {
         Task {
             processingBook = true
             for url in fileUrls {
-                // made async instead of closure so that a large number of books are not being proccessed at the same time
-                if let metadata = try? await BookMetadataExtractor.shared.parseBook(from: url) {
-                    let book = Book()
-
-                    book.title = metadata.title ?? "Untitled"
-                    book.summary = metadata.description ?? ""
-                    book.coverPath = metadata.bookCover
-                    book.bookPath = metadata.bookPath
-
-                    _ = metadata.subject?.map { item in
-                        let newTag = Tag()
-                        newTag.name = item
-                        book.tags.append(newTag)
-                    }
-
-                    _ = metadata.author.map { author in
-                        author.map { author in
-                            let newAuthor = Author()
-                            newAuthor.name = author.name ?? "Unknown Author"
-                            book.authors.append(newAuthor)
-                        }
-                    }
-
-                    book.processed = true
-                    $books.append(book)
-
-                    totalBytes -= url.size
-
-                    if let fileIndex = fileUrls.firstIndex(of: url) {
-                        fileUrls.remove(at: fileIndex)
-                    }
+                do {
+                    try await BookImporter.shared.process(for: url)
+                } catch {
+                    print("ERROR IMPORTING BOOK \(error.localizedDescription)")
                 }
+
+                totalBytes -= url.size
             }
             processingBook = false
             fileUrls = []

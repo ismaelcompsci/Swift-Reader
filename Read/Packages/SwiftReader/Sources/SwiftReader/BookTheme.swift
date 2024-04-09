@@ -99,7 +99,7 @@ protocol ThemeProtocol {
     // init get saved data
 }
 
-public struct Theme: ThemeProtocol, Codable {
+public struct BookTheme: ThemeProtocol, Codable {
     // MARK: Layout
 
     public static let saveKey = "ReaderTheme"
@@ -179,8 +179,8 @@ public struct Theme: ThemeProtocol, Codable {
     }
 
     public init() {
-        if let decodedData = UserDefaults.standard.data(forKey: Theme.saveKey) {
-            if let theme = try? JSONDecoder().decode(Theme.self, from: decodedData) {
+        if let decodedData = UserDefaults.standard.data(forKey: BookTheme.saveKey) {
+            if let theme = try? JSONDecoder().decode(BookTheme.self, from: decodedData) {
                 self.gap = theme.gap
                 self.animated = theme.animated
                 self.maxInlineSize = theme.maxInlineSize
@@ -200,7 +200,7 @@ public struct Theme: ThemeProtocol, Codable {
 
     func save() {
         if let encodedTheme = try? JSONEncoder().encode(self) {
-            UserDefaults.standard.set(encodedTheme, forKey: Theme.saveKey)
+            UserDefaults.standard.set(encodedTheme, forKey: BookTheme.saveKey)
         }
     }
 }

@@ -148,3 +148,42 @@ public extension UIApplication {
         return window
     }
 }
+
+// https://dallinjared.medium.com/swiftui-tutorial-contrasting-text-over-background-color-2e7af57c1b20
+extension Text {
+    func getContrastText(backgroundColor: Color) -> some View {
+        var r, g, b, a: CGFloat
+        (r, g, b, a) = (0, 0, 0, 0)
+        UIColor(backgroundColor).getRed(&r, green: &g, blue: &b, alpha: &a)
+        let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        return luminance < 0.6 ? self.foregroundColor(.white) : self.foregroundColor(.black)
+    }
+}
+
+extension Color {
+    static func random() -> Color {
+        Color(
+            red: .random(in: 0...1),
+            green: .random(in: 0...1),
+            blue: .random(in: 0...1),
+            opacity: 1
+        )
+    }
+}
+
+extension View {
+    func readSize(onChange: @escaping (CGSize) -> Void) -> some View {
+        background(
+            GeometryReader { geometryProxy in
+                Color.clear
+                    .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+            }
+        )
+        .onPreferenceChange(SizePreferenceKey.self, perform: onChange)
+    }
+}
+
+struct SizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
+}

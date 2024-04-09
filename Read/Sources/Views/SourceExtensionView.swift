@@ -66,35 +66,37 @@ struct SourceExtensionView: View {
             }
         }
         .task {
-            print("RUNNING TASK FOR: \(source.sourceInfo.name)")
-            extensionJS = self.sourceManager.extensions[self.source.id]
+            await getHomePageSections()
+        }
+    }
 
-            guard let extensionJS, source.sourceInfo.interfaces.homePage == true else {
-                return
-            }
+    func getHomePageSections() async {
+        extensionJS = sourceManager.extensions[source.id]
 
-            if extensionJS.loaded == false {
-                _ = extensionJS.load()
-            }
+        guard let extensionJS, source.sourceInfo.interfaces.homePage == true else {
+            return
+        }
 
-            let fetchedItems = sections.values.filter {
-                $0.items.count > 0
-            }
+        if extensionJS.loaded == false {
+            _ = extensionJS.load()
+        }
 
-            if fetchedItems.count > 0 {
-                return
-            }
+        let fetchedItems = sections.values.filter {
+            $0.items.count > 0
+        }
 
-            var holdSections: [String: ObservableHomeSection] = [:]
-            var homeSectionsInitialized = 0
-            var homeSectionsItemsAdded = 0
+        if fetchedItems.count > 0 {
+            return
+        }
 
-            extensionJS.getHomePageSections(sectionCallback: { homeSection in
+        var holdSections: [String: ObservableHomeSection] = [:]
+        var homeSectionsInitialized = 0
+        var homeSectionsItemsAdded = 0
 
-                guard let homeSection = homeSection else {
-                    return
-                }
+        extensionJS.getHomePageSections { result in
 
+            switch result {
+            case .success(let homeSection):
                 if let section = holdSections[homeSection.id], section.items.isEmpty {
                     holdSections[homeSection.id]?.items = homeSection.items
                     section.isLoading = false
@@ -116,19 +118,24 @@ struct SourceExtensionView: View {
                     )
 
                     DispatchQueue.main.async {
-                        sections[homeSection.id] = titleSection
+                        self.sections[homeSection.id] = titleSection
                     }
                 }
 
                 if homeSectionsInitialized == homeSectionsItemsAdded {
+                    let sendableHoldSections = holdSections
+
                     DispatchQueue.main.async {
                         withAnimation {
-                            sections = holdSections
+                            self.sections = sendableHoldSections
                         }
                     }
                 }
+            case .failure:
 
-            })
+                // TODO: ERROR
+                break
+            }
         }
     }
 }

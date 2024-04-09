@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SourceSectionView: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     var title: String
     var containsMoreItems: Bool
@@ -37,6 +37,7 @@ struct SourceSectionView: View {
                     NavigationLink {
                         if let id = id {
                             PagedViewMoreItems(sourceId: self.sourceId, viewMoreId: id)
+                                .navigationTitle(title)
                         } else if let searchRequest = searchRequest {
                             SourcesSearchPagedResultsView(searchRequest: searchRequest, sourceId: sourceId)
                         }
@@ -44,7 +45,7 @@ struct SourceSectionView: View {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")
                     }
                     .padding(.trailing, 8)
-                    .tint(appColor.accent)
+                    .tint(theme.tintColor)
                 }
             }
 

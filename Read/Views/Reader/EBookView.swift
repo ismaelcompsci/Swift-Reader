@@ -97,7 +97,7 @@ struct EBookView: View {
             }, currentTocItemId: ebookViewModel.currentTocItem?.id)
         })
         .sheet(isPresented: $showSettingsSheet, content: {
-            ReaderSettings(theme: $ebookViewModel.theme, isPDF: false) {
+            ReaderSettings(bookTheme: $ebookViewModel.theme, isPDF: false) {
                 ebookViewModel.setBookTheme()
             }
 

@@ -11,11 +11,24 @@ import SwiftUI
 struct SourceBookImage: View {
     let imageUrl: String?
 
-    var title: String? = "Assassin's Quest"
-    var author: String? = "Robbin Hobb"
+    var title: String?
+    var author: String?
+
+    init(
+        imageUrl: String?,
+        title: String? = nil,
+        author: String? = nil
+    ) {
+        self.imageUrl = imageUrl
+        self.title = title
+        self.author = author
+    }
 
     var placeholder: some View {
-        Image(systemName: "books.vertical")
+        PlaceholderCover(
+            title: title ?? "Unknown Title",
+            author: author ?? "Unknown Author"
+        )
     }
 
     var body: some View {
@@ -26,15 +39,12 @@ struct SourceBookImage: View {
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                    } else if phase.error != nil {
-                        Image(systemName: "xmark")
                     } else {
-                        ProgressView()
+                        placeholder
                     }
                 }
-
             } else {
-                self.placeholder
+                placeholder
             }
         }
     }

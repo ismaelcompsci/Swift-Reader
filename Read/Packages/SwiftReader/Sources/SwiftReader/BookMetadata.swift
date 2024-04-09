@@ -25,8 +25,6 @@ public struct BookMetadata: Codable {
         case subject
     }
 
-    public init() {}
-
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
@@ -62,10 +60,37 @@ public struct BookMetadata: Codable {
         self.description = try container.decodeIfPresent(String.self, forKey: .description)
         self.cover = try container.decodeIfPresent(String.self, forKey: .cover)
     }
+
+    public init(
+        title: String? = nil,
+        author: [MetadataAuthor]? = nil,
+        description: String? = nil,
+        cover: String? = nil,
+        subject: [String]? = nil,
+        bookPath: String? = nil,
+        bookCover: String? = nil
+    ) {
+        self.title = title
+        self.author = author
+        self.description = description
+        self.cover = cover
+        self.subject = subject
+        self.bookPath = bookPath
+        self.bookCover = bookCover
+    }
 }
 
 public struct MetadataAuthor: Codable {
     public var name: String? = ""
+
+    public init(name: String? = nil) {
+        self.name = name
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decodeIfPresent(String.self, forKey: .name)
+    }
 }
 
 public struct TagItem: Codable {

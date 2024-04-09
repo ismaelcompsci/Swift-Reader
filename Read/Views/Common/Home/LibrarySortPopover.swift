@@ -7,21 +7,8 @@
 
 import SwiftUI
 
-enum LibrarySortKeys: String, CaseIterable {
-    case title = "Title"
-    case date = "Date"
-    case author = "Author"
-    case last_read = "Last Read"
-    case progress = "Progress"
-}
-
-enum LibrarySortOrder: String {
-    case ascending
-    case descending
-}
-
 struct LibrarySortPopover: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     @State var sortPopoverShowing = false
 
@@ -83,7 +70,7 @@ struct LibrarySortPopover: View {
                          .presentationCompactAdaptation(.popover)
 
                      })
-            .foregroundStyle(appColor.accent)
+            .foregroundStyle(theme.tintColor)
         }
     }
 }
@@ -95,6 +82,6 @@ struct LibrarySortPopover: View {
             .descending
         )
     )
-    .environmentObject(AppColor())
+
     .preferredColorScheme(.dark)
 }

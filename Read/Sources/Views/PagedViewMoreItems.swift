@@ -57,7 +57,6 @@ struct PagedViewMoreItems: View {
                 }
             }
         }
-        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             self.checkExtension()
@@ -73,20 +72,26 @@ struct PagedViewMoreItems: View {
     func getMoreHomeViewItems() async {
         self.checkExtension()
         self.loading = true
-        let results = try? await self.extensionJS?.getViewMoreItems(
+
+        guard let extensionJS = self.extensionJS else {
+            return
+        }
+
+        let results = await extensionJS.getViewMoreItems(
             homepageSectionId: self.viewMoreId,
             metadata: self.metadata
         )
 
-        if let results {
-            self.books.append(contentsOf: results.results)
+        switch results {
+        case .success(let pagedResults):
+            self.books.append(contentsOf: pagedResults.results)
 
-            if let metadata = results.metadata {
+            if let metadata = pagedResults.metadata {
                 self.metadata = metadata
             } else {
                 self.cancel = true
             }
-        } else {
+        case .failure:
             self.cancel = true
         }
 

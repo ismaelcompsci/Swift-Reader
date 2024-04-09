@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) private var theme
 
     @State var showMenu = false
     @State var navigation: SideMenuNavigation = .home
@@ -43,7 +43,7 @@ struct ContentView: View {
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal")
-                            .foregroundStyle(self.appColor.accent)
+                            .foregroundStyle(self.theme.tintColor)
                     }
                 }
             }
@@ -74,7 +74,7 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "house")
                     Text("Home")
-                        .foregroundStyle(navigation == .home ? appColor.accent : .white)
+                        .foregroundStyle(navigation == .home ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -88,7 +88,7 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "gear")
                     Text("Settings")
-                        .foregroundStyle(navigation == .settings ? appColor.accent : .white)
+                        .foregroundStyle(navigation == .settings ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -102,7 +102,7 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "shippingbox")
                     Text("Discover")
-                        .foregroundStyle(navigation == .discover ? appColor.accent : .white)
+                        .foregroundStyle(navigation == .discover ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -116,14 +116,14 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                     Text("Search")
-                        .foregroundStyle(navigation == .search ? appColor.accent : .white)
+                        .foregroundStyle(navigation == .search ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Spacer()
         }
-        .tint(self.appColor.accent)
+        .tint(self.theme.tintColor)
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .blendMode(.colorDodge)
@@ -135,6 +135,4 @@ struct ContentView: View {
     ContentView()
         .preferredColorScheme(.dark)
         .environment(\.font, Font.custom("Poppins-Regular", size: 16))
-        .environmentObject(AppColor())
-        .environmentObject(EditViewModel())
 }

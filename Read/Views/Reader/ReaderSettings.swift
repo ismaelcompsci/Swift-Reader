@@ -10,9 +10,9 @@ import SwiftUI
 
 struct ReaderSettings: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     
-    @Binding var theme: Theme
+    @Binding var bookTheme: BookTheme
     
     var isPDF: Bool
     
@@ -27,7 +27,7 @@ struct ReaderSettings: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundStyle(appColor.accent)
+                    .foregroundStyle(theme.tintColor)
                 }
                 
                 VStack(alignment: .center) {
@@ -37,8 +37,8 @@ struct ReaderSettings: View {
                         ForEach(ThemeBackground.allCases) { themeBg in
                             ZStack {
                                 Button {
-                                    theme.bg = themeBg
-                                    theme.fg = themeBg.fromBackground(background: themeBg)
+                                    bookTheme.bg = themeBg
+                                    bookTheme.fg = themeBg.fromBackground(background: themeBg)
                                     
                                     updateTheme?()
                                 } label: {
@@ -48,17 +48,17 @@ struct ReaderSettings: View {
                                 .background(Color(hex: themeBg.rawValue))
                                 .clipShape(.circle)
                                 .overlay {
-                                    if themeBg == theme.bg {
+                                    if themeBg == bookTheme.bg {
                                         Circle()
-                                            .stroke(appColor.accent, lineWidth: 1.0)
+                                            .stroke(theme.tintColor, lineWidth: 1.0)
                                     }
                                 }
                                 .foregroundStyle(Color(hex: themeBg.fromBackground(background: themeBg).rawValue))
                                 
-                                if themeBg == theme.bg {
+                                if themeBg == bookTheme.bg {
                                     Circle()
-                                        .stroke(appColor.accent)
-                                        .fill(appColor.accent)
+                                        .stroke(theme.tintColor)
+                                        .fill(theme.tintColor)
                                         .frame(width: 8, height: 8)
                                         .offset(x: 12, y: -18)
                                 }
@@ -72,7 +72,7 @@ struct ReaderSettings: View {
                         HStack(spacing: 12) {
                             Button {
                                 // decrease line height
-                                theme.decreaseLineHeight()
+                                bookTheme.decreaseLineHeight()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "blinds.horizontal.closed")
@@ -85,7 +85,7 @@ struct ReaderSettings: View {
                                 .frame(maxHeight: 24)
                             
                             Button {
-                                theme.increaseLineHeight()
+                                bookTheme.increaseLineHeight()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "blinds.horizontal.open")
@@ -101,7 +101,7 @@ struct ReaderSettings: View {
                         
                         HStack(spacing: 12) {
                             Button {
-                                theme.decreaseFontSize()
+                                bookTheme.decreaseFontSize()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "textformat.size.smaller")
@@ -112,7 +112,7 @@ struct ReaderSettings: View {
                                 .frame(maxHeight: 24)
                             
                             Button {
-                                theme.increaseFontSize()
+                                bookTheme.increaseFontSize()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "textformat.size.larger")
@@ -126,7 +126,7 @@ struct ReaderSettings: View {
                         
                         HStack {
                             Button {
-                                theme.decreaseGap()
+                                bookTheme.decreaseGap()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "rectangle.portrait.arrowtriangle.2.outward")
@@ -137,7 +137,7 @@ struct ReaderSettings: View {
                                 .frame(maxHeight: 24)
                             
                             Button {
-                                theme.increaseGap()
+                                bookTheme.increaseGap()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "rectangle.portrait.arrowtriangle.2.inward")
@@ -149,7 +149,7 @@ struct ReaderSettings: View {
                         
                         HStack {
                             Button {
-                                theme.increaseMargin()
+                                bookTheme.increaseMargin()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "rectangle.compress.vertical")
@@ -160,7 +160,7 @@ struct ReaderSettings: View {
                                 .frame(maxHeight: 24)
                             
                             Button {
-                                theme.decreaseMargin()
+                                bookTheme.decreaseMargin()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "rectangle.expand.vertical")
@@ -172,24 +172,28 @@ struct ReaderSettings: View {
                         
                         HStack {
                             Button {
-                                theme.setMaxColumnCount(1)
+                                bookTheme.setMaxColumnCount(1)
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "square")
                                     .font(.system(size: 24))
-                                    .foregroundStyle(theme.maxColumnCount == 1 ? appColor.accent : .white)
+                                    .foregroundStyle(
+                                        bookTheme.maxColumnCount == 1 ? theme.tintColor : .white
+                                    )
                             }
                             
                             Divider()
                                 .frame(maxHeight: 24)
                             
                             Button {
-                                theme.setMaxColumnCount(2)
+                                bookTheme.setMaxColumnCount(2)
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "square.split.2x1")
                                     .font(.system(size: 24))
-                                    .foregroundStyle(theme.maxColumnCount == 2 ? appColor.accent : .white)
+                                    .foregroundStyle(
+                                        bookTheme.maxColumnCount == 2 ? theme.tintColor : .white
+                                    )
                             }
                         }
                         .foregroundStyle(.white)
@@ -208,5 +212,5 @@ struct ReaderSettings: View {
 }
 
 #Preview {
-    ReaderSettings(theme: .constant(Theme()), isPDF: false)
+    ReaderSettings(bookTheme: .constant(BookTheme()), isPDF: false)
 }

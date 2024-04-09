@@ -7,31 +7,25 @@
 
 import RealmSwift
 import SwiftUI
-import TagForm
 
 struct EditDetailsView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     var book: Book
 
     @State var title: String
     @State var description: String
-    @State var tagInfoList: [TagInfo]
-
+    @State var authors: String
+    
     init(book: Book) {
         self.book = book
 
         _title = State(initialValue: book.title)
         _description = State(initialValue: book.summary ?? "")
-
-        var initialAuthorTags = [TagInfo]()
-
-        book.authors.forEach { author in
-            initialAuthorTags.append(.init(label: author.name, color: .black))
-        }
-
-        _tagInfoList = State(initialValue: initialAuthorTags)
+        let authors = book.authors.map { $0.name }
+        
+        _authors = State(initialValue: authors.joined(separator: ", "))
     }
 
     var body: some View {
@@ -44,16 +38,7 @@ struct EditDetailsView: View {
                     
                     SRFromInput(text: $title, inputTitle: "Title")
                     
-                    HStack {
-                        Text("Authors")
-                            .foregroundStyle(.gray)
-                        
-                        TagForm(tagInfoList: $tagInfoList, placeholder: "name...", tagColer: .black)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(Color.backgroundSecondary)
-                    .clipShape(.rect(cornerRadius: 12))
+                    SRFromInput(text: $authors, inputTitle: "Authors")
                     
                     SRFromInput(text: $description, inputTitle: "Description", axis: .vertical)
                     
@@ -75,14 +60,13 @@ struct EditDetailsView: View {
                             thawedBook.summary = description
                             
                             let updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
+                            let authors = authors.split(separator: ",")
                             
-                            tagInfoList.forEach { tag in
+                            authors.forEach { name in
                                 let author = Author()
-                                author.name = tag.label
-                                
+                                author.name = String(name).trimmingCharacters(in: .whitespacesAndNewlines)
                                 updatedAuthors.append(author)
                             }
-                            
                             thawedBook.authors = updatedAuthors
                         }
                         
@@ -105,9 +89,9 @@ struct EditDetailsView: View {
                             cornerRadius: 10,
                             style: .continuous
                         )
-                        .stroke(appColor.accent, lineWidth: 2)
+                        .stroke(theme.tintColor, lineWidth: 2)
                     )
-                    .background(appColor.accent.opacity(0.15))
+                    .background(theme.tintColor.opacity(0.15))
                     .clipShape(.rect(cornerRadius: 10))
                 }
                 
@@ -132,5 +116,4 @@ struct EditDetailsView: View {
     EditDetailsView(book: .example1)
         .preferredColorScheme(.dark)
         .environment(\.font, Font.custom("Poppins-Regular", size: 16))
-        .environmentObject(AppColor())
 }

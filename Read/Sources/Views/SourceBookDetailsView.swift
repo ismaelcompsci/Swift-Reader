@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct SourceBookDetailsView: View {
+    @Environment(AppTheme.self) private var theme
     @Environment(SourceManager.self) private var sourceManager
     @State var extensionJS: SourceExtension?
 
-    @State private var showMore = false
     @State private var bookDetails: SourceBook?
     @State private var loadingState: Bool = false
 
@@ -44,26 +44,8 @@ struct SourceBookDetailsView: View {
                 }
 
                 if let desc = bookDetails?.bookInfo.desc {
-                    VStack(spacing: 0) {
-                        Text(desc)
-                            .foregroundStyle(.secondary)
-                            .font(.subheadline)
-                            .lineLimit(self.showMore ? 40 : 3)
-                            .allowsTightening(false)
-                            .onTapGesture {
-                                withAnimation(.snappy) {
-                                    self.showMore.toggle()
-                                }
-                            }
-
-                        Text(self.showMore ? "less" : "more")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .onTapGesture {
-                                withAnimation(.snappy) {
-                                    self.showMore.toggle()
-                                }
-                            }
-                    }
+                    MoreText(text: desc)
+                        .tint(theme.tintColor)
                 }
 
                 if loadingState == false, let bookDetails {
@@ -103,11 +85,23 @@ struct SourceBookDetailsView: View {
             self.loadingState = true
             self.extensionJS = sourceManager.extensions[sourceId]
 
-            if self.extensionJS?.loaded == false {
-                _ = self.extensionJS?.load()
+            guard let extensionJS = extensionJS else {
+                loadingState = false
+                return
             }
-            if let details = try? await self.extensionJS?.getBookDetails(for: self.item.id) {
+
+            if extensionJS.loaded == false {
+                _ = extensionJS.load()
+            }
+
+            let result = await extensionJS.getBookDetails(for: self.item.id)
+
+            switch result {
+            case .success(let details):
                 self.bookDetails = details
+            case .failure:
+                // TODO:
+                break
             }
 
             self.loadingState = false

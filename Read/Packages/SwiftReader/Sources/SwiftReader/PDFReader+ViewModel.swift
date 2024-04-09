@@ -27,7 +27,7 @@ public class PDFViewModel: ObservableObject {
     public var pdfView: NoContextMenuPDFView
     var pdfInitialPageIndex: Int?
 
-    @Published public var theme = Theme()
+    @Published public var theme = BookTheme()
     @Published public var currentPage: PDFPage?
     @Published public var currentTocItem: PDFTocItem?
     @Published public var currentLabel: String = ""

@@ -22,7 +22,7 @@ struct InterfaceTag: View {
 }
 
 struct SourceRow: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     var source: SourceInfo
     var isInstalled: Bool = false
@@ -121,7 +121,7 @@ struct SourceRow: View {
                 .controlSize(.mini)
                 .buttonStyle(.bordered)
                 .disabled(buttonState == .loading)
-                .foregroundStyle(appColor.accent)
+                .foregroundStyle(theme.tintColor)
             }
         }
         .if(isInstalled) { view in
@@ -174,7 +174,7 @@ struct SourceRow: View {
 struct SourceView: View {
     @Environment(SourceManager.self) var sourceManager
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     var sourceUrl: URL
 
@@ -214,7 +214,7 @@ struct SourceView: View {
                     Image(systemName: "chevron.left")
                     Text("Sources")
                 }
-                .tint(appColor.accent)
+                .tint(theme.tintColor)
             }
         }
         .task {
@@ -302,7 +302,7 @@ struct SourceView: View {
 
 struct SettingsSourcesView: View {
     @Environment(SourceManager.self) private var sourceManager
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     @Environment(\.editMode) var editMode
     @Environment(\.dismiss) var dismiss
 
@@ -349,7 +349,7 @@ struct SettingsSourcesView: View {
                     .padding(.vertical, 8)
                     .background(Color.backgroundSecondary)
                     .clipShape(.rect(cornerRadius: 12))
-                    .tint(appColor.accent)
+                    .tint(theme.tintColor)
 
                 Spacer()
 
@@ -372,7 +372,7 @@ struct SettingsSourcesView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .tint(appColor.accent)
+                    .tint(theme.tintColor)
                 }
             } else {
                 ToolbarItem(placement: .topBarLeading) {
@@ -384,13 +384,13 @@ struct SettingsSourcesView: View {
                             Text("Settings")
                         }
                     }
-                    .tint(appColor.accent)
+                    .tint(theme.tintColor)
                 }
             }
 
             ToolbarItem(placement: .topBarTrailing) {
                 EditButton()
-                    .tint(appColor.accent)
+                    .tint(theme.tintColor)
             }
         }
     }

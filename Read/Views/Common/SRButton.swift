@@ -7,11 +7,8 @@
 
 import SwiftUI
 
-/// TODO: can switch to a view modifer
-/// aka ButtonStyle
-
 struct SRButton: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
 
     var systemName: String?
     var text: String?
@@ -39,7 +36,7 @@ struct SRButton: View {
             .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 12)
             .foregroundStyle(.white)
-            .background(appColor.accent)
+            .background(theme.tintColor)
             .clipShape(.rect(cornerRadius: 10))
         }
     }
@@ -48,5 +45,4 @@ struct SRButton: View {
 #Preview {
     SRButton(systemName: "book", text: "Open")
         .preferredColorScheme(.dark)
-        .environmentObject(AppColor())
 }

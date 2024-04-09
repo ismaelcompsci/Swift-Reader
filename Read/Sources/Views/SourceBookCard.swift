@@ -16,8 +16,12 @@ struct SourceBookCard: View {
             SourceBookDetailsView(sourceId: self.sourceId, item: self.book)
         } label: {
             VStack {
-                SourceBookImage(imageUrl: self.book.image)
-                    .frame(width: 130 * 0.6, height: 130)
+                SourceBookImage(
+                    imageUrl: self.book.image,
+                    title: book.title,
+                    author: book.author
+                )
+                .frame(width: 130 * 0.6, height: 130)
 
                 Text(self.book.title)
                     .lineLimit(1)

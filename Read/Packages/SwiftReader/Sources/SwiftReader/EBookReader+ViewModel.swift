@@ -40,7 +40,7 @@ public class EBookReaderViewModel: ObservableObject {
     @Published public var currentLocation: Relocate? = nil
     @Published public var currentLabel: String = ""
 
-    @Published public var theme = Theme()
+    @Published public var theme = BookTheme()
 
     @Published public var hasFinishedLoadingJS = false { didSet { startIfReady() }} // I need to do some work when all three bools are true
     @Published private(set) var isServerStarted = false { didSet { startIfReady() }} // only when all three are true can i render the book

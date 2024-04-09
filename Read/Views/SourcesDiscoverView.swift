@@ -11,6 +11,7 @@ import SwiftData
 import SwiftUI
 
 struct SourcesDiscoverView: View {
+    @Environment(AppTheme.self) var theme
     @Environment(SourceManager.self) var sourceManager
     @State private var selected = 0
     @State private var previousSelected = 0
@@ -51,7 +52,7 @@ struct SourcesDiscoverView: View {
                 }
                 .pagerTabStripViewStyle(
                     .scrollableBarButton(tabItemSpacing: 15,
-                                         tabItemHeight: 32,
+                                         tabItemHeight: 42,
                                          padding: .init(
                                              top: 0,
                                              leading: 8,
@@ -59,7 +60,13 @@ struct SourcesDiscoverView: View {
                                              trailing: 0
                                          ),
                                          indicatorView: {
-                                             Rectangle().fill(Color.accent).cornerRadius(5)
+                                             Rectangle()
+                                                 .fill(theme.tintColor)
+                                                 .cornerRadius(5)
+                                                 .shadow(
+                                                     color: .green,
+                                                     radius: 10
+                                                 )
                                          })
                 )
             }

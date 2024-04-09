@@ -5,30 +5,44 @@
 //  Created by Mirna Olvera on 2/26/24.
 //
 
+import Combine
 import SwiftUI
 
-// only used for debounce.
-class SettingsViewModel: ObservableObject {
-    @Published var selectedColor: Color = .clear
+class ColorPickerObserver: ObservableObject {
+    @Published var selectedColor: Color
+    @Published var debouncedColor: Color
 
-    init(selectedColor: Color) {
-        self.selectedColor = selectedColor
+    private var subscriptions = Set<AnyCancellable>()
+
+    init(defaultColor: Color) {
+        self.selectedColor = defaultColor
+        self.debouncedColor = defaultColor
+
+        $selectedColor
+            .debounce(for: .seconds(0.8), scheduler: DispatchQueue.main)
+            .sink { [weak self] color in
+                self?.debouncedColor = color
+            }
+            .store(in: &subscriptions)
     }
 }
 
 struct SettingsView: View {
-    @EnvironmentObject var appColor: AppColor
+    @Environment(AppTheme.self) var theme
     @Environment(\.presentationMode) var presentationMode
 
-    @State private var selectedColor: Color = .accent
-    @StateObject private var viewModel = SettingsViewModel(selectedColor: .accent)
+    @StateObject var colorPickerObserver = ColorPickerObserver(defaultColor: .accent)
 
     var body: some View {
         VStack {
             List {
                 Section {
                     HStack {
-                        ColorPicker("Set the theme color", selection: $viewModel.selectedColor, supportsOpacity: false)
+                        ColorPicker(
+                            "Set the theme color",
+                            selection: $colorPickerObserver.selectedColor,
+                            supportsOpacity: false
+                        )
                     }
 
                     NavigationLink {
@@ -36,31 +50,34 @@ struct SettingsView: View {
                     } label: {
                         Text("Sources")
                     }
-                    .tint(appColor.accent)
+                    .tint(theme.tintColor)
 
+                } header: {
+                    Text("Settings")
+                }
+
+                Section {
                     Button {
-                        appColor.accent = .accent
-                        selectedColor = .accent
+                        theme.restoreToDefaults()
+                        colorPickerObserver.selectedColor = theme.tintColor
                     } label: {
                         Text("Reset theme")
                     }
                     .tint(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
-
                 } header: {
-                    Text("Settings")
+                    Text("Advanced")
                 }
             }
             .navigationTitle("Settings")
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
-            viewModel.selectedColor = appColor.accent
+            colorPickerObserver.selectedColor = theme.tintColor
+            colorPickerObserver.debouncedColor = theme.tintColor
         }
-        .onReceive(
-            viewModel.$selectedColor.debounce(for: 1, scheduler: RunLoop.main)
-        ) { color in
-            appColor.accent = color
+        .onChange(of: colorPickerObserver.debouncedColor) { _, newValue in
+            theme.tintColor = newValue
         }
     }
 }

@@ -8,157 +8,67 @@
 import RealmSwift
 import SwiftUI
 
-struct BookGridItem: View {
-    var book: Book
-    let onEvent: (BookItemEvent) -> Void
-
-    let bookHeight: CGFloat = 170
-    let bookWidth: CGFloat = 115
-
-    var compactBookView: some View {
-        VStack {
-            ZStack {
-                BookCover(coverPath: book.coverPath)
-                    .frame(width: bookWidth, height: bookHeight)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(.gray, lineWidth: 0.3)
-            }
-            .overlay {
-                if let position = book.readingPosition {
-                    PieProgress(progress: position.progress ?? 0.0)
-                        .frame(width: 22)
-                        .position(x: bookWidth - 5, y: 0)
-                }
-            }
-
-            Text(book.title)
-                .lineLimit(1)
-
-            Text(book.authors.first?.name ?? "Unkown Author")
-                .font(.subheadline)
-                .foregroundStyle(.gray)
-                .lineLimit(1)
-        }
-        .padding(.vertical, 6)
-        .foregroundStyle(.white)
-    }
-
-    var body: some View {
-        NavigationLink(destination: BookDetailView(book: book)) {
-            compactBookView
-                .contextMenu {
-                    Button("Share", systemImage: "square.and.arrow.up.fill") {
-                        showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
-                    }
-
-                    Button("Edit", systemImage: "pencil") {
-                        onEvent(.onEdit)
-                    }
-
-                    if book.readingPosition != nil {
-                        Button("Clear progress", systemImage: "clear.fill") {
-                            onEvent(.onClearProgress)
-                        }
-                    }
-
-                    Button("Delete", systemImage: "trash.fill", role: .destructive) {
-                        onEvent(.onDelete)
-                    }
-                } preview: {
-                    HStack {
-                        BookCover(coverPath: book.coverPath)
-                            .scaledToFit()
-                            .frame(width: bookWidth * 0.8, height: bookHeight * 0.8)
-
-                        VStack(alignment: .leading) {
-                            Text(book.title)
-                                .lineLimit(1)
-
-                            Text(book.authors.first?.name ?? "Unkown Author")
-                                .font(.subheadline)
-                                .foregroundStyle(.gray)
-                                .lineLimit(1)
-
-                            Spacer()
-
-                            if let position = book.readingPosition {
-                                Text("\(Int((position.progress ?? 0) * 100))% last read \(position.updatedAt.formatted(.relative(presentation: .numeric)))")
-                                    .foregroundStyle(.gray)
-
-                            } else {
-                                Text("Added on \(book.addedAt.formatted(date: .abbreviated, time: .omitted))")
-                                    .foregroundStyle(.gray)
-                                    .lineLimit(1)
-                            }
-
-                            HStack {
-                                if let type = book.fileType {
-                                    Text("FORMAT\n\(type)")
-                                }
-
-                                if let size = book.fileSize {
-                                    Text("SIZE\n\(ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file))")
-                                }
-                            }
-                            .foregroundStyle(.gray)
-                            .font(.system(size: 10))
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                        }
-                    }
-                    .frame(maxWidth: UIScreen.main.bounds.width, maxHeight: bookHeight * 1.2)
-                    .padding()
-                    .background(.black)
-                }
-        }
-    }
-}
-
 struct BookGrid: View {
-    @EnvironmentObject var editViewModel: EditViewModel
     @Environment(\.realm) var realm
 
+    @State var selectedBook: Book?
+
+    @State private var gridWidth = UIScreen.main.bounds.width
+    @AppStorage("numberOfGridColumns") var numberOfColumns: Int = 2
+
     var sortedBooks: [Book]
+    let spacing: CGFloat = 24
 
-    let size: CGFloat = 120
     var body: some View {
-        LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: size))],
-            spacing: 8
-        ) {
-            ForEach(sortedBooks) { book in
+        VStack {
+            let width = gridWidth
+            let cols = CGFloat(numberOfColumns)
+            let availableWidth = width - (spacing * cols)
+            let itemWidth = availableWidth / cols
 
-                BookGridItem(book: book) { event in
-                    switch event {
-                    case .onDelete:
-                        let thawedBook = book.thaw()
+            LazyVGrid(
+                columns: [GridItem(
+                    .adaptive(
+                        minimum: itemWidth,
+                        maximum: itemWidth
+                    ), spacing: spacing
+                )],
+                spacing: spacing
+            ) {
+                ForEach(sortedBooks) { book in
 
-                        if let thawedBook, let bookRealm = thawedBook.realm {
-                            try! bookRealm.write {
-                                bookRealm.delete(thawedBook)
+                    BookGridItem(book: book) { event in
+                        switch event {
+                        case .onDelete:
+                            let thawedBook = book.thaw()
+
+                            if let thawedBook, let bookRealm = thawedBook.realm {
+                                try! bookRealm.write {
+                                    bookRealm.delete(thawedBook)
+                                }
+
+                                BookRemover.removeBook(book: book)
+                            }
+                        case .onClearProgress:
+                            let thawedBook = book.thaw()
+                            try! realm.write {
+                                if thawedBook?.readingPosition != nil {
+                                    thawedBook?.readingPosition = nil
+                                }
                             }
 
-                            BookRemover.removeBook(book: book)
+                        case .onEdit:
+                            selectedBook = book
                         }
-                    case .onClearProgress:
-                        let thawedBook = book.thaw()
-                        try! realm.write {
-                            if thawedBook?.readingPosition != nil {
-                                thawedBook?.readingPosition = nil
-                            }
-                        }
-
-                    case .onEdit:
-                        editViewModel.reset()
-
-                        editViewModel.book = book
-                        editViewModel.showEditView = true
                     }
                 }
             }
+        }
+        .readSize { size in
+            gridWidth = size.width
+        }
+        .sheet(item: $selectedBook) { book in
+            EditDetailsView(book: book)
         }
     }
 }
