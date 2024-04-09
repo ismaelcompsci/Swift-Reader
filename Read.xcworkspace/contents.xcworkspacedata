@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Read.xcodeproj">
+      location = "group:/Users/mirnaolvera/MALLEL/swift/Read/Read.xcodeproj">
    </FileRef>
 </Workspace>

@@ -46,6 +46,8 @@ struct EBookWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let webView = viewModel.webView
 
+        webView.scrollView.alwaysBounceVertical = false
+        webView.scrollView.bounces = false
         webView.navigationDelegate = context.coordinator
         let userContentController = webView.configuration.userContentController
         userContentController.removeAllScriptMessageHandlers()
