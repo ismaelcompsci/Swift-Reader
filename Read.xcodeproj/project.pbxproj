@@ -309,6 +309,7 @@
 			children = (
 				9FE38F012B7DCDC9005A446A /* README.md */,
 				9FE324212B85CE36003E61F6 /* Screenshots */,
+				9F7011892BC5F37E001E3955 /* Packages */,
 				9F608E7E2B65D05B00D2B5F4 /* Read */,
 				9F608E7D2B65D05B00D2B5F4 /* Products */,
 				9F023BC02BB69CB70061BE7A /* Frameworks */,
@@ -330,7 +331,6 @@
 				9F608E832B65D05D00D2B5F4 /* Assets.xcassets */,
 				9F608E9B2B664D7600D2B5F4 /* Info.plist */,
 				9F0EA4582B89773900B7B009 /* ReadApp.swift */,
-				9F71FFDC2BBD266700ADDAC0 /* Packages */,
 				9F8F9CBD2BB4FF240081C57F /* Sources */,
 				9F608E902B65E27B00D2B5F4 /* Views */,
 				9F608E982B65F3F700D2B5F4 /* Models */,
@@ -388,7 +388,7 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		9F71FFDC2BBD266700ADDAC0 /* Packages */ = {
+		9F7011892BC5F37E001E3955 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
 				9FD7F7252BBD27C30050B1FA /* SwiftReader */,
