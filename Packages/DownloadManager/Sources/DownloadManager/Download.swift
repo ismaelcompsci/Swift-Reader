@@ -8,71 +8,32 @@
 import Foundation
 
 @Observable
-class DownloadProgress: Identifiable, Hashable {
-    var id = UUID()
-    var fraction: Double = 0
-
-    public static func == (lhs: DownloadProgress, rhs: DownloadProgress) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-
-struct DownloadState {
-    var status: Status
-    let progress: DownloadProgress
-
-    init(
-        status: Status = .idle,
-        progress: DownloadProgress = .init()
-    ) {
-        self.status = status
-        self.progress = progress
-    }
-
-    public enum Status: Hashable {
-        case idle
-        case downloading
-        case paused
-        case finished
-        case failed(Error)
-    }
-
-    public enum Error: Swift.Error, Hashable {
-        case serverError(statusCode: Int)
-        case transportError(URLError, localizedDescription: String)
-        case unknown(code: Int, localizedDescription: String)
-        case aggregate(errors: Set<Error>)
-    }
-}
-
-@Observable
 public class Download: Identifiable, Hashable {
-    public var id: Download.ID
+    public let id: Download.ID
     var request: URLRequest
-    var state: DownloadState
+    private var state: DownloadState
 
     public var url: URL {
         request.url!
     }
 
-    var status: DownloadState.Status {
+    public var status: DownloadState.Status {
         get {
             state.status
         }
         set {
             state.status = newValue
+            NotificationCenter.default.post(
+                .init(name: .downloadStatusChanged, object: self, userInfo: nil)
+            )
         }
     }
 
-    var progress: DownloadProgress {
+    public var progress: DownloadProgress {
         state.progress
     }
 
-    init(
+    public init(
         id: Download.ID,
         request: URLRequest,
         status: DownloadState.Status = .idle,
@@ -86,7 +47,7 @@ public class Download: Identifiable, Hashable {
         )
     }
 
-    convenience init(
+    public convenience init(
         id: Download.ID,
         url: URL,
         status: DownloadState.Status = .idle,
@@ -110,4 +71,10 @@ public class Download: Identifiable, Hashable {
 
     // swiftlint:disable:next type_name
     public typealias ID = String
+}
+
+extension NSNotification.Name {
+    static let downloadStatusChanged = Notification.Name(
+        "SR.download-manager.download-status-changed"
+    )
 }

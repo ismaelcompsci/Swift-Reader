@@ -6,6 +6,7 @@
 //
 
 import Combine
+import DownloadManager
 import Foundation
 
 @Observable
@@ -43,11 +44,5 @@ public class BookDownloader {
             strongSelf.queue = downloads
         }
         .store(in: &subscriptions)
-
-//        manager.onDownloadFinished.sink { [weak self] download, _ in
-//            guard let self = self else { return }
-//            self.manager.remove(download)
-//        }
-//        .store(in: &subscriptions)
     }
 }

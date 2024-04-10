@@ -5,11 +5,13 @@
 //  Created by Mirna Olvera on 4/3/24.
 //
 
+import SimpleToast
 import SwiftUI
 
 struct SourceDownloadButton: View {
     @Environment(AppTheme.self) var theme
     @Environment(BookDownloader.self) var bookDownloader
+    @Environment(Toaster.self) private var toaster
 
     var downloadUrls: [DownloadInfo]
     var downloadable: Bool
@@ -116,6 +118,23 @@ struct SourceDownloadButton: View {
             download = queue.first(where: { $0.id == itemId })
         }
         .onReceive(bookDownloader.manager.onDownloadFinished, perform: downloadFinished)
+        .onChange(of: download?.status) { _, status in
+
+            switch status {
+            case .failed(let error):
+                toaster.presentToast(
+                    message: "Failed to download \(error.localizedDescription)",
+                    type: .error
+                )
+
+                if let download = download {
+                    bookDownloader.cancel(download)
+                }
+
+            default:
+                break
+            }
+        }
     }
 
     func downloadFinished(_ finished: DownloadManager.OnDownloadFinished) {
@@ -123,6 +142,9 @@ struct SourceDownloadButton: View {
 
         Task {
             print(download.status)
+
+            if download.status != .finished { return }
+
             do {
                 if let book = book {
                     try await BookImporter.shared.process(for: location, with: book)
@@ -132,10 +154,9 @@ struct SourceDownloadButton: View {
                 }
             } catch {
                 print("ERROR: \(error.localizedDescription)")
+                toaster.presentToast(message: "Failed to add book to library", type: .error)
             }
         }
-
-        print("DOWNLOAD FINSIHED: \(location.exists)")
     }
 
     func downloadFile() {

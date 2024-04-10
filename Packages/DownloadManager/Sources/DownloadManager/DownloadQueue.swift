@@ -8,24 +8,37 @@
 import Combine
 import Foundation
 
+protocol DownloadQueueNotifying {
+    var onShouldDownloadPublisher: AnyPublisher<Download, Never> { get }
+    var onQueueChangePublisher: AnyPublisher<Void, Never> { get }
+}
+
 @Observable
-class DownloadQueue {
+class DownloadQueue: DownloadQueueNotifying {
     var cache = [Download.ID: Download]()
     private(set) var downloads = [Download]()
 
-    @ObservationIgnored
-    var onShouldDownload = PassthroughSubject<Download, Never>()
-    @ObservationIgnored
-    var onQueueChange = PassthroughSubject<Void, Never>()
+    var onShouldDownloadPublisher: AnyPublisher<Download, Never> {
+        onShouldDownload.eraseToAnyPublisher()
+    }
 
-    var maxConcurrentDownloads: Int = 3 {
+    var onQueueChangePublisher: AnyPublisher<Void, Never> {
+        onQueueChange.eraseToAnyPublisher()
+    }
+
+    @ObservationIgnored
+    private let onShouldDownload = PassthroughSubject<Download, Never>()
+    @ObservationIgnored
+    private let onQueueChange = PassthroughSubject<Void, Never>()
+
+    var maxConcurrentDownloads: Int = 1 {
         didSet {
             update()
         }
     }
 
     func update() {
-        let downloadsByStatus = Dictionary(grouping: downloads, by: { $0.status })
+        let downloadsByStatus = Dictionary(grouping: downloads) { $0.status }
         let numberDownloading = downloadsByStatus[.downloading]?.count ?? 0
         let slotsAvailable = maxConcurrentDownloads - numberDownloading
 

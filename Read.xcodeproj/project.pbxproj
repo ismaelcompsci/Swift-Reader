@@ -13,6 +13,9 @@
 		9F0B9A182BB7C53200581362 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = 9F0B9A172BB7C53200581362 /* bundle.js */; };
 		9F0EA4592B89773900B7B009 /* ReadApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EA4582B89773900B7B009 /* ReadApp.swift */; };
 		9F115F3F2BC4E0F0006C74F3 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F115F3E2BC4E0F0006C74F3 /* UserPreferences.swift */; };
+		9F1C69EE2BC62169002D6AF4 /* SimpleToast in Frameworks */ = {isa = PBXBuildFile; productRef = 9F1C69ED2BC62169002D6AF4 /* SimpleToast */; };
+		9F1C69F02BC622F1002D6AF4 /* Toaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F1C69EF2BC622F1002D6AF4 /* Toaster.swift */; };
+		9F1C69F32BC634A4002D6AF4 /* DownloadManager in Frameworks */ = {isa = PBXBuildFile; productRef = 9F1C69F22BC634A4002D6AF4 /* DownloadManager */; };
 		9F28886B2BC212740048FC4D /* BookGridItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F28886A2BC212740048FC4D /* BookGridItem.swift */; };
 		9F3817AA2BC0D5B700480A56 /* BookListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3817A92BC0D5B700480A56 /* BookListItem.swift */; };
 		9F3A8E4D2B9D81FF004732D6 /* list.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 9F3A8E4C2B9D81FF004732D6 /* list.jpeg */; };
@@ -61,11 +64,7 @@
 		9F8F9CE62BB52C2A0081C57F /* View+If.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8F9CE52BB52C2A0081C57F /* View+If.swift */; };
 		9F8F9CE82BB631060081C57F /* SourcesDiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8F9CE72BB631060081C57F /* SourcesDiscoverView.swift */; };
 		9F9205DA2BA275D7000AED7D /* Color+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9205D92BA275D7000AED7D /* Color+Codable.swift */; };
-		9FA360222BBE1E0200499A4C /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA360212BBE1E0200499A4C /* DownloadManager.swift */; };
-		9FA360242BBE1E2D00499A4C /* DownloadQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA360232BBE1E2D00499A4C /* DownloadQueue.swift */; };
-		9FA360262BBE1E3300499A4C /* DownloadProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA360252BBE1E3300499A4C /* DownloadProgress.swift */; };
 		9FA360282BBE1E3B00499A4C /* BookDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA360272BBE1E3B00499A4C /* BookDownloader.swift */; };
-		9FA3602A2BBE1F7400499A4C /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA360292BBE1F7400499A4C /* Download.swift */; };
 		9FA3602C2BBE22D800499A4C /* SourceDownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA3602B2BBE22D800499A4C /* SourceDownloadButton.swift */; };
 		9FB62D832B8D841F00A10EF5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB62D822B8D841F00A10EF5 /* SettingsView.swift */; };
 		9FB84A602B9D6681005D7915 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 9FB84A5F2B9D6681005D7915 /* Nuke */; };
@@ -129,6 +128,8 @@
 		9F0B9A172BB7C53200581362 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bundle.js; sourceTree = "<group>"; };
 		9F0EA4582B89773900B7B009 /* ReadApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadApp.swift; sourceTree = "<group>"; };
 		9F115F3E2BC4E0F0006C74F3 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
+		9F1C69EF2BC622F1002D6AF4 /* Toaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toaster.swift; sourceTree = "<group>"; };
+		9F1C69F12BC6324A002D6AF4 /* DownloadManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DownloadManager; sourceTree = "<group>"; };
 		9F28886A2BC212740048FC4D /* BookGridItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookGridItem.swift; sourceTree = "<group>"; };
 		9F3817A92BC0D5B700480A56 /* BookListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListItem.swift; sourceTree = "<group>"; };
 		9F3A8E4C2B9D81FF004732D6 /* list.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = list.jpeg; sourceTree = "<group>"; };
@@ -175,11 +176,7 @@
 		9F8F9CE52BB52C2A0081C57F /* View+If.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+If.swift"; sourceTree = "<group>"; };
 		9F8F9CE72BB631060081C57F /* SourcesDiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourcesDiscoverView.swift; sourceTree = "<group>"; };
 		9F9205D92BA275D7000AED7D /* Color+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Codable.swift"; sourceTree = "<group>"; };
-		9FA360212BBE1E0200499A4C /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
-		9FA360232BBE1E2D00499A4C /* DownloadQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadQueue.swift; sourceTree = "<group>"; };
-		9FA360252BBE1E3300499A4C /* DownloadProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadProgress.swift; sourceTree = "<group>"; };
 		9FA360272BBE1E3B00499A4C /* BookDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDownloader.swift; sourceTree = "<group>"; };
-		9FA360292BBE1F7400499A4C /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
 		9FA3602B2BBE22D800499A4C /* SourceDownloadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceDownloadButton.swift; sourceTree = "<group>"; };
 		9FB62D822B8D841F00A10EF5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9FBC726B2B9EA17D0054A7B0 /* SRFromInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRFromInput.swift; sourceTree = "<group>"; };
@@ -238,6 +235,7 @@
 			files = (
 				9F8F9CC22BB4FF880081C57F /* ZIPFoundation in Frameworks */,
 				9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */,
+				9F1C69F32BC634A4002D6AF4 /* DownloadManager in Frameworks */,
 				9FD119B62BBA2DE900AB097D /* PagerTabStripView in Frameworks */,
 				9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */,
 				9FB84A602B9D6681005D7915 /* Nuke in Frameworks */,
@@ -245,6 +243,7 @@
 				9F608E952B65F29D00D2B5F4 /* Realm in Frameworks */,
 				9FEEF7DC2BBD2C080079ECDB /* SwiftReader in Frameworks */,
 				9FB84A662B9D6681005D7915 /* NukeVideo in Frameworks */,
+				9F1C69EE2BC62169002D6AF4 /* SimpleToast in Frameworks */,
 				9FB84A642B9D6681005D7915 /* NukeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,10 +261,12 @@
 		9F14FBF12B8AA3DD001CA119 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				9FA360272BBE1E3B00499A4C /* BookDownloader.swift */,
 				9FBC72742B9EA6C60054A7B0 /* AppTheme.swift */,
 				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
 				9F44F4432BC3B5C500E63461 /* BookImporter.swift */,
 				9F115F3E2BC4E0F0006C74F3 /* UserPreferences.swift */,
+				9F1C69EF2BC622F1002D6AF4 /* Toaster.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -420,6 +421,7 @@
 		9F7011892BC5F37E001E3955 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				9F1C69F12BC6324A002D6AF4 /* DownloadManager */,
 				9FD7F7252BBD27C30050B1FA /* SwiftReader */,
 			);
 			path = Packages;
@@ -428,7 +430,6 @@
 		9F8F9CBD2BB4FF240081C57F /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				9FA3601E2BBE1DDD00499A4C /* Download */,
 				9F8F9CC72BB507AC0081C57F /* JSExports */,
 				9FD119B72BBA410A00AB097D /* Views */,
 				9F8F9CC32BB4FF9A0081C57F /* Source.swift */,
@@ -466,18 +467,6 @@
 				9F8F9CE32BB5151B0081C57F /* SettingsSourcesView.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		9FA3601E2BBE1DDD00499A4C /* Download */ = {
-			isa = PBXGroup;
-			children = (
-				9FA360272BBE1E3B00499A4C /* BookDownloader.swift */,
-				9FA360292BBE1F7400499A4C /* Download.swift */,
-				9FA360212BBE1E0200499A4C /* DownloadManager.swift */,
-				9FA360252BBE1E3300499A4C /* DownloadProgress.swift */,
-				9FA360232BBE1E2D00499A4C /* DownloadQueue.swift */,
-			);
-			path = Download;
 			sourceTree = "<group>";
 		};
 		9FC596062B86A06A00ED3734 /* Resources */ = {
@@ -591,6 +580,8 @@
 				9F8F9CC12BB4FF880081C57F /* ZIPFoundation */,
 				9FD119B52BBA2DE900AB097D /* PagerTabStripView */,
 				9FEEF7DB2BBD2C080079ECDB /* SwiftReader */,
+				9F1C69ED2BC62169002D6AF4 /* SimpleToast */,
+				9F1C69F22BC634A4002D6AF4 /* DownloadManager */,
 			);
 			productName = Read;
 			productReference = 9F608E7C2B65D05B00D2B5F4 /* Read.app */;
@@ -657,6 +648,7 @@
 				9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */,
 				9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				9FD119B42BBA2DE900AB097D /* XCRemoteSwiftPackageReference "PagerTabStripView" */,
+				9F1C69EC2BC62169002D6AF4 /* XCRemoteSwiftPackageReference "SimpleToast" */,
 			);
 			productRefGroup = 9F608E7D2B65D05B00D2B5F4 /* Products */;
 			projectDirPath = "";
@@ -715,7 +707,6 @@
 				9F8F9CC62BB507940081C57F /* SourceExtension.swift in Sources */,
 				9F9205DA2BA275D7000AED7D /* Color+Codable.swift in Sources */,
 				9F3E18BE2BA43353009DDE05 /* SRXButton.swift in Sources */,
-				9FA360262BBE1E3300499A4C /* DownloadProgress.swift in Sources */,
 				9F28886B2BC212740048FC4D /* BookGridItem.swift in Sources */,
 				9FB62D832B8D841F00A10EF5 /* SettingsView.swift in Sources */,
 				9FD119C32BBA44AA00AB097D /* PagedViewMoreItems.swift in Sources */,
@@ -741,7 +732,6 @@
 				9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */,
 				9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */,
 				9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */,
-				9FA3602A2BBE1F7400499A4C /* Download.swift in Sources */,
 				9FD8088C2B983F790007D8F6 /* EBookView.swift in Sources */,
 				9F8F9CDD2BB508BC0081C57F /* DownloadInfo.swift in Sources */,
 				9FA3602C2BBE22D800499A4C /* SourceDownloadButton.swift in Sources */,
@@ -749,9 +739,9 @@
 				9F608E8F2B65DDD100D2B5F4 /* Extensions.swift in Sources */,
 				9FD8088A2B982CE40007D8F6 /* ReaderContent.swift in Sources */,
 				9F8F9CD92BB508900081C57F /* PagedResults.swift in Sources */,
+				9F1C69F02BC622F1002D6AF4 /* Toaster.swift in Sources */,
 				9FD808862B981E020007D8F6 /* ReaderSettings.swift in Sources */,
 				9F4602B42BA65A9000E15D0C /* UIImage+Quality.swift in Sources */,
-				9FA360222BBE1E0200499A4C /* DownloadManager.swift in Sources */,
 				9FD119C52BBA44EB00AB097D /* SourceBookDetailsView.swift in Sources */,
 				9F8F9CCF2BB508280081C57F /* Response.swift in Sources */,
 				9F4A786E2B7832AD007B70B1 /* BookRemover.swift in Sources */,
@@ -763,7 +753,6 @@
 				9F8F9CBF2BB4FF340081C57F /* SourceManager.swift in Sources */,
 				9F115F3F2BC4E0F0006C74F3 /* UserPreferences.swift in Sources */,
 				9F8F9CD32BB508570081C57F /* BookInfo.swift in Sources */,
-				9FA360242BBE1E2D00499A4C /* DownloadQueue.swift in Sources */,
 				9F8F9CD72BB5087D0081C57F /* PartialSourceBook.swift in Sources */,
 				9FBC72752B9EA6C60054A7B0 /* AppTheme.swift in Sources */,
 				9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */,
@@ -1002,6 +991,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		9F1C69EC2BC62169002D6AF4 /* XCRemoteSwiftPackageReference "SimpleToast" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sanzaru/SimpleToast.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.8.1;
+			};
+		};
 		9F4DEB242B69ECB80046B76C /* XCRemoteSwiftPackageReference "WrappingHStack" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dkk/WrappingHStack";
@@ -1045,6 +1042,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9F1C69ED2BC62169002D6AF4 /* SimpleToast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F1C69EC2BC62169002D6AF4 /* XCRemoteSwiftPackageReference "SimpleToast" */;
+			productName = SimpleToast;
+		};
+		9F1C69F22BC634A4002D6AF4 /* DownloadManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DownloadManager;
+		};
 		9F4DEB252B69ECB80046B76C /* WrappingHStack */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9F4DEB242B69ECB80046B76C /* XCRemoteSwiftPackageReference "WrappingHStack" */;

@@ -14,6 +14,7 @@ struct ReadApp: App {
     @State var sourceManager: SourceManager
     @State var theme = AppTheme.shared
     @State var userPreferences = UserPreferences.shared
+    @State var toaster = Toaster.shared
 
     var modelContainer: ModelContainer
 
@@ -25,6 +26,7 @@ struct ReadApp: App {
                 .environment(bookDownloader)
                 .environment(theme)
                 .environment(userPreferences)
+                .environment(toaster)
                 .preferredColorScheme(.dark)
                 .environment(\.font, Font.custom("Poppins-Regular", size: 16))
         }

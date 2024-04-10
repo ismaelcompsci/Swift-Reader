@@ -5,11 +5,13 @@
 //  Created by Mirna Olvera on 1/27/24.
 //
 
+import SimpleToast
 import SwiftData
 import SwiftUI
 
 struct ContentView: View {
     @Environment(AppTheme.self) private var theme
+    @Environment(Toaster.self) private var toaster
 
     @State var showMenu = false
     @State var navigation: SideMenuNavigation = .home
@@ -22,6 +24,8 @@ struct ContentView: View {
     }
 
     var body: some View {
+        @Bindable var toaster = toaster
+
         NavigationStack {
             Group {
                 switch navigation {
@@ -47,6 +51,30 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+        .simpleToast(
+            isPresented: $toaster.showToast,
+            options: toaster.toastSettings)
+        {
+            HStack {
+                Image(systemName: toaster.toastImage)
+                Text(toaster.toastMessage)
+                    .lineLimit(2)
+
+                Spacer()
+
+                Button {
+                    toaster.dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(toaster.toastColor.opacity(0.8))
+            .clipShape(.rect(cornerRadius: 10))
+            .padding(.horizontal)
+            .foregroundColor(.white)
         }
         .sideMenu(isShowing: self.$showMenu) {
             self.sideMenu

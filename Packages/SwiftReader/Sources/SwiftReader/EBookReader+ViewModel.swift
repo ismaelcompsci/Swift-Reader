@@ -124,8 +124,10 @@ public class EBookReaderViewModel: ObservableObject {
             return
         }
 
-        let backgroundQueue = DispatchQueue(label: "background_queue",
-                                            qos: .background)
+        let backgroundQueue = DispatchQueue(
+            label: "background_queue",
+            qos: .background
+        )
 
         backgroundQueue.async { [weak self] in
 

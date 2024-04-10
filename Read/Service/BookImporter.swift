@@ -29,7 +29,7 @@ class BookImporter {
         }
 
         do {
-            let (file, response) = try await URLSession.shared.download(from: url)
+            let (file, _) = try await URLSession.shared.download(from: url)
             return file
         } catch {
             print("Error downloading image: \(error.localizedDescription)")
