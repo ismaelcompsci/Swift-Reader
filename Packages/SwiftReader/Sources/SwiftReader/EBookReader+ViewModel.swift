@@ -13,7 +13,7 @@ import WebKit
 
 public enum EBookReaderError: Error {
     case renderError(Error)
-    case serverError(Error)
+    case serverError(String)
 }
 
 public enum EBookReaderState {
@@ -86,8 +86,23 @@ public class EBookReaderViewModel: ObservableObject {
         self.delay = delay
         self.openCfi = startCfi
 
-        setupServer()
-        loadUrl(url: URL(string: server.base)!)
+        setupServer { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            DispatchQueue.main.async {
+                let started = try? self.server.start()
+                self.isServerStarted = started ?? false
+
+                if let started = started, started == false {
+                    self.state = .failure(.serverError("Could not start web server."))
+                    return
+                }
+
+                self.loadUrl(url: URL(string: self.server.base)!)
+            }
+        }
     }
 
     private var renderTaskHasStarted = false
@@ -101,7 +116,7 @@ public class EBookReaderViewModel: ObservableObject {
         }
     }
 
-    func setupServer() {
+    func setupServer(completion: @escaping () -> Void) {
         let scriptDir = Bundle.module.path(forResource: "scripts", ofType: nil)
 
         guard let scriptDir else {
@@ -109,22 +124,26 @@ public class EBookReaderViewModel: ObservableObject {
             return
         }
 
-        if server.server.isRunning {
-            server.server.stop()
+        let backgroundQueue = DispatchQueue(label: "background_queue",
+                                            qos: .background)
 
-            server.server.removeAllHandlers()
-        }
+        backgroundQueue.async { [weak self] in
 
-        server.registerGETHandlerForDirectory("/", directoryPath: scriptDir, indexFilename: "reader.html")
-        server.registerHandlerForMethod("GET", module: "api", resource: "book", handler: getBookHandler)
+            guard let self = self else {
+                return
+            }
 
-        do {
-            try server.start()
-            isServerStarted = true
+            // DO IN BACKGROUND THREAD
+            if self.server.server.isRunning {
+                self.server.server.stop()
 
-        } catch {
-            state = .failure(.serverError(error))
-            print("Failed to start server: \(error.localizedDescription)")
+                self.server.server.removeAllHandlers()
+            }
+
+            self.server.registerGETHandlerForDirectory("/", directoryPath: scriptDir, indexFilename: "reader.html")
+            self.server.registerHandlerForMethod("GET", module: "api", resource: "book", handler: self.getBookHandler)
+
+            completion()
         }
     }
 

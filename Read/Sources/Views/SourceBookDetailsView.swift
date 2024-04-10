@@ -24,7 +24,7 @@ struct SourceBookDetailsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .bottom, spacing: 10) {
                     SourceBookImage(imageUrl: bookDetails?.bookInfo.image ?? item.image)
                         .frame(width: 114, height: 114 * 1.5)
