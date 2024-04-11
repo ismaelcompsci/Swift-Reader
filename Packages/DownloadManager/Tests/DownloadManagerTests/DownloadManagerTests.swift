@@ -219,6 +219,24 @@ final class DownloadManagerTests: XCTestCase {
 
         XCTAssertEqual(downloader.manager.downloadQueue.downloads.map { $0.status }, [.paused, .downloading])
     }
+
+    func testCancelProducesResumeData() throws {
+        let download = downloader.manager.append(mb512)
+
+        let expectation = self.expectation(description: "resume data should be produced")
+        expectation.assertForOverFulfill = false
+        downloader.manager.remove(download)
+
+        // swiftformat:disable:next redundantSelf
+        withContinousObservation(of: self.downloader.resumeData) { data in
+            if data.count != 0 {
+                expectation.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 1)
+        XCTAssertNotNil(downloader.resumeData[download.id])
+    }
 }
 
 func withContinousObservation<T>(of value: @escaping @autoclosure () -> T, execute: @escaping (T) -> Void) {

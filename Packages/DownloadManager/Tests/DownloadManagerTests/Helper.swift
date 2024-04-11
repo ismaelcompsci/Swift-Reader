@@ -63,7 +63,24 @@ public class Downloader {
     var requestedURLs = [URL]()
     var tasks = [Download.ID: URLSessionDownloadTask]()
 
+    var resumeData = [Download.ID: Data]()
+
     init() {
+        manager.resumeDataForDownload = { [weak self] download in
+            self?.resumeData[download.id]
+        }
+
+        manager.onDidCancelWithResumeData
+            .sink { [weak self] download, data in
+
+                guard let self = self else {
+                    return
+                }
+
+                resumeData[download.id] = data ?? Data()
+            }
+            .store(in: &subscriptions)
+
         manager.onDidCreateTask
             .sink { [weak self] id, task in
 

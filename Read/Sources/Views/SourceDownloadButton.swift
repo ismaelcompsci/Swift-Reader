@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 4/3/24.
 //
 
+import DownloadManager
 import SimpleToast
 import SwiftUI
 

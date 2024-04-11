@@ -41,9 +41,13 @@ public class DownloadManager: NSObject {
     @ObservationIgnored
     private var downloadStatusChangedObservation: NSObjectProtocol?
 
-    override public init() {
-        super.init()
+    var resumeDataForDownload: ((Download) -> Data?)?
 
+    public init(
+        resumeDataForDownload: ((Download) -> Data?)? = nil
+    ) {
+        super.init()
+        self.resumeDataForDownload = resumeDataForDownload
         self.session = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
 
         observeDownloadQueue()
@@ -111,7 +115,14 @@ public class DownloadManager: NSObject {
     }
 
     private func createTask(for download: Download) -> URLSessionDownloadTask {
-        let task = session.downloadTask(with: download.request)
+        let task: URLSessionDownloadTask
+
+        if let resumeData = resumeDataForDownload?(download) {
+            task = session.downloadTask(withResumeData: resumeData)
+        } else {
+            task = session.downloadTask(with: download.request)
+        }
+
         taskIdentifiers[task.taskIdentifier] = download
         return task
     }
