@@ -1,25 +1,13 @@
 @testable import DownloadManager
 import XCTest
 
-let testURL1 = URL(string: "https://w.wallhaven.cc/full/85/wallhaven-858lz1.png")!
 let testURL2 = URL(string: "https://w.wallhaven.cc/full/l8/wallhaven-l8v3ey.png")!
-let testURL3 = URL(string: "https://w.wallhaven.cc/full/vq/wallhaven-vqrmj8.jpg")!
-let testURL4 = URL(string: "https://w.wallhaven.cc/full/o5/wallhaven-o5e3r5.jpg")!
-let testURL5 = URL(string: "https://w.wallhaven.cc/full/we/wallhaven-werowr.png")!
 
 let mb512 = URL(string: "http://ipv4.download.thinkbroadband.com/512MB.zip")!
 let mb200 = URL(string: "http://ipv4.download.thinkbroadband.com/200MB.zip")!
 let mb50 = URL(string: "http://ipv4.download.thinkbroadband.com/50MB.zip")!
 let mb10 = URL(string: "http://ipv4.download.thinkbroadband.com/10MB.zip")!
 let mb5 = URL(string: "http://ipv4.download.thinkbroadband.com/5MB.zip")!
-
-let testURLS = [
-    testURL1,
-    testURL2,
-    testURL3,
-    testURL4,
-    testURL5,
-]
 
 final class DownloadManagerTests: XCTestCase {
     private var observation: NSKeyValueObservation?
@@ -28,8 +16,6 @@ final class DownloadManagerTests: XCTestCase {
     func testFirstItemInQueueStartsDownloadingAutomatically() throws {
         let download = downloader.manager.append(mb512)
 
-        waitForChanges(to: \.status, on: download, timeout: 1)
-
         XCTAssertEqual(download.status, .downloading)
     }
 
@@ -37,18 +23,68 @@ final class DownloadManagerTests: XCTestCase {
         downloader.manager.maxConcurrentDownloads = 2
 
         let download1 = downloader.manager.append(mb512)
-        let download2 = downloader.manager.append(mb512)
-        let download3 = downloader.manager.append(mb512)
+        let download2 = downloader.manager.append(mb200)
+        let download3 = downloader.manager.append(mb50)
 
         downloader.manager.append(download1)
         downloader.manager.append(download2)
         downloader.manager.append(download3)
 
-        waitForChanges(to: \.status, on: download1, timeout: 1)
+        let taskState1 = downloader.tasks[download1.id]!
+        let taskState2 = downloader.tasks[download2.id]!
+        let taskState3 = downloader.tasks[download3.id]!
 
-        XCTAssertEqual(downloader.tasks[download1.id]?.state, .running)
-        XCTAssertEqual(downloader.tasks[download2.id]?.state, .running)
-        XCTAssertEqual(downloader.tasks[download3.id]?.state, .suspended)
+        let countExp = expectation(description: "concurrency")
+
+        // swiftformat:disable:next redundantSelf
+        withContinousObservation(of: self.downloader.tasks) { _ in
+            if self.downloader.tasks.count == 3 {
+                countExp.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 3)
+
+        let exp = expectation(description: "concurrency")
+        exp.assertForOverFulfill = false
+        exp.expectedFulfillmentCount = 3
+
+        withContinousObservation(of: download1.status) { status in
+            if status == .downloading {
+                exp.fulfill()
+            }
+        }
+
+        withContinousObservation(of: download2.status) { status in
+            if status == .downloading {
+                exp.fulfill()
+            }
+        }
+
+        withContinousObservation(of: download3.status) { status in
+            if status == .idle {
+                exp.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 6)
+
+        let taskExp = expectation(description: "running")
+        taskExp.assertForOverFulfill = false
+
+        observation = taskState1.observe(\.state, options: [.initial]) { task, _ in
+            if task.state == .running {
+                taskExp.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 1)
+
+        XCTAssertEqual(downloader.requestedURLs, [mb512, mb200, mb50])
+
+        XCTAssertEqual(taskState1.state, .running)
+        XCTAssertEqual(taskState2.state, .running)
+        XCTAssertEqual(taskState3.state, .suspended)
     }
 
     func testDownloadDuplicateURLReplacesFinishedDownload() throws {
@@ -56,18 +92,20 @@ final class DownloadManagerTests: XCTestCase {
         downloader.manager.append(download)
 
         let exp = expectation(description: "finished")
-        withContinousObservation(of: download) { d in
-            if d.status == .finished {
+        exp.assertForOverFulfill = false
+
+        withContinousObservation(of: download.status) { status in
+            if status == .finished {
                 exp.fulfill()
             }
         }
 
+        // how long the download takes
+        // depends on internet speed
         waitForExpectations(timeout: 10)
 
-        let dupe = downloader.manager.append(testURL2)
+        let dupe = downloader.manager.append(mb512)
         downloader.manager.append(dupe)
-
-        waitForChanges(to: \.status, on: dupe, timeout: 10)
 
         XCTAssertEqual(dupe.status, .downloading)
     }
@@ -76,10 +114,10 @@ final class DownloadManagerTests: XCTestCase {
         let download = downloader.manager.append(mb512)
         let task = downloader.tasks[download.id]!
 
-        waitForChanges(to: \.status, on: download)
         downloader.manager.pause(download)
 
         let exp = expectation(description: "task changes to canceling")
+        exp.assertForOverFulfill = false
 
         observation = task.observe(\.state, options: [.initial]) { task, _ in
             if task.state == .canceling || task.state == .completed {
@@ -93,7 +131,7 @@ final class DownloadManagerTests: XCTestCase {
     }
 
     func testPauseFinishedDownloadHasNoEffect() throws {
-        let download = downloader.manager.append(testURL1)
+        let download = downloader.manager.append(mb512)
         download.status = .finished
         downloader.manager.pause(download)
         XCTAssertEqual(download.status, .finished)
@@ -103,11 +141,8 @@ final class DownloadManagerTests: XCTestCase {
         let download1 = downloader.manager.append(mb512)
         let download2 = downloader.manager.append(mb200)
 
-        // wait for status to change to download
-        waitForChanges(to: \.status, on: download1)
-
         XCTAssertEqual(download1.status, .downloading)
-        XCTAssertEqual(download2.status, .downloading)
+        XCTAssertEqual(download2.status, .idle)
 
         // pause downloads
         downloader.manager.pause(download1)
@@ -128,32 +163,33 @@ final class DownloadManagerTests: XCTestCase {
     func testCancel() throws {
         let download = downloader.manager.append(mb512)
 
-        waitForChanges(to: \.status, on: download, timeout: 2)
-        XCTAssertEqual(download.status, .downloading)
-
         downloader.manager.remove(download)
 
         let task = downloader.tasks[download.id]!
         let exp = expectation(description: "task changes to canceling")
+        exp.assertForOverFulfill = false
+
         observation = task.observe(\.state, options: [.initial]) { task, _ in
+
             if task.state == .canceling || task.state == .completed {
                 exp.fulfill()
             }
         }
 
         waitForExpectations(timeout: 0.5)
+
+        XCTAssertEqual(downloader.manager.downloadQueue.downloads, [])
     }
 
     func testCancelRemovesDownloadFromQueue() throws {
         let download = downloader.manager.append(mb512)
 
-        waitForChanges(to: \.status, on: download)
-        XCTAssertEqual(download.status, .downloading)
-
         let task = downloader.tasks[download.id]!
         downloader.manager.remove(download)
 
         let exp = expectation(description: "task changes to canceling")
+        exp.assertForOverFulfill = false
+
         observation = task.observe(\.state, options: [.initial]) { task, _ in
             if task.state == .canceling || task.state == .completed {
                 exp.fulfill()
@@ -163,6 +199,25 @@ final class DownloadManagerTests: XCTestCase {
         waitForExpectations(timeout: 0.5)
 
         XCTAssertEqual(downloader.manager.downloadQueue.downloads, [])
+    }
+
+    func testCancelStartsDownloadingNextItemInQueue() throws {
+        let download = downloader.manager.append(mb512)
+        let download2 = downloader.manager.append(mb200)
+
+        downloader.manager.remove(download)
+
+        XCTAssertEqual(downloader.manager.downloadQueue.downloads, [download2])
+        XCTAssertEqual(download2.status, .downloading)
+    }
+
+    func testPauseStartsDownloadingNextItemInQueue() throws {
+        let download = downloader.manager.append(mb512)
+        _ = downloader.manager.append(mb200)
+
+        downloader.manager.pause(download)
+
+        XCTAssertEqual(downloader.manager.downloadQueue.downloads.map { $0.status }, [.paused, .downloading])
     }
 }
 

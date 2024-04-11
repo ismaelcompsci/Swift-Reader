@@ -55,11 +55,7 @@ public class DownloadManager: NSObject {
             forName: .downloadStatusChanged,
             object: nil,
             queue: nil
-        ) { [weak self] notification in
-
-            guard let download = notification.object as? Download else {
-                return
-            }
+        ) { [weak self] _ in
 
             self?.downloadQueue.update()
         }
@@ -91,13 +87,10 @@ public class DownloadManager: NSObject {
     }
 
     public func append(_ download: Download) {
-        let task = createTask(for: download)
+        let task = tasks[download.id] ?? createTask(for: download)
         tasks[download.id] = task
         onDidCreateTask.send((download.id, task))
-
-        DispatchQueue.main.async {
-            self.downloadQueue.append(download)
-        }
+        downloadQueue.append(download)
     }
 
     public func pause(_ download: Download) {
