@@ -23,6 +23,8 @@ class BookImporter {
     static let shared = BookImporter()
     @ObservedResults(Book.self) var books
 
+    
+
     private func downloadImage(with url: String) async -> URL? {
         guard let url = URL(string: url) else {
             return nil

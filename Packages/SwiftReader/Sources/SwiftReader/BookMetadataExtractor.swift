@@ -160,11 +160,25 @@ public class BookMetadataExtractor {
         }
         
         guard let metadata = try? await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<BookMetadata, Error>) in
-            getMetadata(path: newPath.absoluteString) { result in
+            getMetadata(path: newPath.absoluteString) { [weak self] result in
                 switch result {
                 case .success(let success):
                     continuation.resume(returning: success)
                 case .failure(let failure):
+                    guard let self = self else {
+                        continuation.resume(throwing: failure)
+                        return
+                    }
+                    
+                    let bookFolderPath = Self.basePath.appending(
+                        path: self.makeBookBasePath(
+                            bookId: bookId.uuidString
+                        ),
+                        directoryHint: .isDirectory
+                    )
+                    
+                    try? FileManager.default.removeItem(at: bookFolderPath)
+                    
                     continuation.resume(throwing: failure)
                 }
             }

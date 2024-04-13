@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9FCDA4F92BC7B9CE00115716 /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCDA4F82BC7B9CE00115716 /* Downloader.swift */; };
 		9FE340462BC7739E00FAC6DE /* DownloadManagerExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE340452BC7739E00FAC6DE /* DownloadManagerExampleApp.swift */; };
 		9FE340482BC7739E00FAC6DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE340472BC7739E00FAC6DE /* ContentView.swift */; };
 		9FE3404A2BC773A000FAC6DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9FE340492BC773A000FAC6DE /* Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9FCDA4F82BC7B9CE00115716 /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
 		9FE340422BC7739E00FAC6DE /* DownloadManagerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownloadManagerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FE340452BC7739E00FAC6DE /* DownloadManagerExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerExampleApp.swift; sourceTree = "<group>"; };
 		9FE340472BC7739E00FAC6DE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -55,6 +57,7 @@
 			children = (
 				9FE340452BC7739E00FAC6DE /* DownloadManagerExampleApp.swift */,
 				9FE340472BC7739E00FAC6DE /* ContentView.swift */,
+				9FCDA4F82BC7B9CE00115716 /* Downloader.swift */,
 				9FE340492BC773A000FAC6DE /* Assets.xcassets */,
 				9FE3404B2BC773A000FAC6DE /* Preview Content */,
 			);
@@ -147,6 +150,7 @@
 			files = (
 				9FE340482BC7739E00FAC6DE /* ContentView.swift in Sources */,
 				9FE340462BC7739E00FAC6DE /* DownloadManagerExampleApp.swift in Sources */,
+				9FCDA4F92BC7B9CE00115716 /* Downloader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

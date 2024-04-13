@@ -5,181 +5,172 @@
 //  Created by Mirna Olvera on 1/27/24.
 //
 
+import QuickLookThumbnailing
 import RealmSwift
 import SwiftReader
 import SwiftUI
 import WrappingHStack
 
-struct UploadFileView: View {
-    @Environment(\.dismiss) var dismiss
-    @Environment(AppTheme.self) var theme
-    @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
+func randomString(length: Int) -> String {
+    let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return String((0 ..< length).map { _ in letters.randomElement()! })
+}
 
-    @ObservedResults(Book.self) var books
+func getRandomURL() -> URL {
+    return URL(string: "\(randomString(length: 5)).pdf")!
+}
 
-    @State private var showFilePicker: Bool = false
-    @State var fileUrls: [URL] = .init()
-    @State private var totalBytes = 0.0
-    @State private var processingBook = false
-
-    private var hasFilesToProccess: Bool {
-        fileUrls.count > 0
-    }
-
-    // needed
-    let hello = HeadlessWebView.shared.greet()
-
-    var fileList: some View {
-        VStack {
-            List {
-                ForEach(fileUrls, id: \.self) { file in
-
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(file.lastPathComponent)
-                            Text("\(ByteCountFormatter.string(fromByteCount: Int64(file.size), countStyle: .file))")
-                                .font(.subheadline)
-                                .foregroundStyle(.gray)
-                        }
-                    }
-                    .listRowBackground(Color.accentBackground)
-                    .contextMenu {
-                        Button("Remove", systemImage: "trash.fill", role: .destructive) {
-                            guard let urlIndex = fileUrls.firstIndex(where: { url in
-                                url.lastPathComponent == file.lastPathComponent
-                            }) else {
-                                print("file not found")
-                                return
-                            }
-
-                            fileUrls.remove(at: urlIndex)
-                        }
-                    }
-                }
-                .onDelete(perform: removeFile)
+struct ImportFileListItem: View {
+    var file: URL
+    
+    @State private var image: UIImage?
+    
+    var thumbnail: some View {
+        Group {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "xmark")
             }
-            .scrollIndicators(ScrollIndicatorVisibility.hidden)
-            Spacer()
-                .frame(maxHeight: 24)
-
-            VStack(alignment: .center) {
-                Text("\(fileUrls.count) files")
-
-                Text("\(ByteCountFormatter.string(fromByteCount: Int64(totalBytes), countStyle: .file))")
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .aspectRatio(contentMode: .fit)
+        .frame(width: 62, height: 62 * 1.77)
+    }
+    
+    var body: some View {
+        HStack {
+            thumbnail
+            
+            VStack(alignment: .leading) {
+                Text(file.lastPathComponent)
+                Text("\(ByteCountFormatter.string(fromByteCount: Int64(file.size), countStyle: .file))")
                     .font(.subheadline)
                     .foregroundStyle(.gray)
             }
-            .frame(maxWidth: .infinity)
+            .lineLimit(1)
+        }
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .task {
+            let _ = file.startAccessingSecurityScopedResource()
+            let size = CGSize(width: 68, height: 62 * 1.77)
+            let request = QLThumbnailGenerator.Request(fileAt: file,
+                                                       size: size,
+                                                       scale: 1,
+                                                       representationTypes: .all)
 
-            Button {
-                processBooks()
-            } label: {
-                if processingBook {
-                    ProgressView()
-                        .padding()
-                        .foregroundStyle(.white)
-                        .tint(theme.tintColor)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+            let thumb = try? await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
 
-                } else {
-                    Text("Add \(fileUrls.count == 1 ? "book" : "books")")
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .foregroundStyle(.white)
-                        .background(theme.tintColor)
-                        .clipShape(.capsule)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-            .disabled(processingBook)
+            image = thumb?.uiImage
+            
+            file.stopAccessingSecurityScopedResource()
         }
     }
+}
 
-    var fileUploadCard: some View {
-        GeometryReader { geo in
-            VStack(alignment: .center) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 24)
-                        .strokeBorder(theme.tintColor, style: StrokeStyle(lineWidth: 1, dash: [5]))
-                        .opacity(0.5)
-                        .zIndex(10)
-
-                    VStack {
-                        // MARK: Upload File Button
-
-                        WrappingHStack(SupportedFileTypes.allCases, id: \.self, alignment: .center) { type in
-                            Text(".\(type.rawValue.uppercased())")
-                                .font(.system(size: 10))
-                                .lineLimit(1)
-                                .padding(.vertical, 2)
-                                .padding(.horizontal, 4)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 24)
-                                        .stroke(Color.gray.opacity(0.7), lineWidth: 1)
-                                )
-                                .padding(2)
+struct UploadFileView: View {
+    @Environment(\.dismiss) var dismiss
+    @Environment(AppTheme.self) var theme
+    @Environment(Toaster.self) var toaster
+    
+    @State private var showFilePicker = false
+    @State private var filesToProcess = [URL]()
+    @State private var processingBooks = false
+    @State private var totalBytes: Double = 0.0
+    @State private var image: UIImage?
+    @State private var offset: CGFloat = .zero
+    
+    var showFileProcessingView: Bool {
+        filesToProcess.isEmpty == false
+    }
+    
+    init() {
+        let _ = HeadlessWebView.shared.greet()
+    }
+    
+    var uploadCard: some View {
+        VStack(spacing: 18) {
+            WrappingHStack(SupportedFileTypes.allCases, id: \.self, alignment: .center) { type in
+                TagItem(name: ".\(type.rawValue.uppercased())", small: true)
+            }
+            
+            Spacer()
+            
+            Text("Add files from your device.")
+                .font(.subheadline)
+                .foregroundStyle(.gray)
+            
+            SRButton(text: "Select Files") {
+                showFilePicker = true
+            }
+            .frame(maxWidth: 120)
+        }
+        .frame(maxHeight: 198)
+        .padding()
+        .padding(.vertical, 12)
+        .background(Color.backgroundSecondary)
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(theme.tintColor, style: StrokeStyle(lineWidth: 1, dash: [5]))
+                .opacity(0.2)
+        }
+        .clipShape(.rect(cornerRadius: 16))
+        .padding(.horizontal, 24)
+    }
+    
+    var fileListView: some View {
+        ScrollView {
+            LazyVStack(pinnedViews: .sectionFooters) {
+                Section {
+                    ForEach(filesToProcess, id: \.self) { file in
+                        ImportFileListItem(file: file)
+                            .padding(.horizontal, 12)
+                        
+                        if filesToProcess.last != file {
+                            Divider()
+                                .padding(.horizontal, 24)
                         }
-                        .frame(maxWidth: geo.size.width * 0.7, maxHeight: .infinity, alignment: .center)
-
-                        Text("Add files from your phone")
-                            .font(.subheadline)
-                            .foregroundStyle(.gray)
-
-                        SRButton(text: "Select Files") {
-                            showFilePicker = true
-                        }
-                        .frame(maxWidth: 120, maxHeight: .infinity, alignment: .top)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.backgroundSecondary)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                } header: {
+                    HStack {
+                        Text("Uploads \(filesToProcess.count)")
+                    
+                        Spacer()
+                    
+                        Text("\(ByteCountFormatter.string(fromByteCount: Int64(totalBytes), countStyle: .file))")
+                    }
+                    .textCase(.uppercase)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.gray)
+                    .padding(.horizontal, 28)
+                    
+                } footer: {
+                    SRButton(systemName: "square.and.arrow.down.on.square", onPress: { self.processBooks() })
+                        .clipShape(.circle)
+                        .disabled(processingBooks)
                 }
-                .transition(.move(edge: .bottom))
-                .frame(maxHeight: horizontalSizeClass == .compact ? geo.size.height * 0.35 : geo.size.height * 0.5, alignment: .bottomTrailing)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
-
+    
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading) {
-                // MARK: Header
-
-                Spacer()
-
-                if hasFilesToProccess {
-                    // MARK: Files to Process List
-
-                    fileList
-
+            VStack {
+                if showFileProcessingView {
+                    fileListView
+                        
                 } else {
-                    // MARK: File Upload Card
-
-                    fileUploadCard
-                }
-
-                Spacer()
-            }
-            .padding(14)
-            .fileImporter(isPresented: $showFilePicker, allowedContentTypes: fileTypes, allowsMultipleSelection: true) { result in
-                switch result {
-                case .success(let selectedFileUrls):
-                    fileUrls = selectedFileUrls
-                    for fileUrl in fileUrls {
-                        totalBytes += fileUrl.size
-                    }
-                case .failure(let failure):
-                    print("No file selected: \(failure.localizedDescription)")
+                    uploadCard
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Text("Upload a book")
                 }
-
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     SRXButton {
                         dismiss()
@@ -187,34 +178,54 @@ struct UploadFileView: View {
                 }
             }
         }
+        .fileImporter(isPresented: $showFilePicker, allowedContentTypes: fileTypes, allowsMultipleSelection: true) { result in
+            switch result {
+            case .success(let selectedFileUrls):
+                filesToProcess = selectedFileUrls
+                for fileUrl in selectedFileUrls {
+                    totalBytes += fileUrl.size
+                }
+            case .failure(let failure):
+                // SHOW TOAST
+                print("No file selected: \(failure.localizedDescription)")
+            }
+        }
     }
-
+    
     func processBooks() {
         Task {
-            processingBook = true
-            for url in fileUrls {
+            var failedImports = [URL]()
+            processingBooks = true
+
+            for url in filesToProcess {
                 do {
                     try await BookImporter.shared.process(for: url)
                 } catch {
-                    print("ERROR IMPORTING BOOK \(error.localizedDescription)")
+                    failedImports.append(url)
                 }
-
+                
+                filesToProcess.removeAll(where: { $0 == url })
                 totalBytes -= url.size
             }
-            processingBook = false
-            fileUrls = []
-            dismiss()
-        }
-    }
+            
+            if failedImports.isEmpty == false {
+                toaster.presentToast(
+                    message: "Failed to import \(failedImports.count) books.",
+                    type: .error
+                )
+            }
 
-    func removeFile(_ set: IndexSet) {
-        withAnimation {
-            fileUrls.remove(atOffsets: set)
+            processingBooks = false
+            dismiss()
         }
     }
 }
 
 #Preview {
-    UploadFileView(fileUrls: [URL(fileURLWithPath: "book.epub"), URL(fileURLWithPath: "otherBOok.epub")])
+    VStack {}
+        .sheet(isPresented: .constant(true)) {
+            UploadFileView()
+        }
         .preferredColorScheme(.dark)
+        .environment(AppTheme.shared)
 }

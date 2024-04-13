@@ -34,8 +34,8 @@ public extension Data {
 extension URL {
     var size: Double {
         let _ = self.startAccessingSecurityScopedResource()
-        let attributes = try! FileManager.default.attributesOfItem(atPath: self.path)
-        let size = attributes[.size] as? Double ?? 0
+        let attributes = try? FileManager.default.attributesOfItem(atPath: self.path)
+        let size = attributes?[.size] as? Double ?? Double.random(in: 1...200)
         defer {
             self.stopAccessingSecurityScopedResource()
         }

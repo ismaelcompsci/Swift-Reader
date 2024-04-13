@@ -51,6 +51,7 @@ struct ContentView: View {
                     }
                 }
             }
+            .toolbarBackground(.black, for: .navigationBar)
         }
         .simpleToast(
             isPresented: $toaster.showToast,
@@ -71,7 +72,7 @@ struct ContentView: View {
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(toaster.toastColor.opacity(0.8))
+            .background(toaster.toastColor)
             .clipShape(.rect(cornerRadius: 10))
             .padding(.horizontal)
             .foregroundColor(.white)
