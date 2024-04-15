@@ -35,7 +35,9 @@ struct SourceSearch: View {
     @State var searchText = ""
     @State var isSearching = false
 
-    @State private var currentSearchTask: Task<Void, Never>? = nil
+    init(searchText: String = "") {
+        self._searchText = State(initialValue: searchText)
+    }
 
     var body: some View {
         if sourceManager.sources.isEmpty {
@@ -48,7 +50,7 @@ struct SourceSearch: View {
             .navigationBarTitleDisplayMode(.inline)
         } else {
             ScrollView {
-                ForEach(self.searchResults.keys.sorted(), id: \.self) { key in
+                ForEach(searchResults.keys.sorted(), id: \.self) { key in
 
                     if let results = searchResults[key] {
                         switch results.state {
@@ -85,11 +87,17 @@ struct SourceSearch: View {
                 }
             }
             .navigationTitle("Search Everything")
-            .searchable(text: self.$searchText, isPresented: self.$isSearching)
+            .searchable(text: $searchText, isPresented: $isSearching)
             .tint(theme.tintColor)
             .onSubmit(of: .search) {
                 Task {
-                    await self.search()
+                    query = nil
+                    await search()
+                }
+            }
+            .task {
+                if searchText.isEmpty == false && query == nil {
+                    await search()
                 }
             }
         }
@@ -112,19 +120,20 @@ struct SourceSearch: View {
                     self.searchResults[key] = searchResult
                 }
 
-                let results = await ext.getSearchResults(query: query, metadata: [:])
+                ext.getSearchResults(query: query, metadata: [:]) { result in
 
-                DispatchQueue.main.async {
-                    switch results {
-                    case .success(let paged):
-                        self.searchResults[key]?.results = paged
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let paged):
+                            self.searchResults[key]?.results = paged
 
-                        withAnimation {
-                            self.searchResults[key]?.state = .done
+                            withAnimation {
+                                self.searchResults[key]?.state = .done
+                            }
+                        case .failure:
+                            // TODO: ERROR
+                            self.searchResults[key]?.state = .error
                         }
-                    case .failure:
-                        // TODO: ERROR
-                        self.searchResults[key]?.state = .error
                     }
                 }
             }

@@ -42,18 +42,16 @@ struct SourceExtensionView: View {
 
             if source.sourceInfo.interfaces.homePage == true {
                 LazyVStack {
-                    ForEach(Array(sections.enumerated()), id: \.element.value.id) { _, elem in
-                        if let section = self.sections[elem.key] {
-                            SourceSectionView(
-                                title: section.title,
-                                containsMoreItems: section.containsMoreItems,
-                                items: section.items,
-                                sourceId: source.id,
-                                id: section.id,
-                                isLoading: section.isLoading
-                            )
-                            .transition(.opacity)
-                        }
+                    ForEach(sections.sorted(by: { $0.value.title < $1.value.title }), id: \.value.id) { _, section in
+                        SourceSectionView(
+                            title: section.title,
+                            containsMoreItems: section.containsMoreItems,
+                            items: section.items,
+                            sourceId: source.id,
+                            id: section.id,
+                            isLoading: section.isLoading
+                        )
+//                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
                 }
 
@@ -126,8 +124,10 @@ struct SourceExtensionView: View {
                     let sendableHoldSections = holdSections
 
                     DispatchQueue.main.async {
-                        withAnimation {
-                            self.sections = sendableHoldSections
+                        for (i, (key, elem)) in sendableHoldSections.enumerated() {
+                            withAnimation(.easeInOut.delay(Double(i) * 0.15)) {
+                                self.sections[key] = elem
+                            }
                         }
                     }
                 }

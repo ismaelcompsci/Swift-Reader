@@ -36,14 +36,18 @@ struct BookListItem: View {
 
     var compactItem: some View {
         HStack(spacing: 12) {
-            BookCover(coverPath: book.coverPath)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(.gray, lineWidth: 0.2)
-                }
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 62, height: 62 * 1.77)
+            BookCover(
+                coverPath: book.coverPath,
+                title: book.title,
+                author: book.authors.first?.name
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .overlay {
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(.gray, lineWidth: 0.2)
+            }
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 62, height: 62 * 1.77)
 
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading) {
@@ -78,8 +82,8 @@ struct BookListItem: View {
     }
 
     var body: some View {
-        NavigationLink {
-            BookDetailView(book: book)
+        Button {
+            onEvent?(.onNavigate)
         } label: {
             compactItem
         }

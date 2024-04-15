@@ -54,6 +54,8 @@ struct SourceDownloadButton: View {
 
                         Text("\(Int((download?.progress.fraction ?? 0) * 100))%")
 
+                    } else if download?.status == .idle {
+                        Text("Queued...")
                     } else {
                         Text(self.downloadable ? "Download \(selected?.filetype ?? "")" : "Download Unavailable")
                     }
@@ -61,7 +63,7 @@ struct SourceDownloadButton: View {
                 .frame(maxWidth: .infinity)
             }
             .frame(height: 32)
-            .disabled(!downloadable || download?.status == .downloading)
+            .disabled(!downloadable || (download != nil && download?.status != .finished))
             .clipShape(.rect(cornerRadius: 10))
             .buttonStyle(.borderedProminent)
             .animation(
@@ -118,51 +120,12 @@ struct SourceDownloadButton: View {
         .onReceive(bookDownloader.manager.onQueueDidChange) { queue in
             download = queue.first(where: { $0.id == itemId })
         }
-        .onReceive(bookDownloader.manager.onDownloadFinished, perform: downloadFinished)
-        .onChange(of: download?.status) { _, status in
-
-            switch status {
-            case .failed(let error):
-                toaster.presentToast(
-                    message: "Failed to download \(error.localizedDescription)",
-                    type: .error
-                )
-
-                if let download = download {
-                    bookDownloader.cancel(download)
-                }
-
-            default:
-                break
-            }
-        }
-    }
-
-    func downloadFinished(_ finished: DownloadManager.OnDownloadFinished) {
-        let (download, location) = finished
-
-        Task {
-            print(download.status)
-
-            if download.status != .finished { return }
-
-            do {
-                if let book = book {
-                    try await BookImporter.shared.process(for: location, with: book)
-
-                } else {
-                    try await BookImporter.shared.process(for: location)
-                }
-            } catch {
-                print("ERROR: \(error.localizedDescription)")
-                toaster.presentToast(message: "Failed to add book to library", type: .error)
-            }
-        }
     }
 
     func downloadFile() {
         if let id = book?.id, let selected, let url = URL(string: selected.link) {
             bookDownloader.download(with: id, for: url)
+            bookDownloader.bookInfo[id] = book?.bookInfo
         }
     }
 }

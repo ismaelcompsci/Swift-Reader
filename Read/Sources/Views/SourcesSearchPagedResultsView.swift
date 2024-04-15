@@ -82,24 +82,25 @@ struct SourcesSearchPagedResultsView: View {
         }
 
         let query = SearchRequest(title: searchRequest.title, parameters: [:])
-        let results = await extensionJS.getSearchResults(query: query, metadata: self.metadata)
 
-        switch results {
-        case .success(let searchResults):
-            self.books.append(contentsOf: searchResults.results)
+        extensionJS.getSearchResults(query: query, metadata: self.metadata as Any) { result in
+            switch result {
+            case .success(let searchResults):
+                self.books.append(contentsOf: searchResults.results)
 
-            if let metadata = searchResults.metadata {
-                self.metadata = metadata
-            } else {
+                if let metadata = searchResults.metadata {
+                    self.metadata = metadata
+                } else {
+                    self.cancel = true
+                }
+            case .failure(let failure):
+                Log("Failed to get search results: \(failure)")
+                // TODO: ERROR
                 self.cancel = true
             }
 
-        case .failure:
-            // TODO: ERROR
-            self.cancel = true
+            self.loading = false
         }
-
-        self.loading = false
     }
 }
 

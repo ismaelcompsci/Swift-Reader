@@ -102,8 +102,8 @@ struct BookGridItem: View {
 
     var body: some View {
         VStack {
-            NavigationLink {
-                BookDetailView(book: book)
+            Button {
+                onEvent(.onNavigate)
             } label: {
                 cover
             }

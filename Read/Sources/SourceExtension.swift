@@ -9,9 +9,9 @@ import Foundation
 import JavaScriptCore
 
 protocol ExtensionProtocol {
-    func getBookDetails(for id: String) async -> Result<SourceBook, ExtensionError>
-    func getSearchResults(query: SearchRequest, metadata: Any?) async -> Result<PagedResults, ExtensionError>
-    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async -> Result<PagedResults, ExtensionError>
+    func getBookDetails(for id: String, completed: @escaping (Result<SourceBook, ExtensionError>) -> Void)
+    func getSearchResults(query: SearchRequest, metadata: Any, completed: @escaping (Result<PagedResults, ExtensionError>) -> Void)
+    func getViewMoreItems(homepageSectionId: String, metadata: Any?, completed: @escaping ((Result<PagedResults, ExtensionError>) -> Void))
     func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void)
 }
 
@@ -29,6 +29,7 @@ enum ExtensionError: String, Error {
     case invalidSourceExtension = "Source extension was never initialized."
     case invalidPropertyInSource = "Source extension does not have the property."
     case invalidContext = "JSContext failed to load."
+    case invalid = "Something went wrong."
 }
 
 @Observable
@@ -107,112 +108,79 @@ class SourceExtension: NSObject, ExtensionProtocol {
 
     func loadExtension() -> Bool {
         guard let jsString = getExtensionJS(from: sourceURL), let cheerio else {
-            print("FAILED TO GET EXTENSION JS: \(sourceInfo.name)")
+            Log("FAILED TO GET EXTENSION JS: \(sourceInfo.name)")
             return false
         }
         context?.evaluateScript(jsString)
 
-        // init extension class
         let sourceClass = context?.evaluateScript("source.\(extensionName)")
         source = sourceClass?.construct(withArguments: [cheerio])
 
-        print("LOADED EXTENSION: \(extensionName)")
+        Log("LOADED EXTENSION: \(extensionName)")
 
         return true
     }
 
-    func getBookDetails(for id: String) async -> Result<SourceBook, ExtensionError> {
-        guard let context = context else {
-            return .failure(.invalidContext)
-        }
-
-        guard let source = source, source.hasProperty("getBookDetails") else {
-            return .failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource)
-        }
-
-        guard let result = try? await withUnsafeThrowingContinuation({ continuation in
-            let callback: @convention(block) (SourceBook?) -> Void = { results in
-                if let results {
-                    continuation.resume(returning: results)
-                    return
-                }
-
-                continuation.resume(
-                    throwing: ExtensionError.invalidBookDetails
-                )
-            }
-
-            context.setObject(callback, forKeyedSubscript: "getBookDetailsCallback" as NSString)
-
-            let promise = source.invokeMethod("getBookDetails", withArguments: [id])
-
-            let thenWrapper = context.evaluateScript("""
-            (e) => {
-                getBookDetailsCallback(e)
-            };
-            """)
-
-            guard let thenWrapper else {
-                return continuation.resume(
-                    throwing: ExtensionError.invalidBookDetails
-                )
-            }
-
-            promise?.invokeMethod("then", withArguments: [thenWrapper])
-
-        }) else {
-            print("\(#function) withUnsafeThrowingContinuation error")
-            return .failure(.invalidBookDetails)
-        }
-
-        return .success(result)
+    func getSearchResults(
+        query: SearchRequest,
+        metadata: Any,
+        completed: @escaping (Result<PagedResults, ExtensionError>) -> Void
+    ) {
+        Log("query: \(query)")
+        executeAsyncJS(method: "getSearchResults", args: [query, metadata], completed: completed)
     }
 
-    func getSearchResults(query: SearchRequest, metadata: Any?) async -> Result<PagedResults, ExtensionError> {
+    func getBookDetails(
+        for id: String,
+        completed: @escaping (Result<SourceBook, ExtensionError>) -> Void
+    ) {
+        executeAsyncJS(method: "getBookDetails", args: [id], completed: completed)
+    }
+
+    func getViewMoreItems(
+        homepageSectionId: String,
+        metadata: Any?,
+        completed: @escaping ((Result<PagedResults, ExtensionError>) -> Void)
+    ) {
+        executeAsyncJS(method: "getViewMoreItems", args: [homepageSectionId, metadata as Any], completed: completed)
+    }
+
+    func executeAsyncJS<T: JSExport>(
+        method: String,
+        args: [Any],
+        completed: @escaping ((Result<T, ExtensionError>) -> Void)
+    ) {
         guard let context = context else {
-            return .failure(.invalidContext)
+            return completed(.failure(.invalidContext))
         }
 
-        guard let source = source, source.hasProperty("getSearchResults") else {
-            return .failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource)
-        }
-
-        guard let results = try? await withCheckedThrowingContinuation({ continuation in
-            let id = UUID().uuidString.replacingOccurrences(of: "-", with: "_")
-
-            let callback: @convention(block) (PagedResults?) -> Void = { results in
-
-                if let results = results {
-                    continuation.resume(returning: results)
-                    context.evaluateScript("""
-                    delete gloablThis.getSearchResultsCallback\(id)
-                    """)
-                } else {
-                    continuation.resume(throwing: ExtensionError.invalidPagedResults)
-                }
+        let successCallback: @convention(block) (JSExport) -> Void = { value in
+            if let genericValue = value as? T {
+                completed(.success(genericValue))
+            } else {
+                completed(.failure(.invalid))
             }
-
-            context.setObject(callback, forKeyedSubscript: "getSearchResultsCallback\(id)" as NSString)
-
-            let promise = source.invokeMethod("getSearchResults", withArguments: [query, metadata as Any])
-
-            let thenWrapper = context.evaluateScript("""
-            (e) => {
-                getSearchResultsCallback\(id)(e)
-            };
-            """)
-
-            guard let thenWrapper else {
-                continuation.resume(throwing: ExtensionError.invalidPagedResults)
-                return
-            }
-
-            promise?.invokeMethod("then", withArguments: [thenWrapper])
-        }) else {
-            return .failure(.invalidPagedResults)
         }
 
-        return .success(results)
+        let failureCallback: @convention(block) (JSValue) -> Void = { value in
+            Log("Failure in async js code: \(value)")
+            completed(.failure(.invalid))
+        }
+        // TODO: MAKE EVERY CALLLBACK UNQUEE id uuidname
+        context.setObject(successCallback, forKeyedSubscript: "jsSuccessHandler" as NSString)
+        context.setObject(failureCallback, forKeyedSubscript: "jsFailureHandler" as NSString)
+
+        let jsSuccessCallback = context.objectForKeyedSubscript("jsSuccessHandler")!
+        let jsFailureCallback = context.objectForKeyedSubscript("jsFailureHandler")!
+
+        guard let source, source.hasProperty(method) else {
+            completed(.failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource))
+            return
+        }
+
+        let promise = source.invokeMethod(method, withArguments: args)
+        promise?.invokeMethod("then", withArguments: [jsSuccessCallback])
+        promise?.invokeMethod("catch", withArguments: [jsFailureCallback])
     }
 
     func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void) {
@@ -246,56 +214,5 @@ class SourceExtension: NSObject, ExtensionProtocol {
         if let callbackWrapper {
             source.invokeMethod("getHomePageSections", withArguments: [callbackWrapper])
         }
-    }
-
-    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async -> Result<PagedResults, ExtensionError> {
-        guard let context = context else {
-            return .failure(.invalidContext)
-        }
-
-        guard let source = source, source.hasProperty("getViewMoreItems") else {
-            return .failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource)
-        }
-
-        guard let result = try? await withUnsafeThrowingContinuation({ continuation in
-
-            let callback: @convention(block) (PagedResults?) -> Void = { results in
-                if let results {
-                    continuation.resume(returning: results)
-                    return
-                }
-
-                continuation.resume(throwing: ExtensionError.invalidViewMoreItems)
-            }
-
-            context.setObject(
-                callback,
-                forKeyedSubscript: "getViewMoreItemsCallback" as NSString
-            )
-
-            let promise = source.invokeMethod(
-                "getViewMoreItems",
-                withArguments: [
-                    homepageSectionId,
-                    metadata as Any
-                ]
-            )
-
-            let thenWrapper = context.evaluateScript("""
-            (e) => {
-                getViewMoreItemsCallback(e)
-            };
-            """)
-
-            guard let thenWrapper else {
-                return continuation.resume(throwing: ExtensionError.invalidViewMoreItems)
-            }
-
-            promise?.invokeMethod("then", withArguments: [thenWrapper])
-        }) else {
-            return .failure(.invalidViewMoreItems)
-        }
-
-        return .success(result)
     }
 }

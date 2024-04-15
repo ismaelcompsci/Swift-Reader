@@ -12,7 +12,8 @@ import SwiftData
 class Source: Identifiable {
     var sourceInfo: SourceInfo
     var url: URL
-    var id: String {
+
+    @Attribute(.unique) var id: String {
         sourceInfo.id
     }
 
@@ -27,6 +28,12 @@ class Source: Identifiable {
 
     static var all: FetchDescriptor<Source> {
         FetchDescriptor<Source>(sortBy: [SortDescriptor(\.sourceInfo.name)])
+    }
+}
+
+extension Source: CustomStringConvertible {
+    var description: String {
+        "\(sourceInfo.name) - \(sourceInfo.version)"
     }
 }
 

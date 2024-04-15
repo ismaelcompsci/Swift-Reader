@@ -27,11 +27,6 @@ class RequestManager: NSObject, RequestManagerJSExport {
     }
 
     var request: @convention(block) (Request, JSValue) -> JSValue = { request, _ in
-        _request(request)
-    }
-
-    // swiftlint:disable:next identifier_name
-    class func _request(_ request: Request) -> JSValue {
         let session = URLSession.shared
 
         let url = URL(string: request.url)
@@ -47,14 +42,14 @@ class RequestManager: NSObject, RequestManagerJSExport {
         return JSValue(newPromiseIn: JSContext.current()) { resolve, reject in
             let task = session.dataTask(with: urlRequest) { data, response, err in
                 if let err = err {
-                    print("fetch failed: \(err.localizedDescription)")
+                    Log("fetch failed: \(err.localizedDescription)")
                     let jsErr = JSError(message: err.localizedDescription)
                     reject?.call(withArguments: [jsErr as Any])
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse else {
-                    print("HTTPURLResponse was nil")
+                    Log("HTTPURLResponse was nil")
                     let jsErr = JSError(message: "native response was nil")
                     reject?.call(withArguments: [jsErr as Any])
                     return
@@ -73,6 +68,9 @@ class RequestManager: NSObject, RequestManagerJSExport {
             task.resume()
         }
     }
+
+    // swiftlint:disable:next identifier_name
+//    class func _request(_ request: Request) -> JSValue {}
 
     class func createRequestManager(requestTimeout: Int) -> RequestManager {
         RequestManager(requestTimeout: requestTimeout)

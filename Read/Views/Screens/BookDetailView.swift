@@ -23,6 +23,7 @@ struct BookDetailView: View {
     @State private var openReader = false
     @State private var sImage: Image?
     @State private var infoSize: CGSize = .zero
+    @Namespace private var animation
     
     private func getHeightForHeaderImage(_ geometry: GeometryProxy) -> CGFloat {
         let offset = getScrollOffset(geometry)
@@ -116,6 +117,7 @@ struct BookDetailView: View {
                         ) / 1.4 : geometry.size.width
                         
                         headerImage
+                            .matchedGeometryEffect(id: "bookCover", in: animation)
                             .frame(
                                 width: calcImageWidth,
                                 height: calcImageHeight
@@ -174,16 +176,7 @@ struct BookDetailView: View {
             setHeaderImage()
         }
         .fullScreenCover(isPresented: $openReader, content: {
-            let bookPathURL = URL.documentsDirectory.appending(path: book.bookPath ?? "")
-            let url = bookPathURL
-            let isPDF = bookPathURL.lastPathComponent.hasSuffix(".pdf")
-            
-            if isPDF {
-                PDF(url: url, book: book)
-            } else {
-                EBookView(url: url, book: book)
-            }
-
+            Reader(book: book)
         })
     }
     
@@ -213,7 +206,9 @@ struct BookDetailView: View {
                     let text: String = book.readingPosition != nil ? "Continue Reading \(Int((book.readingPosition?.progress ?? 0.0) * 100))%" : "Read"
                     
                     SRButton(systemName: "book.fill", text: text) {
-                        openReader = true
+                        withAnimation(.spring()) {
+                            openReader = true
+                        }
                     }
                     .frame(maxWidth: .infinity)
                 }

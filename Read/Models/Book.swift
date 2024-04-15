@@ -20,7 +20,7 @@ class Tag: EmbeddedObject {
     static let example = Tag(value: ["name": "Fantasy"])
 }
 
-class Book: Object, ObjectKeyIdentifiable {
+public class Book: Object, ObjectKeyIdentifiable {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var title = ""
     @Persisted var authors: List<Author> = List()
@@ -60,8 +60,8 @@ extension Book {
     }
 }
 
-extension Book {
-    public func updateReadingPosition(page: PDFPage, document: PDFDocument) {
+public extension Book {
+    func updateReadingPosition(page: PDFPage, document: PDFDocument) {
         guard let realm = realm?.thaw() else {
             return
         }
@@ -88,7 +88,7 @@ extension Book {
     }
 
     /// non-pdf books only
-    public func updateReadingPosition(with location: Relocate) {
+    func updateReadingPosition(with location: Relocate) {
         guard let realm = realm?.thaw() else {
             return
         }
@@ -109,7 +109,7 @@ extension Book {
         }
     }
 
-    public func addHighlight(pdfHighlight: PDFHighlight) {
+    func addHighlight(pdfHighlight: PDFHighlight) {
         guard let realm = realm?.thaw(), let newHightlight = BookHighlight(pdfHighlight: pdfHighlight) else {
             return
         }
@@ -121,7 +121,7 @@ extension Book {
         }
     }
 
-    public func addHighlight(text: String, cfi: String, index: Int, label: String, addedAt: Date, updatedAt: Date) {
+    func addHighlight(text: String, cfi: String, index: Int, label: String, addedAt: Date, updatedAt: Date) {
         guard let realm = realm?.thaw() else {
             return
         }
@@ -141,7 +141,7 @@ extension Book {
         }
     }
 
-    public func removeHighlight(withValue value: String) {
+    func removeHighlight(withValue value: String) {
         guard let realm = realm?.thaw() else {
             return
         }
@@ -156,7 +156,7 @@ extension Book {
         }
     }
 
-    public func removeHighlight(withId highlightId: String) {
+    func removeHighlight(withId highlightId: String) {
         guard let realm = realm?.thaw() else {
             return
         }

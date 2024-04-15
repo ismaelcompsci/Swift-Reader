@@ -29,6 +29,8 @@ struct SourceBookImage: View {
             title: title ?? "Unknown Title",
             author: author ?? "Unknown Author"
         )
+        .aspectRatio(0.7, contentMode: .fill)
+        .spine()
     }
 
     var body: some View {
@@ -39,6 +41,7 @@ struct SourceBookImage: View {
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
+                            .spine()
                     } else {
                         placeholder
                     }

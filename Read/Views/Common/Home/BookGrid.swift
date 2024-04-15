@@ -10,6 +10,7 @@ import SwiftUI
 
 struct BookGrid: View {
     @Environment(\.realm) var realm
+    @Environment(Navigator.self) var navigator
 
     @State var selectedBook: Book?
 
@@ -59,6 +60,9 @@ struct BookGrid: View {
 
                         case .onEdit:
                             selectedBook = book
+
+                        case .onNavigate:
+                            navigator.navigate(to: .localDetails(book: book))
                         }
                     }
                 }

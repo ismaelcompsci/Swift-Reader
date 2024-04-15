@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SourceSectionView: View {
+    @Environment(Navigator.self) var navigator
     @Environment(AppTheme.self) var theme
 
     var title: String
@@ -23,7 +24,7 @@ struct SourceSectionView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(self.title)
+                Text(title)
                     .font(.title2)
                     .lineLimit(1)
                     .fontWeight(.semibold)
@@ -31,32 +32,41 @@ struct SourceSectionView: View {
 
                 Spacer()
 
-                if isLoading {
-                    ProgressView()
-                } else if self.containsMoreItems == true {
-                    NavigationLink {
-                        if let id = id {
-                            PagedViewMoreItems(sourceId: self.sourceId, viewMoreId: id)
+                Group {
+                    if isLoading {
+                        ProgressView()
+                    } else if containsMoreItems == true {
+                        NavigationLink {
+                            if let id = id {
+                                PagedViewMoreItems(
+                                    sourceId: sourceId,
+                                    viewMoreId: id
+                                )
                                 .navigationTitle(title)
-                        } else if let searchRequest = searchRequest {
-                            SourcesSearchPagedResultsView(searchRequest: searchRequest, sourceId: sourceId)
+                            } else if let searchRequest = searchRequest {
+                                SourcesSearchPagedResultsView(
+                                    searchRequest: searchRequest,
+                                    sourceId: sourceId
+                                )
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
                         }
-                    } label: {
-                        Image(systemName: "arrow.up.left.and.arrow.down.right")
                     }
-                    .padding(.trailing, 8)
-                    .tint(theme.tintColor)
                 }
+                .padding(.trailing, 8)
+                .tint(theme.tintColor)
             }
 
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 12) {
-                    ForEach(self.items, id: \.self) { book in
-                        SourceBookCard(book: book, sourceId: self.sourceId)
+                    ForEach(items, id: \.self) { book in
+                        SourceBookCard(book: book, sourceId: sourceId)
                     }
+                    .transition(.opacity)
                 }
-                .transition(.slide)
-                .animation(.snappy, value: self.items)
+                .transition(.move(edge: .bottom))
+//                .animation(.snappy, value: items)
             }
             .contentMargins(10, for: .scrollContent)
             .listRowInsets(EdgeInsets())

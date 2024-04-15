@@ -94,17 +94,20 @@ struct SourceBookDetailsView: View {
                 _ = extensionJS.load()
             }
 
-            let result = await extensionJS.getBookDetails(for: self.item.id)
+            extensionJS.getBookDetails(for: item.id) { result in
 
-            switch result {
-            case .success(let details):
-                self.bookDetails = details
-            case .failure:
-                // TODO:
-                break
+                switch result {
+                case .success(let details):
+//                    DispatchQueue.main.async {
+                    self.bookDetails = details
+//                    }
+                case .failure(let failure):
+
+                    Log("\(failure)")
+                }
+
+                self.loadingState = false
             }
-
-            self.loadingState = false
         }
     }
 }

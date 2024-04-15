@@ -25,6 +25,7 @@ struct SourceRow: View {
     @Environment(AppTheme.self) var theme
 
     var source: SourceInfo
+    var needsUpdate: Bool
     var isInstalled: Bool = false
     var showButton: Bool = true
 
@@ -40,10 +41,12 @@ struct SourceRow: View {
     init(
         source: SourceInfo,
         isInstalled: Bool,
+        needsUpdate: Bool = false,
         showButton: Bool = true,
         onEvent: ((ButtonEvent) async -> Void)? = nil
     ) {
         self.source = source
+        self.needsUpdate = needsUpdate
         self.isInstalled = isInstalled
         self.onEvent = onEvent
         self.showButton = showButton
@@ -87,9 +90,24 @@ struct SourceRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(source.name)
 
-                Text("\(source.info) | \(source.version)")
-                    .foregroundStyle(.gray)
-                    .font(.system(size: 8))
+                HStack(spacing: 4) {
+                    Text("\(source.info) | \(source.version)")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 8))
+
+                    if needsUpdate {
+                        Text("\(needsUpdate ? " -> update" : "")")
+                            .font(.system(size: 8))
+                            .lineLimit(1)
+                            .padding(.vertical, 2)
+                            .padding(.horizontal, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 13)
+                                    .fill(theme.tintColor)
+                            )
+                            .padding(1)
+                    }
+                }
 
                 HStack {
                     if source.interfaces.downloads {
@@ -180,6 +198,7 @@ struct SourceView: View {
 
     @State var sources: [SourceInfo] = []
     @State var installedSourcesDict: [String: SourceInfo] = [:]
+    @State var needsUpdateSources: [String: Bool] = [:]
 
     var body: some View {
         VStack {
@@ -187,10 +206,12 @@ struct SourceView: View {
                 Section("Sources") {
                     ForEach(sources, id: \.self) { source in
                         let installed = installedSourcesDict[source.id]
+                        let needsUpdate = needsUpdateSources[source.id] ?? false
 
                         SourceRow(
                             source: source,
-                            isInstalled: installed != nil
+                            isInstalled: installed != nil,
+                            needsUpdate: needsUpdate
                         ) { event in
                             switch event {
                             case .download(let url):
@@ -239,6 +260,8 @@ struct SourceView: View {
             sources.remove(at: index)
             sources.insert(source.sourceInfo, at: index)
         }
+
+        await loadSources()
     }
 
     func loadSources() async {
@@ -256,6 +279,7 @@ struct SourceView: View {
 
         for instSource in installedSources {
             installedSourcesDict[instSource.id] = instSource
+            installedSourcesDict.updateValue(instSource, forKey: instSource.id)
         }
 
         let url = sourceUrl.pathExtension.isEmpty ? sourceUrl : sourceUrl.deletingLastPathComponent()
@@ -265,7 +289,14 @@ struct SourceView: View {
         }
 
         externalSources = externalSources.filter { externalSource in
-            installedSources.contains { $0.id == externalSource.id } == false
+            let installedSource = installedSources.first(where: { $0.id == externalSource.id })
+
+            if let installedSource = installedSource, installedSource.version != externalSource.version {
+                Log("\(installedSource.name) needs update")
+                needsUpdateSources[installedSource.id] = true
+            }
+
+            return installedSources.contains { $0.id == externalSource.id } == false
         }
 
         for index in externalSources.indices {

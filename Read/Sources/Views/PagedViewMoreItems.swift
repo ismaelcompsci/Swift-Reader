@@ -77,25 +77,22 @@ struct PagedViewMoreItems: View {
             return
         }
 
-        let results = await extensionJS.getViewMoreItems(
-            homepageSectionId: self.viewMoreId,
-            metadata: self.metadata
-        )
+        extensionJS.getViewMoreItems(homepageSectionId: self.viewMoreId, metadata: self.metadata) { result in
+            switch result {
+            case .success(let pagedResults):
+                self.books.append(contentsOf: pagedResults.results)
 
-        switch results {
-        case .success(let pagedResults):
-            self.books.append(contentsOf: pagedResults.results)
-
-            if let metadata = pagedResults.metadata {
-                self.metadata = metadata
-            } else {
+                if let metadata = pagedResults.metadata {
+                    self.metadata = metadata
+                } else {
+                    self.cancel = true
+                }
+            case .failure(let failure):
                 self.cancel = true
             }
-        case .failure:
-            self.cancel = true
-        }
 
-        self.loading = false
+            self.loading = false
+        }
     }
 }
 

@@ -56,9 +56,11 @@ public class Toaster {
     }
 
     func presentToast(message: String, type: ToastType) {
-        toastMessage = message
-        toastImage = type.image
-        toastColor = type.color
-        showToast = true
+        DispatchQueue.main.async {
+            self.toastMessage = message
+            self.toastImage = type.image
+            self.toastColor = type.color
+            self.showToast = true
+        }
     }
 }

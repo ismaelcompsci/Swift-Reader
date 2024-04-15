@@ -16,10 +16,16 @@ public enum EBookReaderError: Error {
     case serverError(String)
 }
 
-public enum EBookReaderState {
+public enum EBookReaderState: Equatable {
+    public static func == (lhs: EBookReaderState, rhs: EBookReaderState) -> Bool {
+        return lhs.reflectedValue == rhs.reflectedValue
+    }
+
     case loading
-    case done // do nothing whehn done
+    case done
     case failure(EBookReaderError)
+
+    var reflectedValue: String { String(reflecting: self) }
 }
 
 // server: https://github.com/readium/swift-toolkit/blob/develop/Sources/Adapters/GCDWebServer/GCDHTTPServer.swift

@@ -12,23 +12,17 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AppTheme.self) private var theme
     @Environment(Toaster.self) private var toaster
+    @Environment(Navigator.self) private var navigator
 
     @State var showMenu = false
-    @State var navigation: SideMenuNavigation = .home
-
-    enum SideMenuNavigation: String {
-        case home = "Home"
-        case settings = "Settings"
-        case discover = "Discover"
-        case search = "Search"
-    }
 
     var body: some View {
         @Bindable var toaster = toaster
+        @Bindable var navigator = navigator
 
-        NavigationStack {
+        NavigationStack(path: $navigator.path) {
             Group {
-                switch navigation {
+                switch navigator.sideMenuTab {
                 case .settings:
                     SettingsView()
                 case .discover:
@@ -39,15 +33,16 @@ struct ContentView: View {
                     SourceSearch()
                 }
             }
+            .withNavigator()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         withAnimation(.snappy) {
-                            self.showMenu = true
+                            showMenu = true
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal")
-                            .foregroundStyle(self.theme.tintColor)
+                            .foregroundStyle(theme.tintColor)
                     }
                 }
             }
@@ -77,8 +72,8 @@ struct ContentView: View {
             .padding(.horizontal)
             .foregroundColor(.white)
         }
-        .sideMenu(isShowing: self.$showMenu) {
-            self.sideMenu
+        .sideMenu(isShowing: $showMenu) {
+            sideMenu
         }
     }
 
@@ -89,70 +84,70 @@ struct ContentView: View {
 
                 SRXButton {
                     withAnimation(.snappy) {
-                        self.showMenu = false
+                        showMenu = false
                     }
                 }
             }
 
             Button {
                 withAnimation(.snappy) {
-                    navigation = .home
-                    self.showMenu = false
+                    navigator.sideMenuTab = .home
+                    showMenu = false
                 }
             } label: {
                 HStack {
                     Image(systemName: "house")
                     Text("Home")
-                        .foregroundStyle(navigation == .home ? theme.tintColor : .white)
+                        .foregroundStyle(navigator.sideMenuTab == .home ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Button {
                 withAnimation(.snappy) {
-                    self.navigation = .settings
-                    self.showMenu = false
+                    navigator.sideMenuTab = .settings
+                    showMenu = false
                 }
             } label: {
                 HStack {
                     Image(systemName: "gear")
                     Text("Settings")
-                        .foregroundStyle(navigation == .settings ? theme.tintColor : .white)
+                        .foregroundStyle(navigator.sideMenuTab == .settings ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Button {
                 withAnimation(.snappy) {
-                    self.navigation = .discover
-                    self.showMenu = false
+                    navigator.sideMenuTab = .discover
+                    showMenu = false
                 }
             } label: {
                 HStack {
                     Image(systemName: "shippingbox")
                     Text("Discover")
-                        .foregroundStyle(navigation == .discover ? theme.tintColor : .white)
+                        .foregroundStyle(navigator.sideMenuTab == .discover ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Button {
                 withAnimation(.snappy) {
-                    self.navigation = .search
-                    self.showMenu = false
+                    navigator.sideMenuTab = .search
+                    showMenu = false
                 }
             } label: {
                 HStack {
                     Image(systemName: "magnifyingglass")
                     Text("Search")
-                        .foregroundStyle(navigation == .search ? theme.tintColor : .white)
+                        .foregroundStyle(navigator.sideMenuTab == .search ? theme.tintColor : .white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Spacer()
         }
-        .tint(self.theme.tintColor)
+        .tint(theme.tintColor)
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .blendMode(.colorDodge)

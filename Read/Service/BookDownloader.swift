@@ -18,6 +18,10 @@ public class BookDownloader {
     private var subscriptions = Set<AnyCancellable>()
 
     var queue = [Download]()
+    var bookInfo = [Download.ID: BookInfo]()
+
+    // TODO: keep data of downloaded books
+    //
 
     func download(with id: String, for url: URL) {
         let download = Download(id: id, url: url, progress: .init())
@@ -39,10 +43,68 @@ public class BookDownloader {
 
     init() {
         manager.onQueueDidChange.sink { [weak self] downloads in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
 
-            strongSelf.queue = downloads
+            self.queue = downloads
         }
         .store(in: &subscriptions)
+
+        manager.onDownloadFinished.sink { [weak self] download, location in
+            guard let self = self else { return }
+            self.downloadFinished((download, location))
+        }
+        .store(in: &subscriptions)
+
+        manager.onDidCancelWithResumeData.sink { [weak self] download, _ in
+            switch download.status {
+                case .failed(let error):
+                    Toaster.shared.presentToast(
+                        message: "Failed to download \(error.localizedDescription)",
+                        type: .error
+                    )
+
+                    self?.cancel(download)
+
+                default:
+                    break
+            }
+        }
+        .store(in: &subscriptions)
+
+        manager.maxConcurrentDownloads = 3
+    }
+}
+
+extension BookDownloader {
+    func downloadFinished(_ finished: DownloadManager.OnDownloadFinished) {
+        let (download, location) = finished
+
+        let info = bookInfo[download.id]
+        let bookTitle = "\(info?.title ?? "book")"
+
+        bookInfo.removeValue(forKey: download.id)
+
+        print("DOWNLOAD FINISHDED: \(info?.title ?? download.id)")
+
+        Task {
+            if download.status != .finished { return }
+
+            do {
+                if let info = info {
+                    try await BookImporter.shared.process(for: location, with: info)
+
+                } else {
+                    try await BookImporter.shared.process(for: location)
+                }
+
+                Toaster.shared.presentToast(
+                    message: "Added \(bookTitle) to library.",
+                    type: .message
+                )
+            } catch {
+                Log("Failed to import book: \(error.localizedDescription)")
+                Toaster.shared.presentToast(message: "Failed to add \(bookTitle) to library", type: .error)
+            }
+        }
     }
 }

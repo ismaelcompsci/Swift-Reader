@@ -8,12 +8,6 @@
 import Foundation
 import RealmSwift
 import SwiftReader
-/*
- add function to pass default metadata so no need for metadata extractor
- // download cover
- // download to book path
- // the same as metadata extractor from swift reader
- */
 
 enum BookImporterError: String, Error {
     case failedToGetMetadata = "Failed to get metadata"
@@ -23,8 +17,6 @@ class BookImporter {
     static let shared = BookImporter()
     @ObservedResults(Book.self) var books
 
-    
-
     private func downloadImage(with url: String) async -> URL? {
         guard let url = URL(string: url) else {
             return nil
@@ -32,43 +24,55 @@ class BookImporter {
 
         do {
             let (file, _) = try await URLSession.shared.download(from: url)
+            Log("Downloaded image with url: \(url)")
             return file
         } catch {
-            print("Error downloading image: \(error.localizedDescription)")
+            Log("Failed to download image with url: \(url), error: \(error.localizedDescription)")
         }
 
         return nil
     }
 
-    func process(for file: URL, with sourceBook: SourceBook) async throws {
+    func process(for file: URL, with bookInfo: BookInfo) async throws {
+        Log("Processing book with book info")
+
         let bookId = UUID()
         let documents = URL.documentsDirectory
         let bookPath = BookMetadataExtractor.shared.makeBookBasePath(bookId: bookId.uuidString)
         let destination = documents.appending(path: bookPath)
 
-        var coverPath: String?
+        try? FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
 
-        if let imageUrl = sourceBook.bookInfo.image,
+        var coverPath: String?
+        Log("book id \(bookId)")
+
+        if let imageUrl = bookInfo.image,
            let downloadedImageUrl = await downloadImage(with: imageUrl)
         {
+            Log("Downloaded image path exists: \(downloadedImageUrl.exists)")
             let filename = downloadedImageUrl.lastPathComponent
             coverPath = "\(bookPath)/\(filename)"
             let newImageLocation = destination.appending(path: filename)
-
-            try? FileManager.default.moveItem(at: downloadedImageUrl, to: newImageLocation)
+            Log("NEW LOC: \(newImageLocation)")
+            do {
+                try FileManager.default.moveItem(at: downloadedImageUrl, to: newImageLocation)
+            } catch {
+                Log("Download image error: \(error.localizedDescription)")
+            }
         }
 
         guard let fullDestinationPath = BookMetadataExtractor.shared.copyBook(from: file, id: bookId) else {
+            try? FileManager.default.removeItem(at: destination)
             throw BookImporterError.failedToGetMetadata
         }
 
-        let author = MetadataAuthor(name: sourceBook.bookInfo.author ?? "Unknown Author")
+        let author = MetadataAuthor(name: bookInfo.author ?? "Unknown Author")
 
         let metadata = BookMetadata(
-            title: sourceBook.bookInfo.title,
+            title: bookInfo.title,
             author: [author],
-            description: sourceBook.bookInfo.desc,
-            subject: sourceBook.bookInfo.tags,
+            description: bookInfo.desc,
+            subject: bookInfo.tags,
             bookPath: "\(bookPath)/\(fullDestinationPath.lastPathComponent)",
             bookCover: coverPath
         )
@@ -77,6 +81,7 @@ class BookImporter {
     }
 
     func process(for file: URL) async throws {
+        Log("Processing book with local file.")
         let isPdf = file.lastPathComponent.hasSuffix(".pdf")
 
         var metadata: BookMetadata?

@@ -32,7 +32,7 @@ struct LibrarySortPopover: View {
                     }
                 }
             }
-            .popover(isPresented: $sortPopoverShowing, attachmentAnchor: .rect(.bounds),
+            .popover(isPresented: $sortPopoverShowing,
                      content: {
                          VStack(alignment: .leading, spacing: 20) {
                              ForEach(LibrarySortKeys.allCases, id: \.self) { sortKey in

@@ -33,9 +33,12 @@ struct BookCover: View {
     }
 
     var placeholder: some View {
-        PlaceholderCover(title: title ?? "Unknown Title", author: author ?? "Unknown Author")
-            .aspectRatio(0.7, contentMode: .fill)
-            .spine()
+        PlaceholderCover(
+            title: title ?? "Unknown Title",
+            author: author ?? "Unknown Author"
+        )
+        .aspectRatio(0.7, contentMode: .fill)
+        .spine()
     }
 
     var body: some View {
