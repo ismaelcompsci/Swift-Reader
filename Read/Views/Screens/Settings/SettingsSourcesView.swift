@@ -226,18 +226,6 @@ struct SourceView: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                    Text("Sources")
-                }
-                .tint(theme.tintColor)
-            }
-        }
         .task {
             await loadSources()
         }
@@ -334,6 +322,7 @@ struct SourceView: View {
 struct SettingsSourcesView: View {
     @Environment(SourceManager.self) private var sourceManager
     @Environment(AppTheme.self) var theme
+    @Environment(Navigator.self) var navigator
     @Environment(\.editMode) var editMode
     @Environment(\.dismiss) var dismiss
 
@@ -354,12 +343,13 @@ struct SettingsSourcesView: View {
 
                 Section {
                     ForEach(sourceManager.sourceLists, id: \.self) { source in
-                        NavigationLink {
-                            SourceView(sourceUrl: source)
+                        Button {
+                            navigator.navigate(to: .source(sourceUrl: source))
                         } label: {
                             Text(source.absoluteString)
                                 .lineLimit(1)
                         }
+                        .tint(.primary)
                     }
                     .onDelete(perform: deleteSourceList)
                 } header: {

@@ -87,7 +87,7 @@ struct PagedViewMoreItems: View {
                 } else {
                     self.cancel = true
                 }
-            case .failure(let failure):
+            case .failure:
                 self.cancel = true
             }
 

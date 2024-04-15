@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import UIKit
 
 func Log(
     _ items: Any...,
@@ -40,6 +41,7 @@ struct ReadApp: App {
                 .environment(navigator)
                 .preferredColorScheme(.dark)
                 .environment(\.font, Font.custom("Poppins-Regular", size: 16))
+                .applyTheme(theme)
         }
     }
 

@@ -26,16 +26,17 @@ struct SourceBookCard: View {
 
     var cover: some View {
         SourceBookImage(
-            imageUrl: self.book.image,
+            imageUrl: book.image,
             title: book.title,
             author: book.author
         )
+        .aspectRatio(contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .overlay {
             RoundedRectangle(cornerRadius: 6)
                 .stroke(.gray, lineWidth: 0.2)
         }
-        .aspectRatio(contentMode: .fit)
+        .frame(width: 130, height: 130 * 1.7, alignment: .bottom)
     }
 
     var footer: some View {
@@ -51,18 +52,19 @@ struct SourceBookCard: View {
     }
 
     var body: some View {
-        VStack {
-            Spacer()
-
-            // TODO: SWITCH TO NAVIGATOR
-            NavigationLink {
-                SourceBookDetailsView(sourceId: self.sourceId, item: self.book)
+        VStack(spacing: 0) {
+            Button {
+                navigator.navigate(to: .sourceBookDetails(sourceId: sourceId, item: book))
             } label: {
                 cover
             }
-
             footer
         }
+        .frame(
+            maxWidth: 130,
+            maxHeight: .infinity,
+            alignment: .bottom
+        )
         .tint(.white)
         .contextMenu {
             let lastPath = navigator.path.last
@@ -74,22 +76,60 @@ struct SourceBookCard: View {
                 }
             }
         }
-        .frame(
-            maxWidth: .infinity,
-            maxHeight: .infinity,
-            alignment: .bottom
-        )
-        .frame(width: 130, height: 130 * 1.7)
     }
 }
 
 #Preview {
-    SourceBookCard(
-        book: PartialSourceBook(
-            id: "",
-            title: "The End is here",
-            author: "Author name"
-        ),
-        sourceId: ""
-    )
+    VStack(alignment: .leading) {
+        HStack {
+            Text("HELLO")
+                .font(.headline)
+
+            Spacer()
+        }
+
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 12) {
+                SourceBookCard(
+                    book: PartialSourceBook(
+                        id: "",
+                        title: "The End is here The End is here The End is here The End is here ",
+                        author: "Author name"
+                    ),
+                    sourceId: ""
+                )
+
+                SourceBookCard(
+                    book: PartialSourceBook(
+                        id: "",
+                        title: "The End is here",
+                        image: "https://s3proxy.cdn-zlib.se//covers299/collections/userbooks/8eb4a3e656f1da578081966d6c26ebbdca84b4b10906f5eb511e8c57cf20807f.jpg",
+                        author: "Author name"
+                    ),
+                    sourceId: ""
+                )
+
+                SourceBookCard(
+                    book: PartialSourceBook(
+                        id: "",
+                        title: "The End is here",
+                        image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1433161048i/1137215.jpg", author: "Author name"
+                    ),
+                    sourceId: ""
+                )
+
+                SourceBookCard(
+                    book: PartialSourceBook(
+                        id: "",
+                        title: "The End is here",
+                        image: "https://s3proxy.cdn-zlib.se//covers299/collections/userbooks/64a1a6951391ec8b702874ed321b40a368e81d564e30b05105564a0fa1762920.jpg", author: "Author name"
+                    ),
+                    sourceId: ""
+                )
+            }
+        }
+        .contentMargins(10, for: .scrollContent)
+        .listRowInsets(EdgeInsets())
+    }
+    .environment(Navigator())
 }

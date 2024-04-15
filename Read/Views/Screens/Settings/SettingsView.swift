@@ -29,6 +29,7 @@ class ColorPickerObserver: ObservableObject {
 
 struct SettingsView: View {
     @Environment(AppTheme.self) var theme
+    @Environment(Navigator.self) var navigator
     @Environment(\.presentationMode) var presentationMode
 
     @StateObject var colorPickerObserver = ColorPickerObserver(defaultColor: .accent)
@@ -45,12 +46,14 @@ struct SettingsView: View {
                         )
                     }
 
-                    NavigationLink {
-                        SettingsSourcesView()
+                    Button {
+                        navigator.navigate(
+                            to: .sourceSettings
+                        )
                     } label: {
-                        Text("Sources")
+                        Text("sources")
                     }
-                    .tint(theme.tintColor)
+                    .tint(.primary)
 
                 } header: {
                     Text("Settings")

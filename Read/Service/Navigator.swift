@@ -10,7 +10,13 @@ import SwiftUI
 
 public enum NavigatorDestination: Hashable {
     case localDetails(book: Book)
+
     case sourceSearch(search: String)
+    case source(sourceUrl: URL)
+    case sourceSettings
+    case sourceBookDetails(sourceId: String, item: PartialSourceBook)
+    case sourcePagedViewMoreItems(sourceId: String, viewMoreId: String)
+    case sourceSearchPagedResults(searchRequest: SearchRequest, sourceId: String)
 
     var id: String {
         switch self {
@@ -18,6 +24,16 @@ public enum NavigatorDestination: Hashable {
             "localDetails"
         case .sourceSearch:
             "sourceSearch"
+        case .source(sourceUrl: _):
+            "source"
+        case .sourceSettings:
+            "sourceSettings"
+        case .sourceBookDetails(sourceId: _, item: _):
+            "sourceBookDetails"
+        case .sourcePagedViewMoreItems(sourceId: _, viewMoreId: _):
+            "sourcePagedViewMoreItems"
+        case .sourceSearchPagedResults(searchRequest: _, sourceId: _):
+            "sourceSearchPagedResults"
         }
     }
 }
@@ -49,6 +65,16 @@ extension View {
                 BookDetailView(book: book)
             case .sourceSearch(search: let search):
                 SourceSearch(searchText: search)
+            case .source(sourceUrl: let sourceUrl):
+                SourceView(sourceUrl: sourceUrl)
+            case .sourceSettings:
+                SettingsSourcesView()
+            case .sourceBookDetails(sourceId: let sourceId, item: let item):
+                SourceBookDetailsView(sourceId: sourceId, item: item)
+            case .sourcePagedViewMoreItems(sourceId: let sourceId, viewMoreId: let viewMoreId):
+                PagedViewMoreItems(sourceId: sourceId, viewMoreId: viewMoreId)
+            case .sourceSearchPagedResults(searchRequest: let searchRequest, sourceId: let sourceId):
+                SourcesSearchPagedResultsView(searchRequest: searchRequest, sourceId: sourceId)
             }
         }
     }

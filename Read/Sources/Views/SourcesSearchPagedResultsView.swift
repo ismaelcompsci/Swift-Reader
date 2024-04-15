@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SourcesSearchPagedResultsView: View {
     @Environment(AppTheme.self) var theme
-    @Environment(SourceManager.self) private var sourceManager
+    @Environment(SourceManager.self) var sourceManager
     @State var extensionJS: SourceExtension?
 
     @State var books = [PartialSourceBook]()
@@ -58,7 +58,7 @@ struct SourcesSearchPagedResultsView: View {
                 }
             }
         }
-        .navigationTitle("")
+        .navigationTitle(self.searchRequest.title ?? "Search")
         .navigationBarTitleDisplayMode(.inline)
         .tint(self.theme.tintColor)
         .task {

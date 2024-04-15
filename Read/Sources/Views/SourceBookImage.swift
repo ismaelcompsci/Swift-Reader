@@ -34,21 +34,19 @@ struct SourceBookImage: View {
     }
 
     var body: some View {
-        Group {
-            if let image = imageUrl, let imageUrl = URL(string: image) {
-                LazyImage(url: imageUrl) { phase in
-                    if let image = phase.image {
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .spine()
-                    } else {
-                        placeholder
-                    }
+        if let image = imageUrl, let imageUrl = URL(string: image) {
+            LazyImage(url: imageUrl) { phase in
+                if let image = phase.image {
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .spine()
+                } else {
+                    placeholder
                 }
-            } else {
-                placeholder
             }
+        } else {
+            placeholder
         }
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-@objc protocol PartialSourceBookJSExport: JSExport {
+@objc public protocol PartialSourceBookJSExport: JSExport {
     var id: String { get set }
     var title: String { get set }
     var image: String? { get set }
@@ -18,13 +18,13 @@ import JavaScriptCore
     static func _create(id: String, title: String, image: String?, author: String?) -> PartialSourceBook
 }
 
-@objc class PartialSourceBook: NSObject, PartialSourceBookJSExport, Identifiable {
-    var id: String
-    var title: String
-    var image: String?
-    var author: String?
+@objc public class PartialSourceBook: NSObject, PartialSourceBookJSExport, Identifiable {
+    public var id: String
+    public var title: String
+    public var image: String?
+    public var author: String?
 
-    init(id: String, title: String, image: String? = nil, author: String? = nil) {
+    public init(id: String, title: String, image: String? = nil, author: String? = nil) {
         self.id = id
         self.title = title
         self.image = image
@@ -32,7 +32,7 @@ import JavaScriptCore
     }
 
     // swiftlint:disable:next identifier_name
-    static func _create(id: String, title: String, image: String?, author: String?) -> PartialSourceBook {
+    public static func _create(id: String, title: String, image: String?, author: String?) -> PartialSourceBook {
         PartialSourceBook(id: id, title: title, image: image, author: author)
     }
 }

@@ -157,21 +157,7 @@ struct BookDetailView: View {
         }
         .scrollIndicators(.hidden)
         .ignoresSafeArea(.container, edges: .top)
-        .navigationBarBackButtonHidden(true)
         .toolbarBackground(Color.black.opacity(0.5))
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                }
-                .tint(theme.tintColor)
-            }
-        }
         .onAppear {
             setHeaderImage()
         }

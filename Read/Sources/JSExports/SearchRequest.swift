@@ -8,16 +8,16 @@
 import Foundation
 import JavaScriptCore
 
-@objc protocol SearchRequestJSExport: JSExport {
+@objc public protocol SearchRequestJSExport: JSExport {
     var title: String? { get }
     var parameters: NSDictionary { get }
 }
 
-@objc class SearchRequest: NSObject, SearchRequestJSExport {
-    var title: String?
-    var parameters: NSDictionary
+@objc public class SearchRequest: NSObject, SearchRequestJSExport {
+    public var title: String?
+    public var parameters: NSDictionary
 
-    init(title: String? = nil, parameters: NSDictionary) {
+    public init(title: String? = nil, parameters: NSDictionary) {
         self.title = title
         self.parameters = parameters
     }

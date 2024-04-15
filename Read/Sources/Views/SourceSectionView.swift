@@ -22,7 +22,7 @@ struct SourceSectionView: View {
     var searchRequest: SearchRequest?
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(title)
                     .font(.title2)
@@ -36,18 +36,11 @@ struct SourceSectionView: View {
                     if isLoading {
                         ProgressView()
                     } else if containsMoreItems == true {
-                        NavigationLink {
+                        Button {
                             if let id = id {
-                                PagedViewMoreItems(
-                                    sourceId: sourceId,
-                                    viewMoreId: id
-                                )
-                                .navigationTitle(title)
+                                navigator.navigate(to: .sourcePagedViewMoreItems(sourceId: sourceId, viewMoreId: id))
                             } else if let searchRequest = searchRequest {
-                                SourcesSearchPagedResultsView(
-                                    searchRequest: searchRequest,
-                                    sourceId: sourceId
-                                )
+                                navigator.navigate(to: .sourceSearchPagedResults(searchRequest: searchRequest, sourceId: sourceId))
                             }
                         } label: {
                             Image(systemName: "arrow.up.left.and.arrow.down.right")
@@ -66,7 +59,6 @@ struct SourceSectionView: View {
                     .transition(.opacity)
                 }
                 .transition(.move(edge: .bottom))
-//                .animation(.snappy, value: items)
             }
             .contentMargins(10, for: .scrollContent)
             .listRowInsets(EdgeInsets())
