@@ -54,16 +54,3 @@ struct ReadApp: App {
         }
     }
 }
-
-extension View {
-    func withNavigator() -> some View {
-        navigationDestination(for: NavigatorDestination.self) { destination in
-            switch destination {
-            case .localDetails(book: let book):
-                BookDetailView(book: book)
-            case .sourceSearch(search: let search):
-                SourceSearch(searchText: search)
-            }
-        }
-    }
-}

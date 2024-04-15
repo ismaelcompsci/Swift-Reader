@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 public enum NavigatorDestination: Hashable {
     case localDetails(book: Book)
@@ -37,5 +38,18 @@ public class Navigator {
 
     public func navigate(to: NavigatorDestination) {
         path.append(to)
+    }
+}
+
+extension View {
+    func withNavigator() -> some View {
+        navigationDestination(for: NavigatorDestination.self) { destination in
+            switch destination {
+            case .localDetails(book: let book):
+                BookDetailView(book: book)
+            case .sourceSearch(search: let search):
+                SourceSearch(searchText: search)
+            }
+        }
     }
 }
