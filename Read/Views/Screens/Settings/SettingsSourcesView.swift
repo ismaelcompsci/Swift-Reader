@@ -266,7 +266,6 @@ struct SourceView: View {
             }
 
         for instSource in installedSources {
-            installedSourcesDict[instSource.id] = instSource
             installedSourcesDict.updateValue(instSource, forKey: instSource.id)
         }
 

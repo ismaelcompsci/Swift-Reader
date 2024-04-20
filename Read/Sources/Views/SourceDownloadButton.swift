@@ -9,38 +9,44 @@ import DownloadManager
 import SimpleToast
 import SwiftUI
 
+struct Butt: View {
+    @Environment(AppTheme.self) var theme
+    @Environment(BookDownloader.self) var bookDownloader
+    @Environment(Toaster.self) var toaster
+
+    var book: SourceBook
+
+    var body: some View {
+        Text("HELO")
+    }
+}
+
 struct SourceDownloadButton: View {
     @Environment(AppTheme.self) var theme
     @Environment(BookDownloader.self) var bookDownloader
-    @Environment(Toaster.self) private var toaster
+    @Environment(Toaster.self) var toaster
 
-    var downloadUrls: [DownloadInfo]
-    var downloadable: Bool
-    var book: SourceBook?
-    var itemId: String
+    var book: SourceBook
 
     @State var selected: DownloadInfo?
     @State var download: Download?
 
     var filename: String {
         if let selected = selected {
-            return "\(itemId)\(selected.filetype)"
+            return "\(book.id)\(selected.filetype)"
         }
-        return "\(itemId)"
+        return "\(book.id)"
+    }
+
+    var downloadable: Bool {
+        book.bookInfo.downloadLinks.isEmpty == false
     }
 
     init(
-        downloadUrls: [DownloadInfo],
-        downloadable: Bool,
-        book: SourceBook? = nil,
-        itemId: String
+        book: SourceBook
     ) {
-        self.downloadUrls = downloadUrls
-        self.downloadable = downloadable
         self.book = book
-        self.itemId = itemId
-
-        self._selected = State(initialValue: downloadUrls.first ?? nil)
+        self._selected = State(initialValue: book.bookInfo.downloadLinks.first ?? nil)
     }
 
     var body: some View {
@@ -49,15 +55,25 @@ struct SourceDownloadButton: View {
                 downloadFile()
             } label: {
                 HStack(spacing: 8) {
-                    if download?.status == .downloading {
-                        ProgressView()
-
-                        Text("\(Int((download?.progress.fraction ?? 0) * 100))%")
-
-                    } else if download?.status == .idle {
-                        Text("Queued...")
+                    if downloadable == true {
+                        switch download?.status {
+                        case .idle:
+                            Text("Queued...")
+                        case .downloading:
+                            ProgressView()
+                            Text("\(Int((download?.progress.fraction ?? 0) * 100))%")
+                        case .paused:
+                            Image(systemName: "pause.fill")
+                            Text("paused")
+                        case .finished:
+                            Text("")
+                        case .failed(let error):
+                            Text("Failed")
+                        case nil:
+                            Text("Download")
+                        }
                     } else {
-                        Text(self.downloadable ? "Download \(selected?.filetype ?? "")" : "Download Unavailable")
+                        Text("Download unavailable")
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -89,19 +105,23 @@ struct SourceDownloadButton: View {
             }
 
             Menu {
-                ForEach(downloadUrls.indices, id: \.self) { index in
+                ForEach(book.bookInfo.downloadLinks.indices, id: \.self) { index in
                     Button {
-                        selected = downloadUrls[index]
+                        selected = book.bookInfo.downloadLinks[index]
+                        download = nil
                     } label: {
-                        if selected?.link == downloadUrls[index].link {
+                        let url = URL(string: book.bookInfo.downloadLinks[index].link)
+                        let host = url?.host() ?? "Server"
+
+                        if selected?.link == book.bookInfo.downloadLinks[index].link {
                             Label {
-                                Text("Server \(index)")
+                                Text("\(host) \(index)")
                             } icon: {
                                 Image(systemName: "checkmark")
                             }
 
                         } else {
-                            Text("Server \(index)")
+                            Text("\(host) \(index)")
                         }
                     }
                 }
@@ -115,25 +135,33 @@ struct SourceDownloadButton: View {
             .tint(.white)
         }
         .task {
-            download = bookDownloader.queue.first(where: { $0.id == itemId })
+            download = bookDownloader.queue.first(where: { $0.id == book.id })
         }
         .onReceive(bookDownloader.manager.onQueueDidChange) { queue in
-            download = queue.first(where: { $0.id == itemId })
+            download = queue.first(where: { $0.id == book.id })
         }
     }
 
     func downloadFile() {
-        if let id = book?.id, let selected, let url = URL(string: selected.link) {
-            bookDownloader.download(with: id, for: url)
-            bookDownloader.bookInfo[id] = book?.bookInfo
+        if let selected, let url = URL(string: selected.link) {
+            bookDownloader.bookInfo[book.id] = book.bookInfo
+            bookDownloader.download(with: book.id, for: url)
         }
     }
 }
 
 #Preview {
     SourceDownloadButton(
-        downloadUrls: [],
-        downloadable: false,
-        itemId: ""
+        book: SourceBook(
+            id: "",
+            bookInfo: BookInfo(
+                title: "tes",
+                author: "e",
+                desc: nil,
+                image: nil,
+                tags: nil,
+                downloadLinks: []
+            )
+        )
     )
 }

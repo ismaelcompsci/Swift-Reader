@@ -48,6 +48,7 @@ struct BookListItem: View {
             }
             .aspectRatio(contentMode: .fit)
             .frame(width: 62, height: 62 * 1.77)
+            .shadow(color: .black.opacity(0.3), radius: 4, x: 3, y: 5)
 
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading) {
@@ -59,6 +60,7 @@ struct BookListItem: View {
 
                     Text(book.authors.first?.name ?? "Unkown Author")
                         .font(.footnote)
+                        .lineLimit(2)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                 }
@@ -78,7 +80,7 @@ struct BookListItem: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.black)
+        .background()
     }
 
     var body: some View {
@@ -128,8 +130,9 @@ struct BookListItem: View {
             .fontWeight(.semibold)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Color.indigo)
+            .background(.indigo)
             .clipShape(.rect(cornerRadius: 8))
+            .foregroundStyle(.white)
     }
 }
 

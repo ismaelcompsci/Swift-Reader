@@ -18,10 +18,6 @@ struct SourceBookDetailsView: View {
     var sourceId: String
     var item: PartialSourceBook
 
-    var downloadable: Bool {
-        bookDetails?.bookInfo.downloadLinks.count != 0
-    }
-
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
@@ -50,10 +46,7 @@ struct SourceBookDetailsView: View {
 
                 if loadingState == false, let bookDetails {
                     SourceDownloadButton(
-                        downloadUrls: bookDetails.bookInfo.downloadLinks,
-                        downloadable: self.downloadable,
-                        book: bookDetails,
-                        itemId: bookDetails.id
+                        book: bookDetails
                     )
 
                 } else {
@@ -67,6 +60,10 @@ struct SourceBookDetailsView: View {
                     .disabled(true)
                     .clipShape(.rect(cornerRadius: 10))
                     .buttonStyle(.borderedProminent)
+                }
+
+                if let tags = bookDetails?.bookInfo.tags {
+                    TagScrollView(tags: tags)
                 }
             }
             .scenePadding()

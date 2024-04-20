@@ -33,7 +33,7 @@ public class Book: Object, ObjectKeyIdentifiable {
     @Persisted var addedAt: Date = .now
     @Persisted var updatedAt: Date = .now
 
-    @Persisted var processed: Bool = false
+    @Persisted var bookFromSource: Bool = false
 
     @Persisted var readingPosition: ReadingPosition?
     @Persisted var highlights: List<BookHighlight> = List()

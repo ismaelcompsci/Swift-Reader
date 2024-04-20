@@ -31,7 +31,7 @@ struct HomeView: View {
                 Image(systemName: "list.bullet")
             }
             .font(.system(size: 20))
-            .foregroundStyle(userPreferences.libraryDisplayMode == .list ? theme.tintColor : .white)
+            .foregroundStyle(userPreferences.libraryDisplayMode == .list ? theme.tintColor : .primary)
 
             Button {
                 userPreferences.libraryDisplayMode = .grid
@@ -40,7 +40,7 @@ struct HomeView: View {
                 Image(systemName: "square.grid.2x2")
             }
             .font(.system(size: 20))
-            .foregroundStyle(userPreferences.libraryDisplayMode == .grid ? theme.tintColor : .white)
+            .foregroundStyle(userPreferences.libraryDisplayMode == .grid ? theme.tintColor : .primary)
         }
     }
 
@@ -49,8 +49,6 @@ struct HomeView: View {
 
         ScrollView {
             LazyVStack(alignment: .leading, pinnedViews: [.sectionHeaders]) {
-                // TODO: VIEW FOR STUFF
-
                 Section {
                     if books.count == 0 {
                         // MARK: EMPTY VIEW
@@ -97,7 +95,6 @@ struct HomeView: View {
                     }
                     .padding(.top, 8)
                     .padding(.vertical, 4)
-                    .background(.black)
                 }
             }
         }

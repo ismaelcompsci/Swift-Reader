@@ -39,7 +39,6 @@ struct ReadApp: App {
                 .environment(userPreferences)
                 .environment(toaster)
                 .environment(navigator)
-                .preferredColorScheme(.dark)
                 .environment(\.font, Font.custom("Poppins-Regular", size: 16))
                 .applyTheme(theme)
         }

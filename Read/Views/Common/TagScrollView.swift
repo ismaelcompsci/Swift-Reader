@@ -22,11 +22,16 @@ struct TagItem: View {
             .lineLimit(1)
             .padding(.vertical, small ? 3 : 4)
             .padding(.horizontal, small ? 6 : 12)
-            .background(
+            .background(Color(uiColor: .secondarySystemFill))
+            .clipShape(.rect(cornerRadius: 13))
+            .overlay(
                 RoundedRectangle(cornerRadius: 13)
-                    .fill(.thinMaterial)
+                    .stroke(Color(
+                        uiColor: .tertiarySystemFill
+                    ), lineWidth: 1)
             )
             .padding(2)
+            .padding(.vertical, 4)
     }
 }
 
@@ -48,6 +53,6 @@ struct TagScrollView: View {
 #Preview {
     VStack {
         TagScrollView(tags: ["Fantasy", "Grim", "Dark", "Medival"])
-            .preferredColorScheme(.light)
     }
+    .background(Color(uiColor: .secondarySystemBackground))
 }

@@ -57,6 +57,7 @@ struct BookGridItem: View {
         .clipShape(
             RoundedRectangle(cornerRadius: 4)
         )
+        .shadow(radius: 6, x: 0, y: 12)
     }
 
     var footer: some View {
@@ -138,8 +139,9 @@ struct BookGridItem: View {
             .fontWeight(.semibold)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Color.indigo)
+            .background(.indigo)
             .clipShape(.rect(cornerRadius: 8))
+            .foregroundStyle(.white)
     }
 }
 

@@ -150,7 +150,6 @@ struct ContentView: View {
         .tint(theme.tintColor)
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .blendMode(.colorDodge)
         .background(.ultraThinMaterial)
     }
 }

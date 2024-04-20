@@ -32,7 +32,7 @@ struct SRFromInput: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color.backgroundSecondary)
+        .background(.bar)
         .clipShape(.rect(cornerRadius: 12))
         .onTapGesture {
             focus.toggle()
@@ -41,10 +41,17 @@ struct SRFromInput: View {
 }
 
 #Preview {
-    SRFromInput(
-        text: .constant("HELLO"),
-        inputTitle: "Test",
-        axis: .horizontal
-    )
-    .preferredColorScheme(.dark)
+    VStack(spacing: 12) {
+        SRFromInput(
+            text: .constant("HELLO"),
+            inputTitle: "Test",
+            axis: .horizontal
+        )
+
+        SRFromInput(
+            text: .constant("HELLO"),
+            inputTitle: "Test",
+            axis: .vertical
+        )
+    }
 }

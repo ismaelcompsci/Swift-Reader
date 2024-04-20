@@ -32,8 +32,8 @@ class SourceManager {
         self.modelContext = modelContext
 
         let dbSources = try? self.modelContext.fetch(Source.all)
-
-        if let dbSources {
+        Log("Loaded \(dbSources?.count ?? 0) sources from database.")
+        if let dbSources = dbSources {
             sources.append(contentsOf: dbSources)
         }
 
@@ -42,7 +42,7 @@ class SourceManager {
 
         for source in sources {
             let ext = SourceManager.createExtension(from: source)
-            extensions[source.id] = ext
+            extensions.updateValue(ext, forKey: source.id)
         }
     }
 
@@ -88,7 +88,7 @@ class SourceManager {
             let payload = tmpDir
             let source = try? Source(url: payload)
 
-            if let source {
+            if let source = source {
                 let destination = Self.directory.appending(path: source.id)
 
                 source.url = destination
@@ -107,8 +107,9 @@ class SourceManager {
 
                 sources.append(source)
                 let ext = SourceManager.createExtension(from: source)
-                extensions[source.id] = ext
+                extensions.updateValue(ext, forKey: source.id)
 
+                try? modelContext.save()
                 return source
             }
 

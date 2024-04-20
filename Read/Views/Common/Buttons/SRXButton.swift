@@ -29,6 +29,13 @@ struct SRXButton: View {
 }
 
 #Preview {
-    SRXButton()
-        .preferredColorScheme(.dark)
+    VStack {
+        SRXButton()
+        SRXButton()
+        SRXButton()
+    }
+    .padding()
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+//    .blendMode(.colorDodge)
+    .background(.ultraThinMaterial)
 }

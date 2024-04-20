@@ -232,7 +232,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
 }
 
 extension DownloadManager {
-    static let downloadsPath = URL.documentsDirectory.appending(path: "Downloads")
+    public static let downloadsPath = URL.documentsDirectory.appending(path: "Downloads")
 
     func moveFileToDownloadsFolder(at location: URL, download: Download, recommendedName: String?) -> URL {
         try? FileManager.default.createDirectory(at: Self.downloadsPath, withIntermediateDirectories: false)

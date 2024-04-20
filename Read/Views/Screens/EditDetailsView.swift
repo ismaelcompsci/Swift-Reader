@@ -44,6 +44,7 @@ struct EditDetailsView: View {
                     
                     Spacer()
                 }
+                .contentMargins(12, for: .scrollContent)
                 
                 HStack {
                     SRButton(text: "Save") {
@@ -94,14 +95,14 @@ struct EditDetailsView: View {
                     .background(theme.tintColor.opacity(0.15))
                     .clipShape(.rect(cornerRadius: 10))
                 }
-                
-                .padding()
             }
+            .padding(.horizontal)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Text("Edit your book")
                 }
-
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     SRXButton {
                         dismiss()
@@ -113,7 +114,12 @@ struct EditDetailsView: View {
 }
 
 #Preview {
-    EditDetailsView(book: .example1)
-        .preferredColorScheme(.dark)
-        .environment(\.font, Font.custom("Poppins-Regular", size: 16))
+    NavigationStack {
+        VStack {}
+            .sheet(isPresented: .constant(true), onDismiss: nil) {
+                EditDetailsView(book: .example1)
+                    .environment(\.font, Font.custom("Poppins-Regular", size: 16))
+                    .environment(AppTheme.shared)
+            }
+    }
 }

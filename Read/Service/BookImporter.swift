@@ -77,7 +77,7 @@ class BookImporter {
             bookCover: coverPath
         )
 
-        addBook(with: metadata)
+        addBook(with: metadata, fromSource: true)
     }
 
     func process(for file: URL) async throws {
@@ -96,10 +96,10 @@ class BookImporter {
             throw BookImporterError.failedToGetMetadata
         }
 
-        addBook(with: metadata)
+        addBook(with: metadata, fromSource: false)
     }
 
-    private func addBook(with metadata: BookMetadata) {
+    private func addBook(with metadata: BookMetadata, fromSource: Bool) {
         let realm = try! Realm()
 
         try! realm.write {
@@ -108,6 +108,7 @@ class BookImporter {
             newBook.summary = metadata.description ?? ""
             newBook.coverPath = metadata.bookCover
             newBook.bookPath = metadata.bookPath
+            newBook.bookFromSource = fromSource
 
             _ = metadata.subject?.map { item in
                 let newTag = Tag()
@@ -122,8 +123,6 @@ class BookImporter {
                     newBook.authors.append(newAuthor)
                 }
             }
-
-            newBook.processed = true
 
             $books.append(newBook)
         }

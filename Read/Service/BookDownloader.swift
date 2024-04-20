@@ -14,14 +14,11 @@ public class BookDownloader {
     public static let shared = BookDownloader()
     var manager = DownloadManager()
 
-    @ObservationIgnored
-    private var subscriptions = Set<AnyCancellable>()
-
     var queue = [Download]()
     var bookInfo = [Download.ID: BookInfo]()
 
-    // TODO: keep data of downloaded books
-    //
+    @ObservationIgnored
+    private var subscriptions = Set<AnyCancellable>()
 
     func download(with id: String, for url: URL) {
         let download = Download(id: id, url: url, progress: .init())
@@ -82,9 +79,7 @@ extension BookDownloader {
         let info = bookInfo[download.id]
         let bookTitle = "\(info?.title ?? "book")"
 
-        bookInfo.removeValue(forKey: download.id)
-
-        print("DOWNLOAD FINISHDED: \(info?.title ?? download.id)")
+        Log("DOWNLOAD FINISHDED: \(info?.title ?? download.id)")
 
         Task {
             if download.status != .finished { return }
@@ -101,10 +96,29 @@ extension BookDownloader {
                     message: "Added \(bookTitle) to library.",
                     type: .message
                 )
+
+                cancel(download)
+                queue.removeAll(where: { $0.id == download.id })
+                bookInfo.removeValue(forKey: download.id)
             } catch {
                 Log("Failed to import book: \(error.localizedDescription)")
                 Toaster.shared.presentToast(message: "Failed to add \(bookTitle) to library", type: .error)
             }
         }
+    }
+}
+
+extension BookDownloader {
+    static func clearDownloadFolder() {
+        let downloadFolderPath = DownloadManager.downloadsPath
+
+        try? FileManager.default.removeItem(at: downloadFolderPath)
+        try? FileManager.default.createDirectory(at: downloadFolderPath, withIntermediateDirectories: true)
+    }
+
+    static func getDownloadFolderSize() -> UInt64 {
+        let downloadFolderPath = DownloadManager.downloadsPath
+
+        return FileManager.default.allocatedSizeOfDirectory(at: downloadFolderPath)
     }
 }

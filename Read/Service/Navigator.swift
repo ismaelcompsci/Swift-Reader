@@ -10,6 +10,7 @@ import SwiftUI
 
 public enum NavigatorDestination: Hashable {
     case localDetails(book: Book)
+    case downloadManager
 
     case sourceSearch(search: String)
     case source(sourceUrl: URL)
@@ -34,6 +35,8 @@ public enum NavigatorDestination: Hashable {
             "sourcePagedViewMoreItems"
         case .sourceSearchPagedResults(searchRequest: _, sourceId: _):
             "sourceSearchPagedResults"
+        case .downloadManager:
+            "downloadManager"
         }
     }
 }
@@ -75,6 +78,8 @@ extension View {
                 PagedViewMoreItems(sourceId: sourceId, viewMoreId: viewMoreId)
             case .sourceSearchPagedResults(searchRequest: let searchRequest, sourceId: let sourceId):
                 SourcesSearchPagedResultsView(searchRequest: searchRequest, sourceId: sourceId)
+            case .downloadManager:
+                DownloadManagerView()
             }
         }
     }

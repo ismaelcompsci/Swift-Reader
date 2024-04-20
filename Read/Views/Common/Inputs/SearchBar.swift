@@ -33,7 +33,7 @@ struct SearchBar: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color.backgroundSecondary)
+        .background(.bar)
         .clipShape(.capsule)
     }
 }

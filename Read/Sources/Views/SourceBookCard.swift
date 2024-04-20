@@ -74,6 +74,10 @@ struct SourceBookCard: View {
                 Button("Search for book") {
                     navigator.navigate(to: .sourceSearch(search: book.title))
                 }
+
+                Button("Search for author") {
+                    navigator.navigate(to: .sourceSearch(search: book.author ?? "Unknown Author"))
+                }
             }
         }
     }

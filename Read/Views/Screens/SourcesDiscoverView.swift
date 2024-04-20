@@ -45,7 +45,6 @@ struct SourcesDiscoverView: View {
                         }
                     }
                 }
-
                 .onChange(of: selected) { oldValue, newValue in
                     previousSelected = oldValue
                     selected = newValue
@@ -69,6 +68,7 @@ struct SourcesDiscoverView: View {
                                                  )
                                          })
                 )
+                .ignoresSafeArea(.all, edges: .bottom)
             }
         }
         .navigationTitle("Discover")

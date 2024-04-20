@@ -74,6 +74,7 @@
 		9FB84A642B9D6681005D7915 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9FB84A632B9D6681005D7915 /* NukeUI */; };
 		9FB84A662B9D6681005D7915 /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = 9FB84A652B9D6681005D7915 /* NukeVideo */; };
 		9FBBE6E42BCDCA69004B1A85 /* ThemeApplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBBE6E32BCDCA69004B1A85 /* ThemeApplier.swift */; };
+		9FBBE6E62BCDE484004B1A85 /* DownloadManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBBE6E52BCDE484004B1A85 /* DownloadManagerView.swift */; };
 		9FBC726C2B9EA17D0054A7B0 /* SRFromInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726B2B9EA17D0054A7B0 /* SRFromInput.swift */; };
 		9FBC726E2B9EA1920054A7B0 /* AdaptiveStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */; };
 		9FBC72702B9EA5B70054A7B0 /* SRButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726F2B9EA5B70054A7B0 /* SRButton.swift */; };
@@ -121,6 +122,9 @@
 		9FEEF7DC2BBD2C080079ECDB /* SwiftReader in Frameworks */ = {isa = PBXBuildFile; productRef = 9FEEF7DB2BBD2C080079ECDB /* SwiftReader */; };
 		9FF92A8D2B788C9400025405 /* PieProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF92A8C2B788C9400025405 /* PieProgress.swift */; };
 		9FF989B82BCA430000B6CF97 /* Reader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989B72BCA430000B6CF97 /* Reader.swift */; };
+		9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */; };
+		9FFFBC9F2BD1F7A20019E6DD /* ThemeColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */; };
+		9FFFBCA22BD1FD0E0019E6DD /* FileList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -184,6 +188,7 @@
 		9FB77EB12BCCE38500D37521 /* list.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = list.PNG; sourceTree = "<group>"; };
 		9FB77EB22BCCE38500D37521 /* grid.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grid.PNG; sourceTree = "<group>"; };
 		9FBBE6E32BCDCA69004B1A85 /* ThemeApplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeApplier.swift; sourceTree = "<group>"; };
+		9FBBE6E52BCDE484004B1A85 /* DownloadManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerView.swift; sourceTree = "<group>"; };
 		9FBC726B2B9EA17D0054A7B0 /* SRFromInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRFromInput.swift; sourceTree = "<group>"; };
 		9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveStack.swift; sourceTree = "<group>"; };
 		9FBC726F2B9EA5B70054A7B0 /* SRButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRButton.swift; sourceTree = "<group>"; };
@@ -230,6 +235,9 @@
 		9FE38F012B7DCDC9005A446A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FF92A8C2B788C9400025405 /* PieProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieProgress.swift; sourceTree = "<group>"; };
 		9FF989B72BCA430000B6CF97 /* Reader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reader.swift; sourceTree = "<group>"; };
+		9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Filemanger+Ext.swift"; sourceTree = "<group>"; };
+		9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColorPicker.swift; sourceTree = "<group>"; };
+		9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +299,7 @@
 			children = (
 				9FBC726F2B9EA5B70054A7B0 /* SRButton.swift */,
 				9F3E18BD2BA43353009DDE05 /* SRXButton.swift */,
+				9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -314,6 +323,7 @@
 				9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */,
 				9F8F9CE72BB631060081C57F /* SourcesDiscoverView.swift */,
 				9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */,
+				9FBBE6E52BCDE484004B1A85 /* DownloadManagerView.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -324,7 +334,6 @@
 				9F1C69EA2BC6037D002D6AF4 /* Inputs */,
 				9F1C69E92BC60371002D6AF4 /* Buttons */,
 				9F1C69E82BC60364002D6AF4 /* Covers */,
-				9F5AADF02B82CB5E00712230 /* Home */,
 				9FF92A8C2B788C9400025405 /* PieProgress.swift */,
 				9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */,
 				9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */,
@@ -400,6 +409,7 @@
 				9F4602B32BA65A9000E15D0C /* UIImage+Quality.swift */,
 				9FC596582B86A56A00ED3734 /* Font+Poppins.swift */,
 				9F9205D92BA275D7000AED7D /* Color+Codable.swift */,
+				9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -407,6 +417,7 @@
 		9F608E902B65E27B00D2B5F4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9FFFBCA02BD1FD000019E6DD /* Components */,
 				9F1C69EB2BC6048B002D6AF4 /* Screens */,
 				9F5954B02B6DD101009FC2F1 /* Common */,
 				9FCFBE202B9D84D800BD9E3D /* Reader */,
@@ -557,6 +568,15 @@
 				9FE3243F2B85D30E003E61F6 /* reader.PNG */,
 			);
 			path = Screenshots;
+			sourceTree = "<group>";
+		};
+		9FFFBCA02BD1FD000019E6DD /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				9F5AADF02B82CB5E00712230 /* Home */,
+				9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -735,6 +755,7 @@
 				9FD119C12BBA41B500AB097D /* SourceBookImage.swift in Sources */,
 				9FD119BF2BBA418800AB097D /* SourceBookCard.swift in Sources */,
 				9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */,
+				9FFFBCA22BD1FD0E0019E6DD /* FileList.swift in Sources */,
 				9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */,
 				9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */,
 				9FD8088C2B983F790007D8F6 /* EBookView.swift in Sources */,
@@ -745,6 +766,7 @@
 				9FD8088A2B982CE40007D8F6 /* ReaderContent.swift in Sources */,
 				9F8F9CD92BB508900081C57F /* PagedResults.swift in Sources */,
 				9F1C69F02BC622F1002D6AF4 /* Toaster.swift in Sources */,
+				9FFFBC9F2BD1F7A20019E6DD /* ThemeColorPicker.swift in Sources */,
 				9FD808862B981E020007D8F6 /* ReaderSettings.swift in Sources */,
 				9F4602B42BA65A9000E15D0C /* UIImage+Quality.swift in Sources */,
 				9FD119C52BBA44EB00AB097D /* SourceBookDetailsView.swift in Sources */,
@@ -757,6 +779,7 @@
 				9F5AADF22B82CB6D00712230 /* BookGrid.swift in Sources */,
 				9F8F9CC42BB4FF9A0081C57F /* Source.swift in Sources */,
 				9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */,
+				9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */,
 				9F8F9CBF2BB4FF340081C57F /* SourceManager.swift in Sources */,
 				9F115F3F2BC4E0F0006C74F3 /* UserPreferences.swift in Sources */,
 				9F8F9CD32BB508570081C57F /* BookInfo.swift in Sources */,
@@ -771,6 +794,7 @@
 				9F86C52B2B89B24300DB61A6 /* BookCover.swift in Sources */,
 				9F0EA4592B89773900B7B009 /* ReadApp.swift in Sources */,
 				9F86C52D2B89B3F300DB61A6 /* SearchBar.swift in Sources */,
+				9FBBE6E62BCDE484004B1A85 /* DownloadManagerView.swift in Sources */,
 				9F8F9CCD2BB508100081C57F /* Request.swift in Sources */,
 				9F608E922B65E29000D2B5F4 /* UploadFileView.swift in Sources */,
 				9F5AADF42B82CB9D00712230 /* BookList.swift in Sources */,

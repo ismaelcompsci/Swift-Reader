@@ -51,7 +51,6 @@ struct SourceExtensionView: View {
                             id: section.id,
                             isLoading: section.isLoading
                         )
-//                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
                 }
 
@@ -63,6 +62,7 @@ struct SourceExtensionView: View {
                 )
             }
         }
+        .contentMargins(.bottom, 24, for: .scrollContent)
         .task {
             await getHomePageSections()
         }

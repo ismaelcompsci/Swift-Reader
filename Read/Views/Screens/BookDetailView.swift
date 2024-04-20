@@ -12,8 +12,13 @@ struct BookDetailView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
     @Environment(\.dismiss) var dismiss
     @Environment(AppTheme.self) var theme
+    @Environment(\.colorScheme) var colorScheme
     
     var book: Book
+    
+    var bgColor: Color {
+        colorScheme == .light ? .white : .black
+    }
     
     var isPDF: Bool {
         book.bookPath?.hasSuffix(".pdf") ?? false
@@ -131,10 +136,10 @@ struct BookDetailView: View {
                             gradient: Gradient(
                                 colors: [
                                     Color.clear,
-                                    Color.black.opacity(0.30),
-                                    Color.black.opacity(0.60),
-                                    Color.black,
-                                    Color.black
+                                    bgColor.opacity(0.30),
+                                    bgColor.opacity(0.60),
+                                    bgColor,
+                                    bgColor
                                 ]
                             ),
                             startPoint: .top,
@@ -157,7 +162,7 @@ struct BookDetailView: View {
         }
         .scrollIndicators(.hidden)
         .ignoresSafeArea(.container, edges: .top)
-        .toolbarBackground(Color.black.opacity(0.5))
+        .toolbarBackground(bgColor.opacity(0.2))
         .onAppear {
             setHeaderImage()
         }
@@ -177,7 +182,7 @@ struct BookDetailView: View {
         
         if combinedHeight < viewHeight {
             Rectangle()
-                .fill(.black)
+                .fill(bgColor)
                 .frame(width: proxy.size.width, height: padViewHeight)
         }
     }
@@ -208,7 +213,7 @@ struct BookDetailView: View {
                 
                 Spacer()
             }
-            .background(.black)
+            .background(bgColor)
         }
     }
     
@@ -224,6 +229,8 @@ struct BookDetailView: View {
                         .foregroundStyle(theme.tintColor)
                     
                     Text(book.authors.first?.name ?? "Unknown Author")
+                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
                 }
                 .font(.subheadline)
             }
@@ -245,6 +252,5 @@ struct BookDetailView: View {
 
 #Preview {
     BookDetailView(book: .shortExample)
-        .preferredColorScheme(.dark)
         .environment(AppTheme.shared)
 }
