@@ -101,7 +101,7 @@ struct SourceDownloadButton: View {
                 .background(.thickMaterial)
                 .clipShape(.rect(cornerRadius: 10))
                 .transition(.move(edge: .trailing).combined(with: .opacity))
-                .tint(.white)
+                .tint(.primary)
             }
 
             Menu {
@@ -132,7 +132,7 @@ struct SourceDownloadButton: View {
                     .clipShape(.rect(cornerRadius: 10))
             }
             .disabled(!downloadable || download?.status == .downloading)
-            .tint(.white)
+            .tint(.primary)
         }
         .task {
             download = bookDownloader.queue.first(where: { $0.id == book.id })

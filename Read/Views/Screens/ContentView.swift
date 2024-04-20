@@ -46,7 +46,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .toolbarBackground(.black, for: .navigationBar)
+            .toolbarBackground(.background, for: .navigationBar)
         }
         .simpleToast(
             isPresented: $toaster.showToast,
