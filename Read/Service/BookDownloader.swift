@@ -8,14 +8,16 @@
 import Combine
 import DownloadManager
 import Foundation
+import UIKit
 
 @Observable
 public class BookDownloader {
     public static let shared = BookDownloader()
-    var manager = DownloadManager()
+    var manager: DownloadManager
 
     var queue = [Download]()
     var bookInfo = [Download.ID: BookInfo]()
+    private var resumeData = [Download.ID: Data]()
 
     @ObservationIgnored
     private var subscriptions = Set<AnyCancellable>()
@@ -38,10 +40,17 @@ public class BookDownloader {
         manager.remove(download)
     }
 
+    func resumeDataForDownload(_ download: Download) -> Data? {
+        return resumeData.removeValue(forKey: download.id)
+    }
+
     init() {
+        manager = DownloadManager()
+        manager.resumeDataForDownload = resumeDataForDownload
+
         manager.onQueueDidChange.sink { [weak self] downloads in
             guard let self = self else { return }
-
+            Log("DownloadManger queue did change")
             self.queue = downloads
         }
         .store(in: &subscriptions)
@@ -52,7 +61,9 @@ public class BookDownloader {
         }
         .store(in: &subscriptions)
 
-        manager.onDidCancelWithResumeData.sink { [weak self] download, _ in
+        manager.onDidCancelWithResumeData.sink { [weak self] download, data in
+            guard let self = self else { return }
+
             switch download.status {
                 case .failed(let error):
                     Toaster.shared.presentToast(
@@ -60,15 +71,32 @@ public class BookDownloader {
                         type: .error
                     )
 
-                    self?.cancel(download)
+                    self.cancel(download)
 
                 default:
                     break
             }
+
+            if let data = data {
+                self.resumeData.updateValue(data, forKey: download.id)
+            }
         }
         .store(in: &subscriptions)
 
+        #if DEBUG
+        manager.maxConcurrentDownloads = 1
+        #else
         manager.maxConcurrentDownloads = 3
+        #endif
+
+        NotificationCenter.default.publisher(
+            for: UIApplication.didReceiveMemoryWarningNotification
+        )
+        .sink { [weak self] _ in
+            guard let self = self else { return }
+            self.resumeData.removeAll()
+        }
+        .store(in: &subscriptions)
     }
 }
 

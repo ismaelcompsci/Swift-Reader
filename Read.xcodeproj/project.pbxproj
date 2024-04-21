@@ -336,7 +336,6 @@
 				9F1C69E82BC60364002D6AF4 /* Covers */,
 				9FF92A8C2B788C9400025405 /* PieProgress.swift */,
 				9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */,
-				9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */,
 				9F075A782BA501580017BFAF /* RefrenceLibrary.swift */,
 				9F6B4EBE2BC5D96C00334C21 /* TagScrollView.swift */,
 				9FC1FBB72BC5E90900CA9288 /* MoreText.swift */,
@@ -573,8 +572,9 @@
 		9FFFBCA02BD1FD000019E6DD /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				9F5AADF02B82CB5E00712230 /* Home */,
+				9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */,
 				9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */,
+				9F5AADF02B82CB5E00712230 /* Home */,
 			);
 			path = Components;
 			sourceTree = "<group>";

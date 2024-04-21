@@ -41,7 +41,7 @@ public class DownloadManager: NSObject {
     @ObservationIgnored
     private var downloadStatusChangedObservation: NSObjectProtocol?
 
-    var resumeDataForDownload: ((Download) -> Data?)?
+    public var resumeDataForDownload: ((Download) -> Data?)?
 
     public init(
         resumeDataForDownload: ((Download) -> Data?)? = nil
