@@ -41,26 +41,11 @@ struct BookGrid: View {
                     BookGridItem(book: book) { event in
                         switch event {
                         case .onDelete:
-                            let thawedBook = book.thaw()
-
-                            if let thawedBook, let bookRealm = thawedBook.realm {
-                                try! bookRealm.write {
-                                    bookRealm.delete(thawedBook)
-                                }
-
-                                BookRemover.removeBook(book: book)
-                            }
+                            BookManager.shared.delete(book)
                         case .onClearProgress:
-                            let thawedBook = book.thaw()
-                            try! realm.write {
-                                if thawedBook?.readingPosition != nil {
-                                    thawedBook?.readingPosition = nil
-                                }
-                            }
-
+                            book.removeReadingPosition()
                         case .onEdit:
                             selectedBook = book
-
                         case .onNavigate:
                             navigator.navigate(to: .localDetails(book: book))
                         }

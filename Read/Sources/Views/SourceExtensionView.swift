@@ -62,7 +62,7 @@ struct SourceExtensionView: View {
                 )
             }
         }
-        .contentMargins(.bottom, 24, for: .scrollContent)
+        .contentMargins(.vertical, 24, for: .scrollContent)
         .task {
             await getHomePageSections()
         }

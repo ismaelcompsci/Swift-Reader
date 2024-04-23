@@ -114,10 +114,10 @@ extension BookDownloader {
 
             do {
                 if let info = info {
-                    try await BookImporter.shared.process(for: location, with: info)
+                    try await BookManager.shared.process(for: location, with: info)
 
                 } else {
-                    try await BookImporter.shared.process(for: location)
+                    try await BookManager.shared.process(for: location)
                 }
 
                 Toaster.shared.presentToast(

@@ -21,9 +21,8 @@
 		9F3817AA2BC0D5B700480A56 /* BookListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3817A92BC0D5B700480A56 /* BookListItem.swift */; };
 		9F3E18BC2BA40E85009DDE05 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */; };
 		9F3E18BE2BA43353009DDE05 /* SRXButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3E18BD2BA43353009DDE05 /* SRXButton.swift */; };
-		9F44F4442BC3B5C500E63461 /* BookImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F44F4432BC3B5C500E63461 /* BookImporter.swift */; };
+		9F44F4442BC3B5C500E63461 /* BookManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F44F4432BC3B5C500E63461 /* BookManager.swift */; };
 		9F4602B42BA65A9000E15D0C /* UIImage+Quality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4602B32BA65A9000E15D0C /* UIImage+Quality.swift */; };
-		9F4A786E2B7832AD007B70B1 /* BookRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4A786D2B7832AD007B70B1 /* BookRemover.swift */; };
 		9F4DEB262B69ECB80046B76C /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 9F4DEB252B69ECB80046B76C /* WrappingHStack */; };
 		9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */; };
 		9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954B12B6DD11C009FC2F1 /* LibrarySortPopover.swift */; };
@@ -65,6 +64,8 @@
 		9F9205DA2BA275D7000AED7D /* Color+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9205D92BA275D7000AED7D /* Color+Codable.swift */; };
 		9FA360282BBE1E3B00499A4C /* BookDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA360272BBE1E3B00499A4C /* BookDownloader.swift */; };
 		9FA3602C2BBE22D800499A4C /* SourceDownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA3602B2BBE22D800499A4C /* SourceDownloadButton.swift */; };
+		9FA730272BD71DE6003294B8 /* ScrollableTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */; };
+		9FA7302A2BD73405003294B8 /* RectPrefrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA730292BD73405003294B8 /* RectPrefrence.swift */; };
 		9FB62D832B8D841F00A10EF5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB62D822B8D841F00A10EF5 /* SettingsView.swift */; };
 		9FB77EB32BCCE38500D37521 /* search.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FB77EB02BCCE38500D37521 /* search.PNG */; };
 		9FB77EB42BCCE38500D37521 /* list.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FB77EB12BCCE38500D37521 /* list.PNG */; };
@@ -101,7 +102,6 @@
 		9FC596572B86A30800ED3734 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FC596442B86A30800ED3734 /* Poppins-MediumItalic.ttf */; };
 		9FC596592B86A56A00ED3734 /* Font+Poppins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC596582B86A56A00ED3734 /* Font+Poppins.swift */; };
 		9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */; };
-		9FD119B62BBA2DE900AB097D /* PagerTabStripView in Frameworks */ = {isa = PBXBuildFile; productRef = 9FD119B52BBA2DE900AB097D /* PagerTabStripView */; };
 		9FD119B92BBA411A00AB097D /* SourceExtensionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD119B82BBA411A00AB097D /* SourceExtensionView.swift */; };
 		9FD119BD2BBA417600AB097D /* SourceSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD119BC2BBA417600AB097D /* SourceSectionView.swift */; };
 		9FD119BF2BBA418800AB097D /* SourceBookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD119BE2BBA418800AB097D /* SourceBookCard.swift */; };
@@ -141,9 +141,8 @@
 		9F3817A92BC0D5B700480A56 /* BookListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListItem.swift; sourceTree = "<group>"; };
 		9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
 		9F3E18BD2BA43353009DDE05 /* SRXButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRXButton.swift; sourceTree = "<group>"; };
-		9F44F4432BC3B5C500E63461 /* BookImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookImporter.swift; sourceTree = "<group>"; };
+		9F44F4432BC3B5C500E63461 /* BookManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookManager.swift; sourceTree = "<group>"; };
 		9F4602B32BA65A9000E15D0C /* UIImage+Quality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Quality.swift"; sourceTree = "<group>"; };
-		9F4A786D2B7832AD007B70B1 /* BookRemover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRemover.swift; sourceTree = "<group>"; };
 		9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9F5954B12B6DD11C009FC2F1 /* LibrarySortPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySortPopover.swift; sourceTree = "<group>"; };
 		9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
@@ -183,6 +182,8 @@
 		9F9205D92BA275D7000AED7D /* Color+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Codable.swift"; sourceTree = "<group>"; };
 		9FA360272BBE1E3B00499A4C /* BookDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDownloader.swift; sourceTree = "<group>"; };
 		9FA3602B2BBE22D800499A4C /* SourceDownloadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceDownloadButton.swift; sourceTree = "<group>"; };
+		9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTabBar.swift; sourceTree = "<group>"; };
+		9FA730292BD73405003294B8 /* RectPrefrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectPrefrence.swift; sourceTree = "<group>"; };
 		9FB62D822B8D841F00A10EF5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9FB77EB02BCCE38500D37521 /* search.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.PNG; sourceTree = "<group>"; };
 		9FB77EB12BCCE38500D37521 /* list.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = list.PNG; sourceTree = "<group>"; };
@@ -248,7 +249,6 @@
 				9F8F9CC22BB4FF880081C57F /* ZIPFoundation in Frameworks */,
 				9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */,
 				9F1C69F32BC634A4002D6AF4 /* DownloadManager in Frameworks */,
-				9FD119B62BBA2DE900AB097D /* PagerTabStripView in Frameworks */,
 				9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */,
 				9FB84A602B9D6681005D7915 /* Nuke in Frameworks */,
 				9F4DEB262B69ECB80046B76C /* WrappingHStack in Frameworks */,
@@ -275,8 +275,7 @@
 			children = (
 				9FBC72742B9EA6C60054A7B0 /* AppTheme.swift */,
 				9FA360272BBE1E3B00499A4C /* BookDownloader.swift */,
-				9F44F4432BC3B5C500E63461 /* BookImporter.swift */,
-				9F4A786D2B7832AD007B70B1 /* BookRemover.swift */,
+				9F44F4432BC3B5C500E63461 /* BookManager.swift */,
 				9F2CF0B82BCB708800E36801 /* Navigator.swift */,
 				9F1C69EF2BC622F1002D6AF4 /* Toaster.swift */,
 				9F115F3E2BC4E0F0006C74F3 /* UserPreferences.swift */,
@@ -485,6 +484,15 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		9FA730282BD733E2003294B8 /* ScrollableTabBar */ = {
+			isa = PBXGroup;
+			children = (
+				9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */,
+				9FA730292BD73405003294B8 /* RectPrefrence.swift */,
+			);
+			path = ScrollableTabBar;
+			sourceTree = "<group>";
+		};
 		9FC596062B86A06A00ED3734 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -572,6 +580,7 @@
 		9FFFBCA02BD1FD000019E6DD /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				9FA730282BD733E2003294B8 /* ScrollableTabBar */,
 				9F3E18BB2BA40E85009DDE05 /* SideMenu.swift */,
 				9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */,
 				9F5AADF02B82CB5E00712230 /* Home */,
@@ -604,7 +613,6 @@
 				9FB84A632B9D6681005D7915 /* NukeUI */,
 				9FB84A652B9D6681005D7915 /* NukeVideo */,
 				9F8F9CC12BB4FF880081C57F /* ZIPFoundation */,
-				9FD119B52BBA2DE900AB097D /* PagerTabStripView */,
 				9FEEF7DB2BBD2C080079ECDB /* SwiftReader */,
 				9F1C69ED2BC62169002D6AF4 /* SimpleToast */,
 				9F1C69F22BC634A4002D6AF4 /* DownloadManager */,
@@ -673,7 +681,6 @@
 				9F4DEB242B69ECB80046B76C /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 				9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */,
 				9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				9FD119B42BBA2DE900AB097D /* XCRemoteSwiftPackageReference "PagerTabStripView" */,
 				9F1C69EC2BC62169002D6AF4 /* XCRemoteSwiftPackageReference "SimpleToast" */,
 			);
 			productRefGroup = 9F608E7D2B65D05B00D2B5F4 /* Products */;
@@ -743,13 +750,14 @@
 				9FD119C72BBA590800AB097D /* SourceSearch.swift in Sources */,
 				9FD808802B9814540007D8F6 /* PDF.swift in Sources */,
 				9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */,
+				9FA7302A2BD73405003294B8 /* RectPrefrence.swift in Sources */,
 				9F3E18BC2BA40E85009DDE05 /* SideMenu.swift in Sources */,
 				9F8F9CE62BB52C2A0081C57F /* View+If.swift in Sources */,
 				9F8F9CE12BB5096B0081C57F /* JSError.swift in Sources */,
 				9F8F9CC92BB507C20081C57F /* App.swift in Sources */,
 				9FBC72702B9EA5B70054A7B0 /* SRButton.swift in Sources */,
 				9FBC726C2B9EA17D0054A7B0 /* SRFromInput.swift in Sources */,
-				9F44F4442BC3B5C500E63461 /* BookImporter.swift in Sources */,
+				9F44F4442BC3B5C500E63461 /* BookManager.swift in Sources */,
 				9F8F9CCB2BB507E50081C57F /* RequestManager.swift in Sources */,
 				9F075A792BA501580017BFAF /* RefrenceLibrary.swift in Sources */,
 				9FD119C12BBA41B500AB097D /* SourceBookImage.swift in Sources */,
@@ -771,7 +779,6 @@
 				9F4602B42BA65A9000E15D0C /* UIImage+Quality.swift in Sources */,
 				9FD119C52BBA44EB00AB097D /* SourceBookDetailsView.swift in Sources */,
 				9F8F9CCF2BB508280081C57F /* Response.swift in Sources */,
-				9F4A786E2B7832AD007B70B1 /* BookRemover.swift in Sources */,
 				9F2CF0B92BCB708800E36801 /* Navigator.swift in Sources */,
 				9FA360282BBE1E3B00499A4C /* BookDownloader.swift in Sources */,
 				9FF989B82BCA430000B6CF97 /* Reader.swift in Sources */,
@@ -783,6 +790,7 @@
 				9F8F9CBF2BB4FF340081C57F /* SourceManager.swift in Sources */,
 				9F115F3F2BC4E0F0006C74F3 /* UserPreferences.swift in Sources */,
 				9F8F9CD32BB508570081C57F /* BookInfo.swift in Sources */,
+				9FA730272BD71DE6003294B8 /* ScrollableTabBar.swift in Sources */,
 				9F8F9CD72BB5087D0081C57F /* PartialSourceBook.swift in Sources */,
 				9FBC72752B9EA6C60054A7B0 /* AppTheme.swift in Sources */,
 				9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */,
@@ -1063,14 +1071,6 @@
 				minimumVersion = 12.4.0;
 			};
 		};
-		9FD119B42BBA2DE900AB097D /* XCRemoteSwiftPackageReference "PagerTabStripView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/xmartlabs/PagerTabStripView.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1122,11 +1122,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeVideo;
-		};
-		9FD119B52BBA2DE900AB097D /* PagerTabStripView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9FD119B42BBA2DE900AB097D /* XCRemoteSwiftPackageReference "PagerTabStripView" */;
-			productName = PagerTabStripView;
 		};
 		9FEEF7DB2BBD2C080079ECDB /* SwiftReader */ = {
 			isa = XCSwiftPackageProductDependency;

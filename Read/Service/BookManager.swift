@@ -1,5 +1,5 @@
 //
-//  BookImporter.swift
+//  BookManager.swift
 //  Read
 //
 //  Created by Mirna Olvera on 4/8/24.
@@ -13,8 +13,8 @@ enum BookImporterError: String, Error {
     case failedToGetMetadata = "Failed to get metadata"
 }
 
-class BookImporter {
-    static let shared = BookImporter()
+class BookManager {
+    static let shared = BookManager()
     @ObservedResults(Book.self) var books
 
     private func downloadImage(with url: String) async -> URL? {
@@ -77,7 +77,7 @@ class BookImporter {
             bookCover: coverPath
         )
 
-        addBook(with: metadata, fromSource: true)
+        append(with: metadata, fromSource: true)
     }
 
     func process(for file: URL) async throws {
@@ -96,10 +96,12 @@ class BookImporter {
             throw BookImporterError.failedToGetMetadata
         }
 
-        addBook(with: metadata, fromSource: false)
+        append(with: metadata, fromSource: false)
     }
+}
 
-    private func addBook(with metadata: BookMetadata, fromSource: Bool) {
+extension BookManager {
+    func append(with metadata: BookMetadata, fromSource: Bool) {
         let realm = try! Realm()
 
         try! realm.write {
@@ -125,6 +127,36 @@ class BookImporter {
             }
 
             $books.append(newBook)
+        }
+    }
+
+    func delete(_ book: Book) {
+        let thawedBook = book.thaw()
+
+        if let thawedBook, let bookRealm = thawedBook.realm {
+            try! bookRealm.write {
+                bookRealm.delete(thawedBook)
+            }
+
+            removeBookFromDisk(book: book)
+        }
+    }
+}
+
+extension BookManager {
+    func removeBookFromDisk(book: Book) {
+        guard let bookPath = book.bookPath else {
+            print("Book has no path")
+            return
+        }
+
+        let fullBookPath = URL.documentsDirectory.appending(path: bookPath)
+        let directoryPath = fullBookPath.deletingLastPathComponent()
+
+        do {
+            try FileManager.default.removeItem(at: directoryPath)
+        } catch {
+            print("Failed to remove book \(error.localizedDescription)")
         }
     }
 }

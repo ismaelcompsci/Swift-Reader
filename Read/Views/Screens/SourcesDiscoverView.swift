@@ -13,8 +13,9 @@ import SwiftUI
 struct SourcesDiscoverView: View {
     @Environment(AppTheme.self) var theme
     @Environment(SourceManager.self) var sourceManager
-    @State private var selected = 0
-    @State private var previousSelected = 0
+
+    @State var tabs: [Tab] = []
+    @State var activeTab: Tab.ID = ""
 
     var body: some View {
         VStack {
@@ -26,53 +27,33 @@ struct SourcesDiscoverView: View {
                 )
 
             } else {
-                PagerTabStripView(swipeGestureEnabled: .constant(true), selection: $selected) {
-                    ForEach(sourceManager.sources.indices, id: \.self) { index in
-                        let source = sourceManager.sources[index]
+                if tabs.isEmpty == false && activeTab != "" {
+                    ScrollableTabBar(
+                        tabs: $tabs,
+                        activeTab: $activeTab
+                    ) { size in
+                        ForEach(sourceManager.sources) { source in
 
-                        Group {
-                            if selected == index || previousSelected == index {
-                                SourceExtensionView(source: source)
-                                    .transition(.opacity)
-                                    .animation(.easeInOut, value: selected == index)
-                            } else {
-                                ProgressView()
-                            }
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .pagerTabItem(tag: index) {
-                            Text("\(source.sourceInfo.name)")
+                            SourceExtensionView(source: source)
+                                .frame(width: size.width, height: size.height)
                         }
                     }
                 }
-                .onChange(of: selected) { oldValue, newValue in
-                    previousSelected = oldValue
-                    selected = newValue
-                }
-                .pagerTabStripViewStyle(
-                    .scrollableBarButton(tabItemSpacing: 15,
-                                         tabItemHeight: 42,
-                                         padding: .init(
-                                             top: 0,
-                                             leading: 8,
-                                             bottom: 0,
-                                             trailing: 0
-                                         ),
-                                         indicatorView: {
-                                             Rectangle()
-                                                 .fill(theme.tintColor)
-                                                 .cornerRadius(5)
-                                                 .shadow(
-                                                     color: .green,
-                                                     radius: 10
-                                                 )
-                                         })
-                )
-                .ignoresSafeArea(.all, edges: .bottom)
             }
         }
+        .ignoresSafeArea(.all, edges: .bottom)
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            tabs = sourceManager.sources.map {
+                Tab(
+                    id: $0.id,
+                    label: $0.sourceInfo.name
+                )
+            }
+
+            activeTab = tabs[0].id
+        }
     }
 }
 

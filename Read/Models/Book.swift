@@ -61,6 +61,20 @@ extension Book {
 }
 
 public extension Book {
+    func removeReadingPosition() {
+        guard let realm = realm?.thaw() else {
+            return
+        }
+
+        let thawedBook = self.thaw()
+
+        try! realm.write {
+            if thawedBook?.readingPosition != nil {
+                thawedBook?.readingPosition = nil
+            }
+        }
+    }
+
     func updateReadingPosition(page: PDFPage, document: PDFDocument) {
         guard let realm = realm?.thaw() else {
             return

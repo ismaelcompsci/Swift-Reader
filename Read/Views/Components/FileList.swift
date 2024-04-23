@@ -110,7 +110,7 @@ struct FileList: View {
 
             for url in filesToProcess {
                 do {
-                    try await BookImporter.shared.process(for: url)
+                    try await BookManager.shared.process(for: url)
                 } catch {
                     failedImports.append(url)
                 }
