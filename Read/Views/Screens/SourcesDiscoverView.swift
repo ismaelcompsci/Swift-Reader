@@ -51,7 +51,9 @@ struct SourcesDiscoverView: View {
                 )
             }
 
-            activeTab = tabs[0].id
+            if tabs.isEmpty == false {
+                activeTab = tabs[0].id
+            }
         }
     }
 }
