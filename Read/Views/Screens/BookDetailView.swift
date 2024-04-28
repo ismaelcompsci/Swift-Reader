@@ -228,7 +228,7 @@ struct BookDetailView: View {
                     Image(systemName: "person.fill")
                         .foregroundStyle(theme.tintColor)
                     
-                    Text(book.authors.first?.name ?? "Unknown Author")
+                    Text(book.authors.map { $0.name }.joined(separator: ", "))
                         .lineLimit(1)
                         .foregroundStyle(.secondary)
                 }

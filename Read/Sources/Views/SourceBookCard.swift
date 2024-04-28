@@ -65,6 +65,7 @@ struct SourceBookCard: View {
             maxHeight: .infinity,
             alignment: .bottom
         )
+        .background()
         .tint(.white)
         .contextMenu {
             let lastPath = navigator.path.last

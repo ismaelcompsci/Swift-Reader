@@ -14,10 +14,10 @@ class Author: EmbeddedObject {
     @Persisted var name: String = ""
 }
 
-class Tag: EmbeddedObject {
+class BookTag: EmbeddedObject {
     @Persisted var name: String = ""
 
-    static let example = Tag(value: ["name": "Fantasy"])
+    static let example = BookTag(value: ["name": "Fantasy"])
 }
 
 public class Book: Object, ObjectKeyIdentifiable {
@@ -25,7 +25,7 @@ public class Book: Object, ObjectKeyIdentifiable {
     @Persisted var title = ""
     @Persisted var authors: List<Author> = List()
     @Persisted var summary: String?
-    @Persisted var tags: List<Tag> = List()
+    @Persisted var tags: List<BookTag> = List()
     @Persisted var language: String?
     @Persisted var bookPath: String?
     @Persisted var coverPath: String?
@@ -189,7 +189,7 @@ extension Book {
     static let example1 = Book(value: ["title": "The Witcher", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. ", "language": "en"])
     static let example2 = Book(value: ["title": "The Game of Thrones", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff. But again", "language": "en"])
 
-    static let shortExample = Book(value: ["title": "The Game of Thrones", "authors": [Author.exampleAuthor], "language": "en", "tags": [Tag.example]])
+    static let shortExample = Book(value: ["title": "The Game of Thrones", "authors": [Author.exampleAuthor], "language": "en", "tags": [BookTag.example]])
 
     static let exampleArray = [Book.example1, Book.example2]
 }

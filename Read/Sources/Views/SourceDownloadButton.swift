@@ -6,7 +6,6 @@
 //
 
 import DownloadManager
-import SimpleToast
 import SwiftUI
 
 struct Butt: View {
@@ -67,7 +66,7 @@ struct SourceDownloadButton: View {
                             Text("paused")
                         case .finished:
                             Text("")
-                        case .failed(let error):
+                        case .failed:
                             Text("Failed")
                         case nil:
                             Text("Download")

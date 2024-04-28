@@ -18,6 +18,7 @@ public enum NavigatorDestination: Hashable {
     case sourceBookDetails(sourceId: String, item: PartialSourceBook)
     case sourcePagedViewMoreItems(sourceId: String, viewMoreId: String)
     case sourceSearchPagedResults(searchRequest: SearchRequest, sourceId: String)
+    case sourceExtensionDetails(sourceId: String)
 
     var id: String {
         switch self {
@@ -37,15 +38,30 @@ public enum NavigatorDestination: Hashable {
             "sourceSearchPagedResults"
         case .downloadManager:
             "downloadManager"
+        case .sourceExtensionDetails(sourceId: _):
+            "sourceDetails"
         }
     }
 }
 
-public enum SideMenuNavigation: String, Hashable {
+public enum SideMenuNavigation: String, Hashable, CaseIterable {
     case home = "Home"
-    case settings = "Settings"
     case discover = "Discover"
     case search = "Search"
+    case settings = "Settings"
+
+    var icon: String {
+        switch self {
+        case .home:
+            "house"
+        case .discover:
+            "shippingbox"
+        case .search:
+            "magnifyingglass"
+        case .settings:
+            "gear"
+        }
+    }
 }
 
 @Observable
@@ -80,6 +96,8 @@ extension View {
                 SourcesSearchPagedResultsView(searchRequest: searchRequest, sourceId: sourceId)
             case .downloadManager:
                 DownloadManagerView()
+            case .sourceExtensionDetails(sourceId: let sourceId):
+                SourceExtensionDetails(sourceId: sourceId)
             }
         }
     }

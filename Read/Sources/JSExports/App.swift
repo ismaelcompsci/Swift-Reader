@@ -10,16 +10,24 @@ import JavaScriptCore
 
 @objc protocol AppJSExport: JSExport {
     static func createRequest(_ request: NSDictionary) -> Request
-    static func createRequestManager(_ manager: NSDictionary) -> RequestManager
+    static func createRequestManager(_ manager: JSValue) -> RequestManager
     static func createBookInfo(_ bookInfo: NSDictionary) -> BookInfo
     static func createSourceBook(_ sourceBook: NSDictionary) -> SourceBook
     static func createPartialSourceBook(_ partialSourceBook: NSDictionary) -> PartialSourceBook
     static func createPagedResults(_ results: NSDictionary) -> PagedResults
     static func createHomeSection(_ results: NSDictionary) -> HomeSection
     static func createDownloadInfo(_ results: NSDictionary) -> DownloadInfo
+    static func createSourceStateManager() -> SourceStateManager
 }
 
+/**
+    -- https://stackoverflow.com/a/69606375
+ */
 class AppJS: NSObject, AppJSExport {
+    static func createSourceStateManager() -> SourceStateManager {
+        return SourceStateManager()
+    }
+
     static func createDownloadInfo(_ results: NSDictionary) -> DownloadInfo {
         let filetype = results["filetype"] as? String ?? "epub"
         let link = results["link"] as? String ?? ""
@@ -59,9 +67,22 @@ class AppJS: NSObject, AppJSExport {
         return Request(url: url, method: method)
     }
 
-    class func createRequestManager(_ manager: NSDictionary) -> RequestManager {
-        let requestTimeout = (manager["requestTimeout"] as? Int) ?? 20_000
-        return RequestManager(requestTimeout: requestTimeout)
+    class func createRequestManager(_ manager: JSValue) -> RequestManager {
+        let timeout = manager.objectForKeyedSubscript("requestTimeout").toNumber() as? Int
+        let interceptor = manager.objectForKeyedSubscript("interceptor")
+
+        var sourceInterceptor: SourceInterceptor? = nil
+
+        if let interceptor = interceptor, interceptor.isUndefined == false {
+            if let interceptRequest = interceptor.objectForKeyedSubscript("interceptRequest") {
+                sourceInterceptor = SourceInterceptor(interceptRequest: interceptRequest)
+            }
+        }
+
+        return RequestManager(
+            requestTimeout: timeout ?? 20_000,
+            interceptor: sourceInterceptor
+        )
     }
 
     class func createBookInfo(_ bookInfo: NSDictionary) -> BookInfo {

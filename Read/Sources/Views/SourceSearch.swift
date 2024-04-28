@@ -120,21 +120,18 @@ struct SourceSearch: View {
                     self.searchResults[key] = searchResult
                 }
 
-                ext.getSearchResults(query: query, metadata: [:]) { result in
+                do {
+                    let paged = try await ext.getSearchResults(query: query, metadata: [:])
+                    self.searchResults[key]?.results = paged
 
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let paged):
-                            self.searchResults[key]?.results = paged
-
-                            withAnimation {
-                                self.searchResults[key]?.state = .done
-                            }
-                        case .failure:
-                            // TODO: ERROR
-                            self.searchResults[key]?.state = .error
-                        }
+                    withAnimation {
+                        self.searchResults[key]?.state = .done
                     }
+                } catch {
+                    // TODO: ERROR TODO
+
+                    Log("Searching sources error: \(error.localizedDescription)")
+                    self.searchResults[key]?.state = .error
                 }
             }
         }

@@ -23,6 +23,7 @@ struct InterfaceTag: View {
 
 struct SourceRow: View {
     @Environment(AppTheme.self) var theme
+    @Environment(Navigator.self) var navigator
 
     var source: SourceInfo
     var needsUpdate: Bool
@@ -76,52 +77,69 @@ struct SourceRow: View {
         }
     }
 
-    var body: some View {
+    var sourceImage: some View {
+        Image(systemName: "puzzlepiece.fill")
+            .resizable()
+            .scaledToFit()
+            .foregroundStyle(.white)
+            .padding(4)
+            .frame(width: 54, height: 54)
+            .background(.black)
+            .clipShape(.rect(cornerRadius: 6))
+    }
+
+    var sourceInfo: some View {
+        Text("\(source.info) | \(source.version)")
+            .foregroundStyle(.gray)
+            .font(.system(size: 8))
+    }
+
+    @ViewBuilder
+    var needsUpdateText: some View {
+        if needsUpdate {
+            Text("\(needsUpdate ? " -> update" : "")")
+                .font(.system(size: 8))
+                .lineLimit(1)
+                .padding(.vertical, 2)
+                .padding(.horizontal, 6)
+                .background(
+                    RoundedRectangle(cornerRadius: 13)
+                        .fill(theme.tintColor)
+                )
+                .padding(1)
+        }
+    }
+
+    var sourceTags: some View {
         HStack {
-            Image(systemName: "puzzlepiece.fill")
-                .resizable()
-                .scaledToFit()
-                .foregroundStyle(.white)
-                .padding(4)
-                .frame(width: 54, height: 54)
-                .background(.black)
-                .clipShape(.rect(cornerRadius: 6))
+            if source.interfaces.downloads {
+                InterfaceTag(systemName: "arrow.down.app.fill", background: .orange)
+            }
+
+            if source.interfaces.homePage {
+                InterfaceTag(systemName: "newspaper.circle.fill", background: .black)
+            }
+
+            if source.interfaces.search {
+                InterfaceTag(systemName: "magnifyingglass.circle.fill", background: .cyan)
+            }
+        }
+    }
+
+    var withActionRow: some View {
+        HStack {
+            sourceImage
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(source.name)
 
                 HStack(spacing: 4) {
-                    Text("\(source.info) | \(source.version)")
-                        .foregroundStyle(.gray)
-                        .font(.system(size: 8))
+                    sourceInfo
 
-                    if needsUpdate {
-                        Text("\(needsUpdate ? " -> update" : "")")
-                            .font(.system(size: 8))
-                            .lineLimit(1)
-                            .padding(.vertical, 2)
-                            .padding(.horizontal, 6)
-                            .background(
-                                RoundedRectangle(cornerRadius: 13)
-                                    .fill(theme.tintColor)
-                            )
-                            .padding(1)
-                    }
+                    needsUpdateText
                 }
 
-                HStack {
-                    if source.interfaces.downloads {
-                        InterfaceTag(systemName: "arrow.down.app.fill", background: .orange)
-                    }
-
-                    if source.interfaces.homePage {
-                        InterfaceTag(systemName: "newspaper.circle.fill", background: .black)
-                    }
-
-                    if source.interfaces.search {
-                        InterfaceTag(systemName: "magnifyingglass.circle.fill", background: .cyan)
-                    }
-                }
+                sourceTags
             }
 
             if showButton {
@@ -140,6 +158,40 @@ struct SourceRow: View {
                 .buttonStyle(.bordered)
                 .disabled(buttonState == .loading)
                 .foregroundStyle(theme.tintColor)
+            }
+        }
+    }
+
+    var withNavigationRow: some View {
+        Button {
+            navigator.navigate(to: .sourceExtensionDetails(sourceId: source.id))
+        } label: {
+            HStack {
+                sourceImage
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(source.name)
+                        .foregroundStyle(.primary)
+
+                    sourceInfo
+
+                    sourceTags
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+            }
+        }
+        .tint(.primary)
+    }
+
+    var body: some View {
+        Group {
+            if showButton == true {
+                withActionRow
+            } else {
+                withNavigationRow
             }
         }
         .if(isInstalled) { view in
@@ -199,6 +251,7 @@ struct SourceView: View {
     @State var sources: [SourceInfo] = []
     @State var installedSourcesDict: [String: SourceInfo] = [:]
     @State var needsUpdateSources: [String: Bool] = [:]
+    @State var loading = false
 
     var body: some View {
         VStack {
@@ -223,6 +276,13 @@ struct SourceView: View {
                             }
                         }
                     }
+                }
+            }
+        }
+        .toolbar {
+            if loading == true {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ProgressView()
                 }
             }
         }
@@ -253,6 +313,8 @@ struct SourceView: View {
     }
 
     func loadSources() async {
+        loading = true
+
         var installedSources = sourceManager.sources
             .filter {
                 if let url = $0.sourceInfo.sourceUrl {
@@ -272,6 +334,7 @@ struct SourceView: View {
         let url = sourceUrl.pathExtension.isEmpty ? sourceUrl : sourceUrl.deletingLastPathComponent()
 
         guard var externalSources = await sourceManager.loadSourceList(url: url) else {
+            loading = false
             return
         }
 
@@ -294,6 +357,7 @@ struct SourceView: View {
         installedSources.sort(by: { $0.name < $1.name })
 
         sources = installedSources
+        loading = false
     }
 
     func uninstall(source: SourceInfo) async {
@@ -367,7 +431,7 @@ struct SettingsSourcesView: View {
                 TextField("Source base url", text: $sourceUrl)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
-                    .background(Color.backgroundSecondary)
+                    .background(.bar)
                     .clipShape(.rect(cornerRadius: 12))
                     .tint(theme.tintColor)
 

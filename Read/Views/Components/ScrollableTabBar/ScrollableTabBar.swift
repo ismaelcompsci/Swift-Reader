@@ -11,8 +11,8 @@ struct ScrollableTabBar<Content: View>: View {
     @Binding var tabs: [Tab]
     @Binding var activeTab: Tab.ID
 
-    @State private var tabBarScrollState: String
-    @State private var mainViewScrollState: String?
+    @State private var tabBarScrollState: Tab.ID
+    @State private var mainViewScrollState: Tab.ID?
     @State private var progress: CGFloat = .zero
 
     private var content: (CGSize) -> Content
@@ -147,7 +147,7 @@ extension CGFloat {
     func interpolate(inputRange: [CGFloat], outputRange: [CGFloat]) -> CGFloat {
         let x = self
         let length = inputRange.count - 1
-        if x <= inputRange[0] { return outputRange[0] }
+        if x <= inputRange[0] || length == 0 { return outputRange[0] }
 
         for index in 1 ... length {
             let x1 = inputRange[index - 1]

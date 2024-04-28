@@ -23,7 +23,7 @@ struct DownloadManagerView: View {
                 Text("paused")
             case .finished:
                 Image(systemName: "checkmark.cirlce")
-            case .failed(let error):
+            case .failed:
                 Image(systemName: "x.circle")
             }
         }

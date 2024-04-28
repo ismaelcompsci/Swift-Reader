@@ -88,23 +88,19 @@ struct SourceBookDetailsView: View {
             }
 
             if extensionJS.loaded == false {
-                _ = extensionJS.load()
+                _ = extensionJS.initialiseSource()
             }
 
-            extensionJS.getBookDetails(for: item.id) { result in
+            do {
+                let details = try await extensionJS.getBookDetails(for: item.id)
 
-                switch result {
-                case .success(let details):
-//                    DispatchQueue.main.async {
-                    self.bookDetails = details
-//                    }
-                case .failure(let failure):
-
-                    Log("\(failure)")
-                }
-
-                self.loadingState = false
+                bookDetails = details
+            } catch {
+                // TODO: ERROR
+                Log("Something went wrong getting book details: \(error.localizedDescription)")
             }
+
+            loadingState = false
         }
     }
 }

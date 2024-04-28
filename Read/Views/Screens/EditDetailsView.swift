@@ -18,14 +18,22 @@ struct EditDetailsView: View {
     @State var description: String
     @State var authors: String
     
+    @State var tags: [Tag]
+    
     init(book: Book) {
         self.book = book
 
         _title = State(initialValue: book.title)
         _description = State(initialValue: book.summary ?? "")
-        let authors = book.authors.map { $0.name }
+        let authors = book.authors.compactMap { $0.name }
+        let tagsOfAuthors = Array(authors.map { Tag(value: $0) })
         
-        _authors = State(initialValue: authors.joined(separator: ", "))
+        _tags = State(initialValue: tagsOfAuthors)
+        _authors = State(initialValue: "")
+    }
+    
+    var authorInput: some View {
+        TagField(tags: $tags, header: "Authors", placeholder: "name...")
     }
 
     var body: some View {
@@ -38,7 +46,7 @@ struct EditDetailsView: View {
                     
                     SRFromInput(text: $title, inputTitle: "Title")
                     
-                    SRFromInput(text: $authors, inputTitle: "Authors")
+                    authorInput
                     
                     SRFromInput(text: $description, inputTitle: "Description", axis: .vertical)
                     
@@ -61,11 +69,15 @@ struct EditDetailsView: View {
                             thawedBook.summary = description
                             
                             let updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
-                            let authors = authors.split(separator: ",")
                             
-                            authors.forEach { name in
+                            let authors = tags
+                            
+                            authors.forEach { tag in
                                 let author = Author()
-                                author.name = String(name).trimmingCharacters(in: .whitespacesAndNewlines)
+                                author.name = String(
+                                    tag.value
+                                ).trimmingCharacters(in: .whitespacesAndNewlines)
+                                
                                 updatedAuthors.append(author)
                             }
                             thawedBook.authors = updatedAuthors

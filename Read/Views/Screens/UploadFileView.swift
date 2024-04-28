@@ -8,7 +8,6 @@
 import RealmSwift
 import SwiftReader
 import SwiftUI
-import WrappingHStack
 
 struct UploadFileView: View {
     @Environment(\.dismiss) var dismiss
@@ -31,8 +30,10 @@ struct UploadFileView: View {
     
     var uploadCard: some View {
         VStack(spacing: 18) {
-            WrappingHStack(SupportedFileTypes.allCases, id: \.self, alignment: .center) { type in
-                TagItem(name: ".\(type.rawValue.uppercased())", small: true)
+            WrappingStackLayout {
+                ForEach(SupportedFileTypes.allCases, id: \.self) { type in
+                    TagItem(name: ".\(type.rawValue.uppercased())", small: true)
+                }
             }
             
             Spacer()

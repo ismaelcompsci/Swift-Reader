@@ -7,16 +7,6 @@
 
 import SwiftData
 import SwiftUI
-import UIKit
-
-func Log(
-    _ items: Any...,
-    separator: String = " ",
-    terminator: String = "\n")
-{
-    let output = items.map { "SR_LOG: \($0)" }.joined(separator: separator)
-    Swift.print(output, terminator: terminator)
-}
 
 @main
 struct ReadApp: App {

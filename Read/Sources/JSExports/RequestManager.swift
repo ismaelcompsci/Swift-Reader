@@ -10,69 +10,113 @@ import JavaScriptCore
 
 @objc protocol RequestManagerJSExport: JSExport {
     var requestTimeout: Int { get }
+    var interceptor: SourceInterceptor? { get set }
 
-    var request: @convention(block) (Request, JSValue) -> JSValue { get }
-    static func createRequestManager(requestTimeout: Int) -> RequestManager
+    func request(_ request: Request, _ options: JSValue) -> JSManagedValue
+    static func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager
+}
+
+@objc protocol SourceInterceptorJSExport: JSExport {
+    var interceptRequest: JSValue { get set }
+}
+
+class SourceInterceptor: NSObject, SourceInterceptorJSExport {
+    var interceptRequest: JSValue
+
+    init(interceptRequest: JSValue) {
+        self.interceptRequest = interceptRequest
+    }
 }
 
 class RequestManager: NSObject, RequestManagerJSExport {
     var requestTimeout: Int
+    var interceptor: SourceInterceptor?
 
-    init(requestTimeout: Int) {
+//    var requests = [String: Request]()
+
+    init(requestTimeout: Int, interceptor: SourceInterceptor? = nil) {
         self.requestTimeout = requestTimeout
+        self.interceptor = interceptor
     }
 
-    class func create() -> RequestManager {
-        RequestManager(requestTimeout: 20_000)
-    }
+    func request(_ request: Request, _ options: JSValue) -> JSManagedValue {
+        let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
+            guard let resolve = resolve, let reject = reject, let self = self else { return }
 
-    var request: @convention(block) (Request, JSValue) -> JSValue = { request, _ in
-        let session = URLSession.shared
+            Task {
+                var finalRequest: Request = request
 
-        let url = URL(string: request.url)
+                if let interceptor = self.interceptor {
+                    let interceptedRequest = try? await interceptor.interceptRequest.callAsync(withArguments: [request]).toObjectOf(Request.self) as? Request
 
-        guard let url = url else {
-            return JSValue(newErrorFromMessage: "invalid url", in: JSContext.current())
-        }
+                    finalRequest = interceptedRequest ?? request
+                }
 
-        var urlRequest = URLRequest(url: url)
+//                if let interceptor = self.interceptor {
+//                    let previousIntercept = self.requests[request.url]
+//
+//                    if previousIntercept == nil, let interceptRequestJS = try? await interceptor.interceptRequest.callAsync(withArguments: [request]), let interceptedRequest = interceptRequestJS.toObjectOf(Request.self) as? Request {
+//                        finalRequest = interceptedRequest
+//                    } else {
+//                        finalRequest = request
+//                    }
+//
+//                } else {
+//                    finalRequest = request
+//                }
+//
+//                self.requests.updateValue(finalRequest, forKey: request.url)
 
-        urlRequest.httpMethod = request.method
+                let url = URL(string: finalRequest.url)
 
-        return JSValue(newPromiseIn: JSContext.current()) { resolve, reject in
-            let task = session.dataTask(with: urlRequest) { data, response, err in
-                if let err = err {
-                    Log("fetch failed: \(err.localizedDescription)")
-                    let jsErr = JSError(message: err.localizedDescription)
-                    reject?.call(withArguments: [jsErr as Any])
+                guard let url = url else {
+                    reject.call(withArguments: [
+                        [
+                            "name": "URL Error",
+                            "response": "Could not decode URL / Request."
+                        ]
+                    ])
+
                     return
                 }
 
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    Log("HTTPURLResponse was nil")
-                    let jsErr = JSError(message: "native response was nil")
-                    reject?.call(withArguments: [jsErr as Any])
+                var urlRequest = URLRequest(url: url)
+                urlRequest.timeoutInterval = TimeInterval(self.requestTimeout)
+                urlRequest.httpMethod = finalRequest.method
+
+                do {
+                    let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+                    guard let httpResponse = response as? HTTPURLResponse else {
+                        Log("HTTPURLResponse was nil")
+                        reject.call(withArguments: ["native response was nil"])
+                        return
+                    }
+
+                    let res = Response(
+                        data: String(data: data, encoding: .utf8),
+                        status: httpResponse.statusCode,
+                        headers: [:],
+                        request: request
+                    )
+
+                    resolve.call(withArguments: [res])
+                } catch {
+                    reject.call(withArguments: [
+                        [
+                            "name": "FetchError",
+                            "response": "\(error.localizedDescription)"
+                        ]
+                    ])
                     return
                 }
-
-                let res = Response(
-                    data: data != nil ? String(data: data!, encoding: .utf8) : nil,
-                    status: httpResponse.statusCode,
-                    headers: [:],
-                    request: request
-                )
-
-                resolve?.call(withArguments: [res])
             }
-
-            task.resume()
         }
+
+        return JSManagedValue(value: promise)
     }
 
-    // swiftlint:disable:next identifier_name
-//    class func _request(_ request: Request) -> JSValue {}
-
-    class func createRequestManager(requestTimeout: Int) -> RequestManager {
-        RequestManager(requestTimeout: requestTimeout)
+    class func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager {
+        return RequestManager(requestTimeout: requestTimeout, interceptor: interceptor)
     }
 }

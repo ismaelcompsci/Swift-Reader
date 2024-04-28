@@ -9,32 +9,22 @@ import Foundation
 import JavaScriptCore
 
 protocol ExtensionProtocol {
-    func getBookDetails(for id: String, completed: @escaping (Result<SourceBook, ExtensionError>) -> Void)
-    func getSearchResults(query: SearchRequest, metadata: Any, completed: @escaping (Result<PagedResults, ExtensionError>) -> Void)
-    func getViewMoreItems(homepageSectionId: String, metadata: Any?, completed: @escaping ((Result<PagedResults, ExtensionError>) -> Void))
+    func getBookDetails(for id: String) async throws -> SourceBook
+    func getSearchResults(query: SearchRequest, metadata: Any) async throws -> PagedResults
+    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async throws -> PagedResults
     func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void)
 }
 
-enum ApplicationError: Error {
-    case getViewMoreItems(String)
-    case getSearchResults(String)
-    case unexpected(String)
-}
-
 enum ExtensionError: String, Error {
-    case invalidBookDetails = "Unable to get book details from extension."
-    case invalidPagedResults = "Unable to get paged details from extension."
     case invalidHomeSection = "Unable to get home section from extension."
-    case invalidViewMoreItems = "Unable to get more items from extension."
     case invalidSourceExtension = "Source extension was never initialized."
     case invalidPropertyInSource = "Source extension does not have the property."
     case invalidContext = "JSContext failed to load."
-    case invalid = "Something went wrong."
+    case invalid = "Something went wrong with extension"
 }
 
 @Observable
-class SourceExtension: NSObject, ExtensionProtocol {
-    var extensionName: String
+class SourceExtension: NSObject {
     var context: JSContext?
     var sourceURL: URL
     var source: JSValue?
@@ -44,23 +34,24 @@ class SourceExtension: NSObject, ExtensionProtocol {
 
     var loaded = false
 
-    init(extensionName: String, sourceURL: URL, sourceInfo: SourceInfo) {
-        self.extensionName = extensionName
-        self.sourceInfo = sourceInfo
-        self.sourceURL = sourceURL
-
-        super.init()
+    var extensionName: String {
+        sourceInfo.name
     }
 
-    func load() -> Bool {
-        let inited = initContext()
+    init(sourceURL: URL, sourceInfo: SourceInfo) {
+        self.sourceInfo = sourceInfo
+        self.sourceURL = sourceURL
+    }
+
+    func initialiseSource() -> Bool {
+        let inited = initialiseContext()
         let load = loadExtension()
         loaded = inited && load
 
         return inited && load
     }
 
-    func initContext() -> Bool {
+    func initialiseContext() -> Bool {
         context = JSContext()
         context?.name = extensionName
         /* DEBUG */
@@ -68,7 +59,7 @@ class SourceExtension: NSObject, ExtensionProtocol {
 
         // Loading CheerioJS
         guard let baseJS = Bundle.main.path(forResource: "bundle", ofType: "js") else {
-            print("NO CHEERIO FOUND IN BUNDLE")
+            Log("NO CHEERIO FOUND IN BUNDLE")
             return false
         }
 
@@ -79,9 +70,24 @@ class SourceExtension: NSObject, ExtensionProtocol {
             cheerio = context?.evaluateScript(jsString)
 
         } catch {
-            print("Error while processing script file: \(error)")
-
+            Log("Error while processing script file: \(error)")
             return false
+        }
+
+        context?.setObject(
+            Console.self,
+            forKeyedSubscript: "console" as NSCopying & NSObjectProtocol
+        )
+
+        context?.exceptionHandler = { (_: JSContext!, value: JSValue!) in
+
+            let stacktrace = value.objectForKeyedSubscript("stack").toString() ?? ""
+
+            let lineNumber = value.objectForKeyedSubscript("line") ?? JSValue()
+
+            let column = value.objectForKeyedSubscript("column") ?? JSValue()
+            let moreInfo = "in method \(stacktrace)Line number in file: \(lineNumber), column: \(column)"
+            Log("JS ERROR: \(value ?? JSValue()) \(moreInfo)")
         }
 
         context?.setObject(AppJS.self, forKeyedSubscript: "App" as (NSCopying & NSObjectProtocol)?)
@@ -91,11 +97,10 @@ class SourceExtension: NSObject, ExtensionProtocol {
         context?.setObject(BookInfo.self, forKeyedSubscript: "BookInfo" as (NSCopying & NSObjectProtocol)?)
         context?.setObject(SourceBook.self, forKeyedSubscript: "SourceBook" as (NSCopying & NSObjectProtocol)?)
         context?.setObject(SearchRequest.self, forKeyedSubscript: "SearchRequest" as (NSCopying & NSObjectProtocol)?)
-        context?.setObject(
-            PartialSourceBook.self,
-            forKeyedSubscript: "PartialSourceBook" as (NSCopying & NSObjectProtocol)?
-        )
+        context?.setObject(PartialSourceBook.self, forKeyedSubscript: "PartialSourceBook" as (NSCopying & NSObjectProtocol)?)
         context?.setObject(HomeSection.self, forKeyedSubscript: "HomeSection" as (NSCopying & NSObjectProtocol)?)
+        context?.setObject(SourceStateManager.self, forKeyedSubscript: "SourceStateManager"as (NSCopying & NSObjectProtocol)?)
+        context?.setObject(SourceInterceptor.self, forKeyedSubscript: "SourceInterceptor"as (NSCopying & NSObjectProtocol)?)
 
         return true
     }
@@ -120,67 +125,19 @@ class SourceExtension: NSObject, ExtensionProtocol {
 
         return true
     }
+}
 
-    func getSearchResults(
-        query: SearchRequest,
-        metadata: Any,
-        completed: @escaping (Result<PagedResults, ExtensionError>) -> Void
-    ) {
-        Log("query: \(query)")
-        executeAsyncJS(method: "getSearchResults", args: [query, metadata], completed: completed)
+extension SourceExtension: ExtensionProtocol {
+    func getBookDetails(for id: String) async throws -> SourceBook {
+        try await source!.invokeAsyncMethod(methodKey: "getBookDetails", args: [id])
     }
 
-    func getBookDetails(
-        for id: String,
-        completed: @escaping (Result<SourceBook, ExtensionError>) -> Void
-    ) {
-        executeAsyncJS(method: "getBookDetails", args: [id], completed: completed)
+    func getSearchResults(query: SearchRequest, metadata: Any) async throws -> PagedResults {
+        try await source!.invokeAsyncMethod(methodKey: "getSearchResults", args: [query, metadata])
     }
 
-    func getViewMoreItems(
-        homepageSectionId: String,
-        metadata: Any?,
-        completed: @escaping ((Result<PagedResults, ExtensionError>) -> Void)
-    ) {
-        executeAsyncJS(method: "getViewMoreItems", args: [homepageSectionId, metadata as Any], completed: completed)
-    }
-
-    func executeAsyncJS<T: JSExport>(
-        method: String,
-        args: [Any],
-        completed: @escaping ((Result<T, ExtensionError>) -> Void)
-    ) {
-        guard let context = context else {
-            return completed(.failure(.invalidContext))
-        }
-
-        let successCallback: @convention(block) (JSExport) -> Void = { value in
-            if let genericValue = value as? T {
-                completed(.success(genericValue))
-            } else {
-                completed(.failure(.invalid))
-            }
-        }
-
-        let failureCallback: @convention(block) (JSValue) -> Void = { value in
-            Log("Failure in async js code: \(value)")
-            completed(.failure(.invalid))
-        }
-        // TODO: MAKE EVERY CALLLBACK UNQUEE id uuidname
-        context.setObject(successCallback, forKeyedSubscript: "jsSuccessHandler" as NSString)
-        context.setObject(failureCallback, forKeyedSubscript: "jsFailureHandler" as NSString)
-
-        let jsSuccessCallback = context.objectForKeyedSubscript("jsSuccessHandler")!
-        let jsFailureCallback = context.objectForKeyedSubscript("jsFailureHandler")!
-
-        guard let source, source.hasProperty(method) else {
-            completed(.failure(source == nil ? .invalidSourceExtension : .invalidPropertyInSource))
-            return
-        }
-
-        let promise = source.invokeMethod(method, withArguments: args)
-        promise?.invokeMethod("then", withArguments: [jsSuccessCallback])
-        promise?.invokeMethod("catch", withArguments: [jsFailureCallback])
+    func getViewMoreItems(homepageSectionId: String, metadata: Any?) async throws -> PagedResults {
+        try await source!.invokeAsyncMethod(methodKey: "getViewMoreItems", args: [homepageSectionId, metadata as Any])
     }
 
     func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void) {

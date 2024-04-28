@@ -11,9 +11,9 @@ struct PlaceholderCover: View {
     var title: String
     var author: String
 
-    var body: some View {
-        let randomColor: Color = .random()
+    var randomColor: Color = .random()
 
+    var body: some View {
         return GeometryReader { proxy in
 
             Rectangle()

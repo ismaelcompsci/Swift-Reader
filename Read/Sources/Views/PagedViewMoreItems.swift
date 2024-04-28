@@ -77,21 +77,20 @@ struct PagedViewMoreItems: View {
             return
         }
 
-        extensionJS.getViewMoreItems(homepageSectionId: self.viewMoreId, metadata: self.metadata) { result in
-            switch result {
-            case .success(let pagedResults):
-                self.books.append(contentsOf: pagedResults.results)
+        do {
+            let moreItems = try await extensionJS.getViewMoreItems(homepageSectionId: self.viewMoreId, metadata: self.metadata)
 
-                if let metadata = pagedResults.metadata {
-                    self.metadata = metadata
-                } else {
-                    self.cancel = true
-                }
-            case .failure:
+            self.books.append(contentsOf: moreItems.results)
+            if let metadata = moreItems.metadata {
+                self.metadata = metadata
+            } else {
                 self.cancel = true
             }
 
-            self.loading = false
+        } catch {
+            // TODO: EROROR
+            Log("Paged View More Items Error: \(error.localizedDescription)")
+            self.cancel = true
         }
     }
 }

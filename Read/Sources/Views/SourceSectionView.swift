@@ -56,9 +56,9 @@ struct SourceSectionView: View {
                     ForEach(items, id: \.self) { book in
                         SourceBookCard(book: book, sourceId: sourceId)
                     }
-                    .transition(.opacity)
                 }
-                .transition(.move(edge: .bottom))
+                .transition(.opacity.combined(with: .scale))
+                .animation(.easeInOut, value: items)
             }
             .contentMargins(10, for: .scrollContent)
             .listRowInsets(EdgeInsets())

@@ -113,7 +113,7 @@ extension BookManager {
             newBook.bookFromSource = fromSource
 
             _ = metadata.subject?.map { item in
-                let newTag = Tag()
+                let newTag = BookTag()
                 newTag.name = item
                 newBook.tags.append(newTag)
             }

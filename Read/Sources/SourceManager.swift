@@ -48,12 +48,11 @@ class SourceManager {
 
     static func createExtension(from source: Source) -> SourceExtension {
         let sourceExt = SourceExtension(
-            extensionName: source.sourceInfo.name,
             sourceURL: URL.documentsDirectory.appending(path: source.path!),
             sourceInfo: source.sourceInfo
         )
 
-        _ = sourceExt.load()
+        _ = sourceExt.initialiseSource()
 
         return sourceExt
     }
