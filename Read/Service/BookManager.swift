@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 import RealmSwift
 import SwiftReader
 
@@ -24,17 +25,17 @@ class BookManager {
 
         do {
             let (file, _) = try await URLSession.shared.download(from: url)
-            Log("Downloaded image with url: \(url)")
+            Logger.general.info("Downloaded image with url: \(url)")
             return file
         } catch {
-            Log("Failed to download image with url: \(url), error: \(error.localizedDescription)")
+            Logger.general.error("Failed to download image with url: \(url), error: \(error.localizedDescription)")
         }
 
         return nil
     }
 
     func process(for file: URL, with bookInfo: BookInfo) async throws {
-        Log("Processing book with book info")
+        Logger.general.info("Processing book with book info")
 
         let bookId = UUID()
         let documents = URL.documentsDirectory
@@ -44,20 +45,18 @@ class BookManager {
         try? FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
 
         var coverPath: String?
-        Log("book id \(bookId)")
 
         if let imageUrl = bookInfo.image,
            let downloadedImageUrl = await downloadImage(with: imageUrl)
         {
-            Log("Downloaded image path exists: \(downloadedImageUrl.exists)")
             let filename = downloadedImageUrl.lastPathComponent
             coverPath = "\(bookPath)/\(filename)"
             let newImageLocation = destination.appending(path: filename)
-            Log("NEW LOC: \(newImageLocation)")
+
             do {
                 try FileManager.default.moveItem(at: downloadedImageUrl, to: newImageLocation)
             } catch {
-                Log("Download image error: \(error.localizedDescription)")
+                Logger.general.error("Download image error: \(error.localizedDescription)")
             }
         }
 
@@ -81,7 +80,6 @@ class BookManager {
     }
 
     func process(for file: URL) async throws {
-        Log("Processing book with local file.")
         let isPdf = file.lastPathComponent.hasSuffix(".pdf")
 
         var metadata: BookMetadata?
@@ -156,7 +154,7 @@ extension BookManager {
         do {
             try FileManager.default.removeItem(at: directoryPath)
         } catch {
-            print("Failed to remove book \(error.localizedDescription)")
+            Logger.general.error("Failed to remove book \(error.localizedDescription)")
         }
     }
 }

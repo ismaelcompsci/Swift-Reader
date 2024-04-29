@@ -22,14 +22,8 @@ public extension JSValue {
                 continuation.resume(returning: $0)
             }
             let onRejected: @convention(block) (JSValue) -> Void = { error in
-                var userInfo: [String: Any] = [:]
-
-                if error.isObject {
-                    userInfo = error.toDictionary() as? [String: Any] ?? [:]
-                } else {
-                    userInfo[NSLocalizedDescriptionKey] = error.toString() ?? "UnknownError"
-                }
-                continuation.resume(throwing: NSError(domain: "async js function", code: 0, userInfo: userInfo))
+                let error = JSContext.getErrorFrom(key: "JS async function", error: error)
+                continuation.resume(throwing: error)
             }
 
             let promiseArgs = [

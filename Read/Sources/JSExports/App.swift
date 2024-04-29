@@ -7,6 +7,7 @@
 
 import Foundation
 import JavaScriptCore
+import OSLog
 
 @objc protocol AppJSExport: JSExport {
     static func createRequest(_ request: NSDictionary) -> Request
@@ -36,6 +37,7 @@ class AppJS: NSObject, AppJSExport {
     }
 
     static func createHomeSection(_ results: NSDictionary) -> HomeSection {
+        Logger.js.info("Thread:: \(Thread.current) M:: \(Thread.isMainThread)")
         let id = results["id"] as? String ?? UUID().uuidString
         let title = results["title"] as? String ?? ""
         let items = (results["items"] as? [PartialSourceBook]) ?? []
@@ -60,32 +62,39 @@ class AppJS: NSObject, AppJSExport {
         return PartialSourceBook(id: id, title: title, image: image, author: author)
     }
 
-    class func createRequest(_ request: NSDictionary) -> Request {
+    static func createRequest(_ request: NSDictionary) -> Request {
         let url = request["url"] as? String ?? "undefined"
         let method = request["method"] as? String ?? "undefined"
 
         return Request(url: url, method: method)
     }
 
-    class func createRequestManager(_ manager: JSValue) -> RequestManager {
+    static func createRequestManager(_ manager: JSValue) -> RequestManager {
         let timeout = manager.objectForKeyedSubscript("requestTimeout").toNumber() as? Int
         let interceptor = manager.objectForKeyedSubscript("interceptor")
 
         var sourceInterceptor: SourceInterceptor? = nil
 
+        let rm = RequestManager(
+            requestTimeout: timeout ?? 20_000,
+            interceptor: nil
+        )
+
         if let interceptor = interceptor, interceptor.isUndefined == false {
-            if let interceptRequest = interceptor.objectForKeyedSubscript("interceptRequest") {
-                sourceInterceptor = SourceInterceptor(interceptRequest: interceptRequest)
+            if let interceptRequest = interceptor.objectForKeyedSubscript("interceptRequest"),
+               let interceptorJSMangaged = JSManagedValue(value: interceptRequest)
+            {
+                sourceInterceptor = SourceInterceptor(interceptRequest: interceptorJSMangaged)
+                JSContext.current()!.virtualMachine.addManagedReference(interceptorJSMangaged, withOwner: rm)
             }
         }
 
-        return RequestManager(
-            requestTimeout: timeout ?? 20_000,
-            interceptor: sourceInterceptor
-        )
+        rm.interceptor = sourceInterceptor
+
+        return rm
     }
 
-    class func createBookInfo(_ bookInfo: NSDictionary) -> BookInfo {
+    static func createBookInfo(_ bookInfo: NSDictionary) -> BookInfo {
         let title = bookInfo["title"] as? String ?? ""
         let author = bookInfo["title"] as? String
         let desc = bookInfo["desc"] as? String
@@ -103,7 +112,7 @@ class AppJS: NSObject, AppJSExport {
         )
     }
 
-    class func createSourceBook(_ sourceBook: NSDictionary) -> SourceBook {
+    static func createSourceBook(_ sourceBook: NSDictionary) -> SourceBook {
         let id = sourceBook["id"] as? String ?? ""
         let bookInfo = sourceBook["bookInfo"] as? BookInfo ?? BookInfo(title: "", downloadLinks: [])
 

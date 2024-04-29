@@ -7,6 +7,7 @@
 
 import Foundation
 import JavaScriptCore
+import OSLog
 
 @objc protocol RequestManagerJSExport: JSExport {
     var requestTimeout: Int { get }
@@ -17,13 +18,13 @@ import JavaScriptCore
 }
 
 @objc protocol SourceInterceptorJSExport: JSExport {
-    var interceptRequest: JSValue { get set }
+    var interceptRequest: JSManagedValue { get set }
 }
 
 class SourceInterceptor: NSObject, SourceInterceptorJSExport {
-    var interceptRequest: JSValue
+    var interceptRequest: JSManagedValue
 
-    init(interceptRequest: JSValue) {
+    init(interceptRequest: JSManagedValue) {
         self.interceptRequest = interceptRequest
     }
 }
@@ -32,22 +33,22 @@ class RequestManager: NSObject, RequestManagerJSExport {
     var requestTimeout: Int
     var interceptor: SourceInterceptor?
 
-//    var requests = [String: Request]()
-
     init(requestTimeout: Int, interceptor: SourceInterceptor? = nil) {
         self.requestTimeout = requestTimeout
         self.interceptor = interceptor
     }
 
     func request(_ request: Request, _ options: JSValue) -> JSManagedValue {
+        Logger.js.info("\(#function) creating request")
         let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
             guard let resolve = resolve, let reject = reject, let self = self else { return }
 
-            Task {
+            Task(priority: .utility) {
+                // TODO: FIX INFINITE CALLING OF INTERCEPTOR
                 var finalRequest: Request = request
 
                 if let interceptor = self.interceptor {
-                    let interceptedRequest = try? await interceptor.interceptRequest.callAsync(withArguments: [request]).toObjectOf(Request.self) as? Request
+                    let interceptedRequest = try? await interceptor.interceptRequest.value.callAsync(withArguments: [request]).toObjectOf(Request.self) as? Request
 
                     finalRequest = interceptedRequest ?? request
                 }
@@ -81,14 +82,13 @@ class RequestManager: NSObject, RequestManagerJSExport {
                 }
 
                 var urlRequest = URLRequest(url: url)
-                urlRequest.timeoutInterval = TimeInterval(self.requestTimeout)
+                urlRequest.timeoutInterval = TimeInterval(self.requestTimeout / 1000)
                 urlRequest.httpMethod = finalRequest.method
 
                 do {
                     let (data, response) = try await URLSession.shared.data(for: urlRequest)
 
                     guard let httpResponse = response as? HTTPURLResponse else {
-                        Log("HTTPURLResponse was nil")
                         reject.call(withArguments: ["native response was nil"])
                         return
                     }
@@ -102,9 +102,10 @@ class RequestManager: NSObject, RequestManagerJSExport {
 
                     resolve.call(withArguments: [res])
                 } catch {
+                    Logger.js.error("\(#function) request error: \(error.localizedDescription) ")
                     reject.call(withArguments: [
                         [
-                            "name": "FetchError",
+                            "name": "RequestError",
                             "response": "\(error.localizedDescription)"
                         ]
                     ])

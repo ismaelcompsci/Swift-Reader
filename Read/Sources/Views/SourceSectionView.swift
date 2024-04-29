@@ -58,7 +58,7 @@ struct SourceSectionView: View {
                     }
                 }
                 .transition(.opacity.combined(with: .scale))
-                .animation(.easeInOut, value: items)
+                .animation(.easeInOut, value: items.count)
             }
             .contentMargins(10, for: .scrollContent)
             .listRowInsets(EdgeInsets())

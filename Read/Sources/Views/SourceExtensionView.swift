@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 3/31/24.
 //
 
+import OSLog
 import SwiftUI
 
 struct SRHomeSection {
@@ -14,33 +15,95 @@ struct SRHomeSection {
     var containsMoreItems: Bool
 }
 
+@Observable
+class HomeSectionProvider {
+    var extensionJS: SRExtension
+    var sections: [String: SRHomeSection] = [:]
+    var fetching = false
+
+    var batchUpdateHomeSections: [String: SRHomeSection] = [:]
+    var homeSectionsInitialized = 0
+    var homeSectionsWithItemsAdded = 0
+
+    init(extensionJS: SRExtension) {
+        self.extensionJS = extensionJS
+    }
+
+    func getHomePageSections() {
+        // TODO: Batch update ui
+        extensionJS.getHomePageSections { [weak self] result in
+
+            guard let self = self else { return }
+
+            switch result {
+            case .success(let homeSection):
+
+                if let batchedHomeSection = self.batchUpdateHomeSections[homeSection.id], batchedHomeSection.items.isEmpty {
+                    self.batchUpdateHomeSections[homeSection.id]?.items = homeSection.items
+                    self.homeSectionsWithItemsAdded += 1
+                } else {
+                    let srhomeSection = SRHomeSection(
+                        id: homeSection.id,
+                        title: homeSection.title,
+                        items: homeSection.items,
+                        containsMoreItems: homeSection.containsMoreItems
+                    )
+                    self.homeSectionsInitialized += 1
+                    self.batchUpdateHomeSections[srhomeSection.id] = srhomeSection
+
+                    DispatchQueue.main.async {
+                        self.sections[srhomeSection.id] = srhomeSection
+                    }
+                }
+
+                if self.homeSectionsInitialized == self.homeSectionsWithItemsAdded {
+                    let sendableHoldSections = self.batchUpdateHomeSections
+
+                    DispatchQueue.main.async {
+                        self.sections = sendableHoldSections
+                    }
+                }
+
+            case .failure(let error):
+                Logger.general.error("Failed to get home sections: \(error.localizedDescription)")
+            }
+        }
+    }
+}
+
 struct SourceExtensionView: View {
     @Environment(SourceManager.self) private var sourceManager
-    @State var extensionJS: SourceExtension?
+    var extensionJS: SRExtension?
 
-    @State var sections: [String: SRHomeSection] = [:]
-    @State var fetching = false
+    @State var homeSectionProvider: HomeSectionProvider?
 
-    let source: Source
+    let sourceId: String
+    let hasHomePageInterface: Bool
 
-    init(source: Source) {
-        self.source = source
+    init(sourceId: String, hasHomePageInterface: Bool, extensionJS: SRExtension?) {
+        self.sourceId = sourceId
+        self.hasHomePageInterface = hasHomePageInterface
+        self.extensionJS = extensionJS
+
+        if let extensionJS = extensionJS {
+            self._homeSectionProvider = State(initialValue: HomeSectionProvider(extensionJS: extensionJS))
+        }
     }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             // MARK: Home
 
-            if source.sourceInfo.interfaces.homePage == true {
+            if hasHomePageInterface == true {
                 LazyVStack {
-                    ForEach(sections.sorted(by: { $0.value.title < $1.value.title }), id: \.value.id) { _, section in
+                    ForEach(homeSectionProvider?.sections.sorted(by: { $0.value.title < $1.value.title }) ?? [], id: \.value.id) { _, section in
                         SourceSectionView(
                             title: section.title,
                             containsMoreItems: section.containsMoreItems,
                             items: section.items,
-                            sourceId: source.id,
+                            sourceId: sourceId,
                             id: section.id,
-                            isLoading: false
+                            isLoading: section.items.isEmpty
                         )
                     }
                 }
@@ -56,196 +119,19 @@ struct SourceExtensionView: View {
         }
         .contentMargins(.vertical, 24, for: .scrollContent)
         .task {
-            if fetching {
+            guard let homeSectionProvider = homeSectionProvider, hasHomePageInterface == true else { return }
+
+            if homeSectionProvider.fetching {
                 return
             }
 
-            fetching = true
+            homeSectionProvider.fetching = true
 
-            Task {
-                await getHomePageSections()
-            }
-        }
-    }
-
-    func getHomePageSections() async {
-        extensionJS = sourceManager.extensions[source.id]
-
-        guard let extensionJS, source.sourceInfo.interfaces.homePage == true else {
-            return
-        }
-
-        if extensionJS.loaded == false {
-            _ = extensionJS.initialiseSource()
-        }
-
-        extensionJS.getHomePageSections { result in
-            switch result {
-            case .success(let homeSection):
-                DispatchQueue.main.async {
-                    sections[homeSection.id] = SRHomeSection(
-                        id: homeSection.id,
-                        title: homeSection.title,
-                        items: homeSection.items,
-                        containsMoreItems: homeSection.containsMoreItems
-                    )
-                }
-
-            case .failure(let failure):
-                //
-                Log("Failed to get home sections")
-            }
+            homeSectionProvider.getHomePageSections()
         }
     }
 }
 
-// @Observable
-// class ObservableHomeSection: Identifiable {
-//    var title: String
-//    var id: String
-//    var containsMoreItems: Bool
-//    var items = [PartialSourceBook]()
-//    var isLoading = false
-//
-//    init(title: String, id: String, containsMoreItems: Bool, items: [PartialSourceBook] = [PartialSourceBook](), isLoading: Bool = false) {
-//        self.title = title
-//        self.id = id
-//        self.containsMoreItems = containsMoreItems
-//        self.isLoading = isLoading
-//        self.items = items
-//    }
-// }
-//
-// struct SourceExtensionView: View {
-//    @Environment(SourceManager.self) private var sourceManager
-//    @State var extensionJS: SourceExtension?
-//
-//    @State var sections: [String: ObservableHomeSection] = [:]
-//    @State var fetching = false
-//
-//    let source: Source
-//
-//    init(source: Source) {
-//        self.source = source
-//    }
-//
-//    var body: some View {
-//        ScrollView(showsIndicators: false) {
-//            // MARK: Home
-//
-//            if source.sourceInfo.interfaces.homePage == true {
-//                LazyVStack {
-//                    ForEach(sections.sorted(by: { $0.value.title < $1.value.title }), id: \.value.id) { _, section in
-//                        SourceSectionView(
-//                            title: section.title,
-//                            containsMoreItems: section.containsMoreItems,
-//                            items: section.items,
-//                            sourceId: source.id,
-//                            id: section.id,
-//                            isLoading: section.isLoading
-//                        )
-//                    }
-//                }
-//                .transition(.opacity.combined(with: .scale))
-//
-//            } else {
-//                ContentUnavailableView(
-//                    "Source has no homepage",
-//                    systemImage: "exclamationmark.triangle",
-//                    description: Text("Use search instead")
-//                )
-//            }
-//        }
-//        .contentMargins(.vertical, 24, for: .scrollContent)
-//        .task {
-//            if fetching {
-//                return
-//            }
-//
-//            fetching = true
-//
-//            Task {
-//                await getHomePageSections()
-//            }
-//        }
-//    }
-//
-//    func getHomePageSections() async {
-//        Log("\(#function) - got called")
-//
-//        extensionJS = sourceManager.extensions[source.id]
-//
-//        guard let extensionJS, source.sourceInfo.interfaces.homePage == true else {
-//            return
-//        }
-//
-//        if extensionJS.loaded == false {
-//            _ = extensionJS.initialiseSource()
-//        }
-//
-//        let fetchedItems = sections.values.filter {
-//            $0.items.count > 0
-//        }
-//
-//        if fetchedItems.count > 0 {
-//            return
-//        }
-//
-//        var holdSections: [String: ObservableHomeSection] = [:]
-//        var homeSectionsInitialized = 0
-//        var homeSectionsItemsAdded = 0
-//
-//        extensionJS.getHomePageSections { result in
-//
-//            switch result {
-//            case .success(let homeSection):
-//                if let section = holdSections[homeSection.id], section.items.isEmpty {
-//                    holdSections[homeSection.id]?.items = homeSection.items
-//                    section.isLoading = false
-//                    homeSectionsItemsAdded += 1
-//                } else {
-//                    let newSection = ObservableHomeSection(
-//                        title: homeSection.title,
-//                        id: homeSection.id,
-//                        containsMoreItems: homeSection.containsMoreItems
-//                    )
-//                    homeSectionsInitialized += 1
-//                    holdSections[homeSection.id] = newSection
-//
-//                    let titleSection = ObservableHomeSection(
-//                        title: homeSection.title,
-//                        id: homeSection.id,
-//                        containsMoreItems: homeSection.containsMoreItems,
-//                        isLoading: true
-//                    )
-//
-//                    DispatchQueue.main.async {
-//                        self.sections[homeSection.id] = titleSection
-//                    }
-//                }
-//
-//                if homeSectionsInitialized == homeSectionsItemsAdded {
-//                    let sendableHoldSections = holdSections
-//
-//                    DispatchQueue.main.async {
-//                        for (_, (key, elem)) in sendableHoldSections.enumerated() {
-//                            self.sections[key] = elem
-//                        }
-//                    }
-//                }
-//            case .failure:
-//
-//                // TODO: ERROR
-//                break
-//            }
-//        }
-//    }
-// }
-
 #Preview {
-    if let source = try? Source(url: URL(string: "")!) {
-        return SourceExtensionView(source: source)
-    } else {
-        return EmptyView()
-    }
+    SourceExtensionView(sourceId: "", hasHomePageInterface: false, extensionJS: nil)
 }

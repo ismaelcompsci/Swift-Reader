@@ -6,6 +6,7 @@
 //
 
 import JavaScriptCore
+import OSLog
 
 @objc protocol ConsoleExports: JSExport {
     static func log(_ msg: String)
@@ -16,18 +17,18 @@ import JavaScriptCore
 
 final class Console: NSObject, ConsoleExports {
     public class func log(_ msg: String) {
-        Log("\(msg)")
+        Logger.js.log("\(msg)")
     }
 
     public class func info(_ msg: String) {
-        Log("\(msg)")
+        Logger.js.info("\(msg)")
     }
 
     public class func warn(_ msg: String) {
-        Log("\(msg)")
+        Logger.js.warning("\(msg)")
     }
 
     public class func error(_ msg: String) {
-        Log("\(msg)")
+        Logger.js.error("\(msg)")
     }
 }

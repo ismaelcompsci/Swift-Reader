@@ -11,3 +11,8 @@
 </p>
 
 ---
+
+# TODO
+- fix performance in discover page
+    - problem getHomePageSections <- 
+

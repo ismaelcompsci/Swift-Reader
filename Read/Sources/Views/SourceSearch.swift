@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 3/31/24.
 //
 
+import OSLog
 import SwiftUI
 
 @Observable
@@ -130,7 +131,7 @@ struct SourceSearch: View {
                 } catch {
                     // TODO: ERROR TODO
 
-                    Log("Searching sources error: \(error.localizedDescription)")
+                    Logger.general.error("Searching sources error: \(error.localizedDescription)")
                     self.searchResults[key]?.state = .error
                 }
             }

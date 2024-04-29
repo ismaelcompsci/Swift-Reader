@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 3/27/24.
 //
 
+import OSLog
 import SwiftUI
 
 struct InterfaceTag: View {
@@ -342,7 +343,7 @@ struct SourceView: View {
             let installedSource = installedSources.first(where: { $0.id == externalSource.id })
 
             if let installedSource = installedSource, installedSource.version != externalSource.version {
-                Log("\(installedSource.name) needs update")
+                Logger.general.info("\(installedSource.name) needs update")
                 needsUpdateSources[installedSource.id] = true
             }
 

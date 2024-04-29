@@ -5,12 +5,13 @@
 //  Created by Mirna Olvera on 4/3/24.
 //
 
+import OSLog
 import SwiftUI
 
 struct SourcesSearchPagedResultsView: View {
     @Environment(AppTheme.self) var theme
     @Environment(SourceManager.self) var sourceManager
-    @State var extensionJS: SourceExtension?
+    @State var extensionJS: SRExtension?
 
     @State var books = [PartialSourceBook]()
 
@@ -95,7 +96,7 @@ struct SourcesSearchPagedResultsView: View {
 
         } catch {
             // TODO: ERROR
-            Log("Failed to get search results: \(error.localizedDescription)")
+            Logger.general.error("Failed to get search results: \(error.localizedDescription)")
             self.cancel = true
         }
         self.loading = false

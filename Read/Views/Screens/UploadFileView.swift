@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 1/27/24.
 //
 
+import OSLog
 import RealmSwift
 import SwiftReader
 import SwiftUI
@@ -91,7 +92,7 @@ struct UploadFileView: View {
                 }
             case .failure(let failure):
                 // SHOW TOAST
-                print("No file selected: \(failure.localizedDescription)")
+                Logger.general.info("No file selected: \(failure.localizedDescription)")
             }
         }
     }

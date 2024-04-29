@@ -77,14 +77,12 @@ struct BookDetailView: View {
     
     func setHeaderImage() {
         guard let lastPathComponent = book.coverPath else {
-            print("NO COVER PATH")
             return
         }
         
         let fullBookPath = URL.documentsDirectory.appending(path: lastPathComponent)
         
         guard let imageData = try? Data(contentsOf: fullBookPath), let originalImage = UIImage(data: imageData) else {
-            print("BAD DATA")
             return
         }
         

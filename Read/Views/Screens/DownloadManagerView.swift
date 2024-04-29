@@ -6,6 +6,7 @@
 //
 
 import DownloadManager
+import OSLog
 import SwiftUI
 
 struct DownloadManagerView: View {
@@ -41,7 +42,7 @@ struct DownloadManagerView: View {
         case .finished:
             return .green
         case .failed(let error):
-            Log("download error: \(error.localizedDescription)")
+            Logger.general.error("download error: \(error.localizedDescription)")
             return .red
         }
     }

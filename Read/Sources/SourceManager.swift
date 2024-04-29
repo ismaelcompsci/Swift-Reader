@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 import ZIPFoundation
 
@@ -22,7 +23,7 @@ class SourceManager {
     var sources: [Source] = []
     var sourceLists: [URL] = []
 
-    var extensions: [String: SourceExtension] = [:]
+    var extensions: [String: SRExtension] = [:]
 
     private var sourceListsStrings: [String] {
         sourceLists.map { $0.absoluteString }
@@ -32,7 +33,7 @@ class SourceManager {
         self.modelContext = modelContext
 
         let dbSources = try? self.modelContext.fetch(Source.all)
-        Log("Loaded \(dbSources?.count ?? 0) sources from database.")
+        Logger.general.info("Loaded \(dbSources?.count ?? 0) sources from database.")
         if let dbSources = dbSources {
             sources.append(contentsOf: dbSources)
         }
@@ -41,18 +42,19 @@ class SourceManager {
             .compactMap { URL(string: $0) }
 
         for source in sources {
-            let ext = SourceManager.createExtension(from: source)
-            extensions.updateValue(ext, forKey: source.id)
+            let ext = try? SourceManager.createExtension(from: source)
+
+            if let ext = ext {
+                extensions.updateValue(ext, forKey: source.id)
+            }
         }
     }
 
-    static func createExtension(from source: Source) -> SourceExtension {
-        let sourceExt = SourceExtension(
+    static func createExtension(from source: Source) throws -> SRExtension {
+        let sourceExt = try SRExtension(
             sourceURL: URL.documentsDirectory.appending(path: source.path!),
             sourceInfo: source.sourceInfo
         )
-
-        _ = sourceExt.initialiseSource()
 
         return sourceExt
     }
@@ -105,14 +107,17 @@ class SourceManager {
                 try? FileManager.default.removeItem(at: tmpDir)
 
                 sources.append(source)
-                let ext = SourceManager.createExtension(from: source)
-                extensions.updateValue(ext, forKey: source.id)
+
+                let ext = try? SourceManager.createExtension(from: source)
+                if let ext = ext {
+                    extensions.updateValue(ext, forKey: source.id)
+                }
 
                 try? modelContext.save()
                 return source
             }
 
-            print("\(#function) Failed to create source")
+            Logger.general.warning("\(#function) Failed to create source")
         }
 
         return nil

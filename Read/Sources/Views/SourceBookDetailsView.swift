@@ -5,12 +5,14 @@
 //  Created by Mirna Olvera on 3/31/24.
 //
 
+import OSLog
 import SwiftUI
 
 struct SourceBookDetailsView: View {
     @Environment(AppTheme.self) private var theme
     @Environment(SourceManager.self) private var sourceManager
-    @State var extensionJS: SourceExtension?
+    @State var extensionJS: SRExtension?
+//    @State var extensionJS: SourceExtension?
 
     @State private var bookDetails: SourceBook?
     @State private var loadingState: Bool = false
@@ -22,7 +24,7 @@ struct SourceBookDetailsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .bottom, spacing: 10) {
-                    SourceBookImage(imageUrl: bookDetails?.bookInfo.image ?? item.image)
+                    SourceBookImage(imageUrl: bookDetails?.bookInfo.image ?? item.image, title: item.title, author: item.author)
                         .frame(width: 114, height: 114 * 1.5)
                         .clipShape(.rect(cornerRadius: 6))
 
@@ -87,9 +89,9 @@ struct SourceBookDetailsView: View {
                 return
             }
 
-            if extensionJS.loaded == false {
-                _ = extensionJS.initialiseSource()
-            }
+//            if extensionJS.loaded == false {
+//                _ = extensionJS.initialiseSource()
+//            }
 
             do {
                 let details = try await extensionJS.getBookDetails(for: item.id)
@@ -97,7 +99,7 @@ struct SourceBookDetailsView: View {
                 bookDetails = details
             } catch {
                 // TODO: ERROR
-                Log("Something went wrong getting book details: \(error.localizedDescription)")
+                Logger.general.error("Something went wrong getting book details: \(error.localizedDescription)")
             }
 
             loadingState = false

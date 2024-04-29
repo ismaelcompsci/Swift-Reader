@@ -5,11 +5,12 @@
 //  Created by Mirna Olvera on 3/31/24.
 //
 
+import OSLog
 import SwiftUI
 
 struct PagedViewMoreItems: View {
     @Environment(SourceManager.self) private var sourceManager
-    @State var extensionJS: SourceExtension?
+    @State var extensionJS: SRExtension?
 
     var sourceId: String
     var viewMoreId: String
@@ -89,7 +90,7 @@ struct PagedViewMoreItems: View {
 
         } catch {
             // TODO: EROROR
-            Log("Paged View More Items Error: \(error.localizedDescription)")
+            Logger.general.error("Paged View More Items Error: \(error.localizedDescription)")
             self.cancel = true
         }
     }

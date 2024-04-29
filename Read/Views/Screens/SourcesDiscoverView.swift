@@ -33,8 +33,12 @@ struct SourcesDiscoverView: View {
                     ) { size in
                         ForEach(sourceManager.sources) { source in
 
-                            SourceExtensionView(source: source)
-                                .frame(width: size.width, height: size.height)
+                            SourceExtensionView(
+                                sourceId: source.id,
+                                hasHomePageInterface: source.sourceInfo.interfaces.homePage,
+                                extensionJS: sourceManager.extensions[source.id]
+                            )
+                            .frame(width: size.width, height: size.height)
                         }
                     }
                 }

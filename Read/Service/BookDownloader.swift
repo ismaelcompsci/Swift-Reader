@@ -8,6 +8,7 @@
 import Combine
 import DownloadManager
 import Foundation
+import OSLog
 import UIKit
 
 @Observable
@@ -50,7 +51,7 @@ public class BookDownloader {
 
         manager.onQueueDidChange.sink { [weak self] downloads in
             guard let self = self else { return }
-            Log("DownloadManger queue did change")
+            Logger.general.debug("DownloadManger queue did change")
             self.queue = downloads
         }
         .store(in: &subscriptions)
@@ -107,9 +108,10 @@ extension BookDownloader {
         let info = bookInfo[download.id]
         let bookTitle = "\(info?.title ?? "book")"
 
-        Log("DOWNLOAD FINISHDED: \(info?.title ?? download.id)")
+        Logger.general.info("DOWNLOAD FINISHDED: \(info?.title ?? download.id)")
 
         Task {
+            Logger.general.info("Adding Book to db")
             if download.status != .finished { return }
 
             do {
@@ -129,9 +131,11 @@ extension BookDownloader {
                 queue.removeAll(where: { $0.id == download.id })
                 bookInfo.removeValue(forKey: download.id)
             } catch {
-                Log("Failed to import book: \(error.localizedDescription)")
+                Logger.general.error("Failed to import book: \(error.localizedDescription)")
                 Toaster.shared.presentToast(message: "Failed to add \(bookTitle) to library", type: .error)
             }
+
+            Logger.general.info("Done Adding Book to db")
         }
     }
 }
