@@ -28,7 +28,7 @@ struct SideMenu<Menu: View>: ViewModifier {
                             if self.isShowing {
                                 Color.black.opacity(0.4)
                                     .onTapGesture {
-                                        withAnimation(.snappy) {
+                                        withAnimation(.snappy.speed(2)) {
                                             self.isShowing.toggle()
                                         }
                                     }

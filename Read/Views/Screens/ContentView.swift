@@ -36,7 +36,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        withAnimation(.snappy) {
+                        withAnimation(.snappy.speed(2)) {
                             showMenu = true
                         }
                     } label: {
@@ -65,7 +65,6 @@ struct ContentView: View {
             }
 
             ForEach(SideMenuNavigation.allCases, id: \.self) { nav in
-
                 Button {
                     withAnimation(.snappy) {
                         navigator.sideMenuTab = nav

@@ -15,10 +15,10 @@ struct PagedViewMoreItems: View {
     var sourceId: String
     var viewMoreId: String
 
-    @State var loading = false
-    @State var cancel = false
-    @State var books = [PartialSourceBook]()
+    @State var isFinished = false
+    @State var isLoading = false
 
+    @State var books = [PartialSourceBook]()
     @State var metadata: Any?
 
     let size: CGFloat = 120
@@ -34,26 +34,18 @@ struct PagedViewMoreItems: View {
                     SourceBookCard(book: book, sourceId: self.sourceId)
                 }
 
-                if self.cancel == false {
-                    VStack(spacing: 12) {
+                if !self.isFinished {
+                    HStack(alignment: .center, spacing: 16) {
                         ProgressView()
-                        Spacer()
-                        Text("Loading items")
-                            .font(.subheadline)
+                        Text("Loading...")
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     .padding(8)
                     .background(.ultraThickMaterial)
                     .clipShape(.rect(cornerRadius: 10))
                     .padding(.horizontal)
                     .onAppear {
-                        Task {
-                            if self.loading == true || self.cancel == true {
-                                return
-                            }
-
-                            await self.getMoreHomeViewItems()
-                        }
+                        self.getMoreHomeViewItems()
                     }
                 }
             }
@@ -70,28 +62,32 @@ struct PagedViewMoreItems: View {
         }
     }
 
-    func getMoreHomeViewItems() async {
+    func getMoreHomeViewItems() {
         self.checkExtension()
-        self.loading = true
+        guard let extensionJS = extensionJS else { return }
 
-        guard let extensionJS = self.extensionJS else {
-            return
-        }
+        if !self.isLoading {
+            self.isLoading = true
 
-        do {
-            let moreItems = try await extensionJS.getViewMoreItems(homepageSectionId: self.viewMoreId, metadata: self.metadata)
+            Task {
+                do {
+                    let moreItems = try await extensionJS.getViewMoreItems(homepageSectionId: self.viewMoreId, metadata: self.metadata)
 
-            self.books.append(contentsOf: moreItems.results)
-            if let metadata = moreItems.metadata {
-                self.metadata = metadata
-            } else {
-                self.cancel = true
+                    self.books.append(contentsOf: moreItems.results)
+                    if let metadata = moreItems.metadata {
+                        self.metadata = metadata
+                    } else {
+                        self.isFinished = true
+                    }
+
+                } catch {
+                    // TODO: EROROR
+                    Logger.general.error("Paged View More Items Error: \(error.localizedDescription)")
+                    self.isFinished = true
+                }
+
+                self.isLoading = false
             }
-
-        } catch {
-            // TODO: EROROR
-            Logger.general.error("Paged View More Items Error: \(error.localizedDescription)")
-            self.cancel = true
         }
     }
 }

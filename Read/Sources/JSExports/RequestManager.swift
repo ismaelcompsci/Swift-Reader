@@ -38,12 +38,74 @@ class RequestManager: NSObject, RequestManagerJSExport {
         self.interceptor = interceptor
     }
 
+//    func request(_ request: Request, _ options: JSValue) -> JSManagedValue {
+//        let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
+//            guard let resolve = resolve, let reject = reject, let self = self else { return }
+//
+//            Task {
+//                // TODO: FIX INFINITE CALLING OF INTERCEPTOR
+//                var finalRequest: Request = request
+//
+//                if let interceptor = self.interceptor {
+//                    let interceptedRequest = try? await interceptor.interceptRequest.value.callAsync(withArguments: [request]).toObjectOf(Request.self) as? Request
+//
+//                    finalRequest = interceptedRequest ?? request
+//                }
+//
+//                let url = URL(string: finalRequest.url)
+//                guard let url = url else {
+//                    reject.call(withArguments: [
+//                        [
+//                            "name": "URL Error",
+//                            "response": "Could not decode URL / Request."
+//                        ]
+//                    ])
+//
+//                    return
+//                }
+//
+//                var urlRequest = URLRequest(url: url)
+//                urlRequest.timeoutInterval = TimeInterval(self.requestTimeout / 1000)
+//                urlRequest.httpMethod = finalRequest.method
+//
+//                URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+//
+//                    if let error = error {
+//                        Logger.js.error("\(#function) request error: \(error.localizedDescription) ")
+//                        reject.call(withArguments: [
+//                            [
+//                                "name": "RequestError",
+//                                "response": "\(error.localizedDescription)"
+//                            ]
+//                        ])
+//                    }
+//
+//                    guard let httpResponse = response as? HTTPURLResponse else {
+//                        reject.call(withArguments: ["native response was nil"])
+//                        return
+//                    }
+//
+//                    let res = Response(
+//                        data: String(data: data ?? Data(), encoding: .utf8),
+//                        status: httpResponse.statusCode,
+//                        headers: [:],
+//                        request: request
+//                    )
+//
+//                    resolve.call(withArguments: [res])
+//                }
+//                .resume()
+//            }
+//        }
+//
+//        return JSManagedValue(value: promise)
+//    }
+
     func request(_ request: Request, _ options: JSValue) -> JSManagedValue {
-        Logger.js.info("\(#function) creating request")
         let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
             guard let resolve = resolve, let reject = reject, let self = self else { return }
 
-            Task(priority: .utility) {
+            Task {
                 // TODO: FIX INFINITE CALLING OF INTERCEPTOR
                 var finalRequest: Request = request
 
@@ -65,7 +127,7 @@ class RequestManager: NSObject, RequestManagerJSExport {
 //                } else {
 //                    finalRequest = request
 //                }
-//
+
 //                self.requests.updateValue(finalRequest, forKey: request.url)
 
                 let url = URL(string: finalRequest.url)

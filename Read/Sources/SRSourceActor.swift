@@ -7,6 +7,7 @@
 
 import Foundation
 import JavaScriptCore
+import OSLog
 
 actor SRSourceActor {
     var source: SRExtension
@@ -16,15 +17,15 @@ actor SRSourceActor {
     }
 
     func getBookDetails(for id: String) async throws -> SourceBook {
-        try await source.extensionClass.invokeAsyncMethod(methodKey: "getBookDetails", args: [id])
+        return try await source.extensionClass.invokeAsyncMethod(methodKey: "getBookDetails", args: [id])
     }
 
     func getSearchResults(query: SearchRequest, metadata: Any) async throws -> PagedResults {
-        try await source.extensionClass.invokeAsyncMethod(methodKey: "getSearchResults", args: [query, metadata])
+        return try await source.extensionClass.invokeAsyncMethod(methodKey: "getSearchResults", args: [query, metadata])
     }
 
     func getViewMoreItems(homepageSectionId: String, metadata: Any?) async throws -> PagedResults {
-        try await source.extensionClass.invokeAsyncMethod(methodKey: "getViewMoreItems", args: [homepageSectionId, metadata as Any])
+        return try await source.extensionClass.invokeAsyncMethod(methodKey: "getViewMoreItems", args: [homepageSectionId, metadata as Any])
     }
 
     func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void) {

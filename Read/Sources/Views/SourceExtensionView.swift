@@ -60,7 +60,9 @@ class HomeSectionProvider {
                     let sendableHoldSections = self.batchUpdateHomeSections
 
                     DispatchQueue.main.async {
-                        self.sections = sendableHoldSections
+                        withAnimation(.bouncy) {
+                            self.sections = sendableHoldSections
+                        }
                     }
                 }
 
@@ -105,10 +107,9 @@ struct SourceExtensionView: View {
                             id: section.id,
                             isLoading: section.items.isEmpty
                         )
+                        .transition(.blurReplace().combined(with: .scale(0, anchor: .bottomTrailing)))
                     }
                 }
-                .transition(.opacity.combined(with: .scale))
-
             } else {
                 ContentUnavailableView(
                     "Source has no homepage",
@@ -127,7 +128,9 @@ struct SourceExtensionView: View {
 
             homeSectionProvider.fetching = true
 
-            homeSectionProvider.getHomePageSections()
+            Task {
+                homeSectionProvider.getHomePageSections()
+            }
         }
     }
 }

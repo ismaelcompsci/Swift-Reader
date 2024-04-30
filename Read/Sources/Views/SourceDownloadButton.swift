@@ -8,18 +8,6 @@
 import DownloadManager
 import SwiftUI
 
-struct Butt: View {
-    @Environment(AppTheme.self) var theme
-    @Environment(BookDownloader.self) var bookDownloader
-    @Environment(Toaster.self) var toaster
-
-    var book: SourceBook
-
-    var body: some View {
-        Text("HELO")
-    }
-}
-
 struct SourceDownloadButton: View {
     @Environment(AppTheme.self) var theme
     @Environment(BookDownloader.self) var bookDownloader
@@ -69,8 +57,9 @@ struct SourceDownloadButton: View {
                         case .failed:
                             Text("Failed")
                         case nil:
-                            Text("Download")
+                            Text("Download \(selected?.filetype ?? "book")")
                         }
+
                     } else {
                         Text("Download unavailable")
                     }

@@ -37,7 +37,6 @@ class AppJS: NSObject, AppJSExport {
     }
 
     static func createHomeSection(_ results: NSDictionary) -> HomeSection {
-        Logger.js.info("Thread:: \(Thread.current) M:: \(Thread.isMainThread)")
         let id = results["id"] as? String ?? UUID().uuidString
         let title = results["title"] as? String ?? ""
         let items = (results["items"] as? [PartialSourceBook]) ?? []

@@ -57,12 +57,11 @@ struct SourceSectionView: View {
                         SourceBookCard(book: book, sourceId: sourceId)
                     }
                 }
-                .transition(.opacity.combined(with: .scale))
-                .animation(.easeInOut, value: items.count)
             }
             .contentMargins(10, for: .scrollContent)
             .listRowInsets(EdgeInsets())
         }
+        .transition(.blurReplace().combined(with: .scale(0, anchor: .bottomTrailing)))
     }
 }
 
