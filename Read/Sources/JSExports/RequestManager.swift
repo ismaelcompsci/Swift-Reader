@@ -13,7 +13,7 @@ import OSLog
     var requestTimeout: Int { get }
     var interceptor: SourceInterceptor? { get set }
 
-    func request(_ request: Request, _ options: JSValue) -> JSManagedValue
+    func request(_ request: Request) -> JSManagedValue
     static func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager
 }
 
@@ -33,153 +33,45 @@ class RequestManager: NSObject, RequestManagerJSExport {
     var requestTimeout: Int
     var interceptor: SourceInterceptor?
 
+    let queue: OperationQueue = {
+        let _queue = OperationQueue()
+        _queue.name = "com.sr.RequestManager.OperationQueue"
+        _queue.maxConcurrentOperationCount = 3
+
+        return _queue
+    }()
+
     init(requestTimeout: Int, interceptor: SourceInterceptor? = nil) {
         self.requestTimeout = requestTimeout
         self.interceptor = interceptor
     }
 
-//    func request(_ request: Request, _ options: JSValue) -> JSManagedValue {
-//        let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
-//            guard let resolve = resolve, let reject = reject, let self = self else { return }
-//
-//            Task {
-//                // TODO: FIX INFINITE CALLING OF INTERCEPTOR
-//                var finalRequest: Request = request
-//
-//                if let interceptor = self.interceptor {
-//                    let interceptedRequest = try? await interceptor.interceptRequest.value.callAsync(withArguments: [request]).toObjectOf(Request.self) as? Request
-//
-//                    finalRequest = interceptedRequest ?? request
-//                }
-//
-//                let url = URL(string: finalRequest.url)
-//                guard let url = url else {
-//                    reject.call(withArguments: [
-//                        [
-//                            "name": "URL Error",
-//                            "response": "Could not decode URL / Request."
-//                        ]
-//                    ])
-//
-//                    return
-//                }
-//
-//                var urlRequest = URLRequest(url: url)
-//                urlRequest.timeoutInterval = TimeInterval(self.requestTimeout / 1000)
-//                urlRequest.httpMethod = finalRequest.method
-//
-//                URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-//
-//                    if let error = error {
-//                        Logger.js.error("\(#function) request error: \(error.localizedDescription) ")
-//                        reject.call(withArguments: [
-//                            [
-//                                "name": "RequestError",
-//                                "response": "\(error.localizedDescription)"
-//                            ]
-//                        ])
-//                    }
-//
-//                    guard let httpResponse = response as? HTTPURLResponse else {
-//                        reject.call(withArguments: ["native response was nil"])
-//                        return
-//                    }
-//
-//                    let res = Response(
-//                        data: String(data: data ?? Data(), encoding: .utf8),
-//                        status: httpResponse.statusCode,
-//                        headers: [:],
-//                        request: request
-//                    )
-//
-//                    resolve.call(withArguments: [res])
-//                }
-//                .resume()
-//            }
-//        }
-//
-//        return JSManagedValue(value: promise)
-//    }
-
-    func request(_ request: Request, _ options: JSValue) -> JSManagedValue {
+    func request(_ request: Request) -> JSManagedValue {
         let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
-            guard let resolve = resolve, let reject = reject, let self = self else { return }
+            let requestOperation = RequestOperation(request: request, requestTimeout: self?.requestTimeout ?? 20_000)
 
-            Task {
-                // TODO: FIX INFINITE CALLING OF INTERCEPTOR
-                var finalRequest: Request = request
+            requestOperation.onResult = { result in
+                switch result {
+                case .success(let response):
+                    resolve?.call(withArguments: [response])
 
-                if let interceptor = self.interceptor {
-                    let interceptedRequest = try? await interceptor.interceptRequest.value.callAsync(withArguments: [request]).toObjectOf(Request.self) as? Request
-
-                    finalRequest = interceptedRequest ?? request
-                }
-
-//                if let interceptor = self.interceptor {
-//                    let previousIntercept = self.requests[request.url]
-//
-//                    if previousIntercept == nil, let interceptRequestJS = try? await interceptor.interceptRequest.callAsync(withArguments: [request]), let interceptedRequest = interceptRequestJS.toObjectOf(Request.self) as? Request {
-//                        finalRequest = interceptedRequest
-//                    } else {
-//                        finalRequest = request
-//                    }
-//
-//                } else {
-//                    finalRequest = request
-//                }
-
-//                self.requests.updateValue(finalRequest, forKey: request.url)
-
-                let url = URL(string: finalRequest.url)
-
-                guard let url = url else {
-                    reject.call(withArguments: [
+                case .failure(let error):
+                    reject?.call(withArguments: [
                         [
-                            "name": "URL Error",
-                            "response": "Could not decode URL / Request."
+                            "name": error,
+                            "response": error.localizedDescription
                         ]
                     ])
-
-                    return
-                }
-
-                var urlRequest = URLRequest(url: url)
-                urlRequest.timeoutInterval = TimeInterval(self.requestTimeout / 1000)
-                urlRequest.httpMethod = finalRequest.method
-
-                do {
-                    let (data, response) = try await URLSession.shared.data(for: urlRequest)
-
-                    guard let httpResponse = response as? HTTPURLResponse else {
-                        reject.call(withArguments: ["native response was nil"])
-                        return
-                    }
-
-                    let res = Response(
-                        data: String(data: data, encoding: .utf8),
-                        status: httpResponse.statusCode,
-                        headers: [:],
-                        request: request
-                    )
-
-                    resolve.call(withArguments: [res])
-                } catch {
-                    Logger.js.error("\(#function) request error: \(error.localizedDescription) ")
-                    reject.call(withArguments: [
-                        [
-                            "name": "RequestError",
-                            "response": "\(error.localizedDescription)"
-                        ]
-                    ])
-                    return
                 }
             }
+
+            self?.queue.addOperations([requestOperation], waitUntilFinished: false)
         }
 
         return JSManagedValue(value: promise)
     }
 
-    class func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager {
+    static func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager {
         return RequestManager(requestTimeout: requestTimeout, interceptor: interceptor)
     }
 }
