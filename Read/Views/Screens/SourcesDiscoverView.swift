@@ -14,7 +14,7 @@ struct SourcesDiscoverView: View {
     @Environment(SourceManager.self) var sourceManager
 
     @State var tabs: [Tab] = []
-    @State var activeTab: Tab.ID = ""
+    @State var tabBarState = ScrollableTabBarScrollingState(isScrolling: false, activeTab: "")
 
     var body: some View {
         VStack {
@@ -26,17 +26,18 @@ struct SourcesDiscoverView: View {
                 )
 
             } else {
-                if tabs.isEmpty == false && activeTab != "" {
+                if tabs.isEmpty == false && tabBarState.activeTab != "" {
                     ScrollableTabBar(
                         tabs: $tabs,
-                        activeTab: $activeTab
+                        state: $tabBarState
                     ) { size in
                         ForEach(sourceManager.sources) { source in
 
                             SourceExtensionView(
                                 sourceId: source.id,
                                 hasHomePageInterface: source.sourceInfo.interfaces.homePage,
-                                extensionJS: sourceManager.extensions[source.id]
+                                extensionJS: sourceManager.extensions[source.id],
+                                tabBarState: $tabBarState
                             )
                             .frame(width: size.width, height: size.height)
                         }
@@ -56,7 +57,7 @@ struct SourcesDiscoverView: View {
             }
 
             if tabs.isEmpty == false {
-                activeTab = tabs[0].id
+                tabBarState = .init(isScrolling: false, activeTab: tabs[0].id)
             }
         }
     }

@@ -8,6 +8,8 @@
 import JavaScriptCore
 
 @objc protocol StateManagerJSExport: JSExport {
+    var keychain: SecureStateManager { get }
+
     func store(_ key: String, _ value: Any)
     func retrieve(_ key: String) -> Any?
 
@@ -15,8 +17,11 @@ import JavaScriptCore
 }
 
 class SourceStateManager: NSObject, StateManagerJSExport {
+    var keychain: SecureStateManager = .init()
+
     var id: String?
 
+    // TODO: Make retrieve and store async
     func store(_ key: String, _ value: Any) {
         var keyPrefix: String
 

@@ -10,96 +10,101 @@ import JavaScriptCore
 import OSLog
 
 @objc protocol AppJSExport: JSExport {
-    static func createRequest(_ request: NSDictionary) -> Request
-    static func createRequestManager(_ manager: JSValue) -> RequestManager
-    static func createBookInfo(_ bookInfo: NSDictionary) -> BookInfo
-    static func createSourceBook(_ sourceBook: NSDictionary) -> SourceBook
-    static func createPartialSourceBook(_ partialSourceBook: NSDictionary) -> PartialSourceBook
-    static func createPagedResults(_ results: NSDictionary) -> PagedResults
-    static func createHomeSection(_ results: NSDictionary) -> HomeSection
-    static func createDownloadInfo(_ results: NSDictionary) -> DownloadInfo
+    static func createRequest(_ info: JSValue) -> Request
+    static func createRequestManager(_ info: JSValue) -> RequestManager
+    static func createBookInfo(_ info: JSValue) -> BookInfo
+    static func createSourceBook(_ info: JSValue) -> SourceBook
+    static func createPartialSourceBook(_ info: JSValue) -> PartialSourceBook
+    static func createPagedResults(_ info: JSValue) -> PagedResults
+    static func createHomeSection(_ info: JSValue) -> HomeSection
+    static func createDownloadInfo(_ info: JSValue) -> DownloadInfo
     static func createSourceStateManager() -> SourceStateManager
+    static func createUISection(_ info: JSValue) -> UISection
+    static func createUIButton(_ info: JSValue) -> UIButton
+    static func createUINavigationButton(_ info: JSValue) -> UINavigationButton
+    static func createUIForm(_ info: JSValue) -> UIForm
+    static func createUIInputField(_ info: JSValue) -> UIInputField
 }
 
-/**
-    -- https://stackoverflow.com/a/69606375
- */
 class AppJS: NSObject, AppJSExport {
+    static func createSecureStateManager() -> SecureStateManager {
+        return SecureStateManager()
+    }
+
     static func createSourceStateManager() -> SourceStateManager {
         return SourceStateManager()
     }
 
-    static func createDownloadInfo(_ results: NSDictionary) -> DownloadInfo {
-        let filetype = results["filetype"] as? String ?? "epub"
-        let link = results["link"] as? String ?? ""
+    static func createDownloadInfo(_ info: JSValue) -> DownloadInfo {
+        let filetype = info.forProperty("filetype").toString() ?? "epub"
+        let link = info.forProperty("link").toString() ?? ""
 
         return DownloadInfo(link: link, filetype: filetype)
     }
 
-    static func createHomeSection(_ results: NSDictionary) -> HomeSection {
-        let id = results["id"] as? String ?? UUID().uuidString
-        let title = results["title"] as? String ?? ""
-        let items = (results["items"] as? [PartialSourceBook]) ?? []
-        let containsMoreItems = results["containsMoreItems"] as? Bool ?? false
+    static func createHomeSection(_ info: JSValue) -> HomeSection {
+        let id = info.forProperty("id").toString() ?? UUID().uuidString
+        let title = info.forProperty("title").toString() ?? ""
+        let items = (info.forProperty("items").toArray() as? [PartialSourceBook]) ?? []
+        let containsMoreItems = info.forProperty("containsMoreItems").toBool()
 
         return HomeSection(id: id, title: title, items: items, containsMoreItems: containsMoreItems)
     }
 
-    static func createPagedResults(_ pagedResults: NSDictionary) -> PagedResults {
-        let results = (pagedResults["results"] as? [PartialSourceBook]) ?? []
-        let metadata = pagedResults["metadata"] as Any?
-
+    static func createPagedResults(_ info: JSValue) -> PagedResults {
+        let results = (info.forProperty("results").toArray() as? [PartialSourceBook]) ?? []
+        let metadata = info.forProperty("metadata").toObject()
         return PagedResults(results: results, metadata: metadata)
     }
 
-    static func createPartialSourceBook(_ partialSourceBook: NSDictionary) -> PartialSourceBook {
-        let title = partialSourceBook["title"] as? String ?? ""
-        let id = partialSourceBook["id"] as? String ?? UUID().uuidString
-        let image = partialSourceBook["image"] as? String
-        let author = partialSourceBook["author"] as? String
+    static func createPartialSourceBook(_ info: JSValue) -> PartialSourceBook {
+        let title = info.forProperty("title").toString() ?? "Unknown Title"
+        let id = info.forProperty("id").toString() ?? UUID().uuidString
+        let image = info.forProperty("image").toString()
+        let author = info.forProperty("author").toString() ?? "Unknown Author"
 
         return PartialSourceBook(id: id, title: title, image: image, author: author)
     }
 
-    static func createRequest(_ request: NSDictionary) -> Request {
-        let url = request["url"] as? String ?? "undefined"
-        let method = request["method"] as? String ?? "undefined"
+    static func createRequest(_ info: JSValue) -> Request {
+        let url = info.forProperty("url").toString() ?? "undefined"
+        let method = info.forProperty("method").toString() ?? "undefined"
+        let data = info.forProperty("data")
+        let headers = info.forProperty("headers").toDictionary() as? [String: String]
 
-        return Request(url: url, method: method)
+        var dataString: String? = nil
+
+        if let data = data, data.isUndefined == false {
+            dataString = data.toString()
+        }
+
+        return Request(url: url, method: method, data: dataString, headers: headers)
     }
 
-    static func createRequestManager(_ manager: JSValue) -> RequestManager {
-        let timeout = manager.objectForKeyedSubscript("requestTimeout").toNumber() as? Int
-        let interceptor = manager.objectForKeyedSubscript("interceptor")
+    static func createRequestManager(_ info: JSValue) -> RequestManager {
+        let timeout = info.forProperty("requestTimeout").toNumber() as? Int
 
-        var sourceInterceptor: SourceInterceptor? = nil
+        var interceptor: JSValue? = nil
+
+        if info.hasProperty("interceptor") {
+            interceptor = info.forProperty("interceptor")
+        }
 
         let rm = RequestManager(
             requestTimeout: timeout ?? 20_000,
-            interceptor: nil
+            interceptor: interceptor
         )
-
-        if let interceptor = interceptor, interceptor.isUndefined == false {
-            if let interceptRequest = interceptor.objectForKeyedSubscript("interceptRequest"),
-               let interceptorJSMangaged = JSManagedValue(value: interceptRequest)
-            {
-                sourceInterceptor = SourceInterceptor(interceptRequest: interceptorJSMangaged)
-                JSContext.current()!.virtualMachine.addManagedReference(interceptorJSMangaged, withOwner: rm)
-            }
-        }
-
-        rm.interceptor = sourceInterceptor
 
         return rm
     }
 
-    static func createBookInfo(_ bookInfo: NSDictionary) -> BookInfo {
-        let title = bookInfo["title"] as? String ?? ""
-        let author = bookInfo["title"] as? String
-        let desc = bookInfo["desc"] as? String
-        let image = bookInfo["image"] as? String
-        let tags = bookInfo["tags"] as? [String]
-        let downloadLinks = bookInfo["downloadLinks"] as? [DownloadInfo] ?? []
+    static func createBookInfo(_ info: JSValue) -> BookInfo {
+        let title = info.forProperty("title").toString() ?? "Unknown Title"
+        let author = info.forProperty("author").toString() ?? "Unknown Author"
+        let desc = info.forProperty("desc").toString()
+        let image = info.forProperty("image").toString()
+        let tags = info.forProperty("tags").toArray() as? [String]
+        let downloadLinks = info.forProperty("downloadLinks").toArray() as? [DownloadInfo] ?? []
 
         return BookInfo(
             title: title,
@@ -111,10 +116,109 @@ class AppJS: NSObject, AppJSExport {
         )
     }
 
-    static func createSourceBook(_ sourceBook: NSDictionary) -> SourceBook {
-        let id = sourceBook["id"] as? String ?? ""
-        let bookInfo = sourceBook["bookInfo"] as? BookInfo ?? BookInfo(title: "", downloadLinks: [])
+    static func createSourceBook(_ info: JSValue) -> SourceBook {
+        let id = info.forProperty("id").toString() ?? ""
+        let bookInfo = info.forProperty("bookInfo").toObjectOf(BookInfo.self) as? BookInfo ?? BookInfo(title: "", downloadLinks: [])
 
         return SourceBook(id: id, bookInfo: bookInfo)
+    }
+}
+
+// MARK: JS UI
+
+extension AppJS {
+//    static func createUIBinding(_ info: JSValue) -> UIBinding {
+//        return UIBinding()
+//    }
+
+    static func createUIInputField(_ info: JSValue) -> UIInputField {
+        let id = info.forProperty("id")
+        let label = info.forProperty("label")
+        let value = info.forProperty("value")
+
+        let input = UIInputField(id: id?.toString() ?? UUID().uuidString)
+        input.setProp("id", id)
+        input.setProp("label", label)
+        input.setProp("value", value)
+
+        return input
+    }
+
+    static func createUIForm(_ info: JSValue) -> UIForm {
+        let id = info.forProperty("id")
+        let sections = info.forProperty("sections")
+        let onSubmit = info.forProperty("onSubmit")
+
+        let form = UIForm(id: id?.toString() ?? UUID().uuidString)
+
+        sections?.call(completion: { result in
+            switch result {
+            case .success(let success):
+                if let children = success, let children = children.toArray() as? [AnyUI] {
+                    form.setChildren(children)
+                }
+            case .failure:
+                Logger.js.warning("Failure making uiform sections children")
+            }
+        })
+
+        form.setProp("onSubmit", onSubmit)
+        form.setProp("id", id)
+
+        return form
+    }
+
+    static func createUINavigationButton(_ info: JSValue) -> UINavigationButton {
+        let id = info.forProperty("id")
+        let label = info.forProperty("label")
+        let form = info.forProperty("form")
+
+        let navigationButton = UINavigationButton(id: id?.toString() ?? UUID().uuidString)
+        navigationButton.setProp("label", label)
+        navigationButton.setProp("id", id)
+
+        if let children = form, let children = children.toObjectOf(AnyUI.self) as? AnyUI {
+            navigationButton.setChildren([children])
+        }
+
+        return navigationButton
+    }
+
+    static func createUIButton(_ info: JSValue) -> UIButton {
+        let id = info.forProperty("id")
+
+        let button = UIButton(id: id?.toString() ?? UUID().uuidString)
+        button.setProp("id", id)
+        button.setProp("label", info.forProperty("label"))
+        button.setProp("onTap", info.forProperty("onTap"))
+
+        return button
+    }
+
+    static func createUISection(_ info: JSValue) -> UISection {
+        let id = info.forProperty("id")
+        let title = info.forProperty("title")
+        let isHidden = info.forProperty("isHidden")
+        let rows = info.forProperty("rows")
+
+        let section = UISection(id: id?.toString() ?? UUID().uuidString)
+
+        section.setProp("id", id)
+        section.setProp("title", title)
+        section.setProp("isHidden", isHidden)
+        section.setProp("rows", rows)
+
+        rows?.call(completion: { result in
+            switch result {
+            case .success(let success):
+                if let children = success, let children = children.toArray() as? [AnyUI] {
+                    section.setChildren(children)
+                }
+            case .failure:
+                Logger.js.warning("Failure making ui section children")
+            }
+        })
+
+        return section
     }
 }

@@ -13,6 +13,24 @@ public extension JSValue {
         return !isUndefined && !isNull
     }
 
+    func call(withArguments args: [Any] = [], completion: @escaping (Result<JSValue?, Error>) -> Void) {
+        let onFulfilled: @convention(block) (JSValue) -> Void = { value in
+            completion(.success(value))
+        }
+        let onRejected: @convention(block) (JSValue) -> Void = { error in
+            let error = JSContext.getErrorFrom(key: "JS async function", error: error)
+            completion(.failure(error))
+        }
+
+        let promiseArgs = [
+            unsafeBitCast(onFulfilled, to: JSValue.self),
+            unsafeBitCast(onRejected, to: JSValue.self)
+        ]
+
+        let promise = call(withArguments: args)
+        promise?.invokeMethod("then", withArguments: promiseArgs)
+    }
+
     /// - Parameters:
     ///   - withArguments: Optional arguments
     /// - Returns: The return value of the function

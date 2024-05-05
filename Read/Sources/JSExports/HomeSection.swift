@@ -9,8 +9,8 @@ import Foundation
 import JavaScriptCore
 
 @objc protocol HomeSectionJSExport: JSExport {
-    var id: String { get }
-    var title: String { get }
+    var id: String { get set }
+    var title: String { get set }
     var items: [PartialSourceBook] { get set }
     var containsMoreItems: Bool { get set }
 

@@ -6,25 +6,68 @@
 //
 
 import SwiftUI
+import SwiftUIIntrospect
+import UIKit
+
+@Observable
+class ScrollViewDelegate: NSObject, UIScrollViewDelegate {
+    var isScrolling = false
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if isScrolling == false {
+            isScrolling = true
+        }
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isScrolling = false
+    }
+
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        isScrolling = false
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isScrolling = true
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        isScrolling = false
+    }
+}
+
+struct ScrollableTabBarScrollingState: Equatable, Identifiable {
+    var id = UUID()
+    var isScrolling: Bool
+    var activeTab: Tab.ID
+
+    static func ==(
+        lhs: ScrollableTabBarScrollingState,
+        rhs: ScrollableTabBarScrollingState
+    ) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
 
 struct ScrollableTabBar<Content: View>: View {
     @Binding var tabs: [Tab]
-    @Binding var activeTab: Tab.ID
+    @Binding var state: ScrollableTabBarScrollingState
 
     @State private var tabBarScrollState: Tab.ID
     @State private var mainViewScrollState: Tab.ID?
     @State private var progress: CGFloat = .zero
+    @State private var scrollViewDelegate = ScrollViewDelegate()
 
     private var content: (CGSize) -> Content
 
     init(
         tabs: Binding<[Tab]>,
-        activeTab: Binding<Tab.ID>,
+        state: Binding<ScrollableTabBarScrollingState>,
         content: @escaping (CGSize) -> Content
     ) {
         self._tabs = tabs
-        self._activeTab = activeTab
-        self._tabBarScrollState = State(initialValue: activeTab.wrappedValue)
+        self._state = state
+        self._tabBarScrollState = State(initialValue: state.wrappedValue.activeTab)
         self.content = content
     }
 
@@ -49,10 +92,24 @@ struct ScrollableTabBar<Content: View>: View {
                 .onChange(of: mainViewScrollState) { _, newValue in
                     if let newValue = newValue {
                         withAnimation(.snappy) {
+                            state.activeTab = newValue
                             tabBarScrollState = newValue
-                            activeTab = newValue
                         }
                     }
+                }
+                .onChange(of: scrollViewDelegate.isScrolling) { _, newValue in
+                    if newValue == false {
+                        let index = Int(progress)
+                        let tab = tabs[index]
+
+                        withAnimation(.snappy) {
+                            state = .init(isScrolling: newValue, activeTab: tab.id)
+                            tabBarScrollState = tab.id
+                        }
+                    }
+                }
+                .introspect(.scrollView, on: .iOS(.v17)) { scrollView in
+                    scrollView.delegate = scrollViewDelegate
                 }
             }
         }
@@ -65,7 +122,7 @@ struct ScrollableTabBar<Content: View>: View {
                 ForEach(tabs) { tab in
                     Button {
                         withAnimation(.snappy) {
-                            activeTab = tab.id
+                            state = .init(isScrolling: false, activeTab: tab.id)
                             tabBarScrollState = tab.id
                             mainViewScrollState = tab.id
                         }
@@ -73,7 +130,7 @@ struct ScrollableTabBar<Content: View>: View {
                         Text(tab.label)
                             .padding(.vertical, 12)
                             .contentShape(.rect)
-                            .foregroundStyle(activeTab == tab.id ? Color.primary : Color.gray)
+                            .foregroundStyle(state.activeTab == tab.id ? Color.primary : Color.gray)
                     }
                     .buttonStyle(.plain)
                     .rect { rect in

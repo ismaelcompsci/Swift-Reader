@@ -11,27 +11,27 @@ import OSLog
 
 @objc protocol RequestManagerJSExport: JSExport {
     var requestTimeout: Int { get }
-    var interceptor: SourceInterceptor? { get set }
+    var interceptor: JSValue? { get set }
 
     func request(_ request: Request) -> JSManagedValue
-    static func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager
+    static func createRequestManager(requestTimeout: Int, interceptor: JSValue?) -> RequestManager
 }
 
 @objc protocol SourceInterceptorJSExport: JSExport {
-    var interceptRequest: JSManagedValue { get set }
+    var interceptRequest: JSValue { get set }
 }
 
 class SourceInterceptor: NSObject, SourceInterceptorJSExport {
-    var interceptRequest: JSManagedValue
+    var interceptRequest: JSValue
 
-    init(interceptRequest: JSManagedValue) {
+    init(interceptRequest: JSValue) {
         self.interceptRequest = interceptRequest
     }
 }
 
 class RequestManager: NSObject, RequestManagerJSExport {
     var requestTimeout: Int
-    var interceptor: SourceInterceptor?
+    var interceptor: JSValue?
 
     let queue: OperationQueue = {
         let _queue = OperationQueue()
@@ -41,14 +41,18 @@ class RequestManager: NSObject, RequestManagerJSExport {
         return _queue
     }()
 
-    init(requestTimeout: Int, interceptor: SourceInterceptor? = nil) {
+    init(requestTimeout: Int, interceptor: JSValue? = nil) {
         self.requestTimeout = requestTimeout
         self.interceptor = interceptor
     }
 
     func request(_ request: Request) -> JSManagedValue {
         let promise = JSValue(newPromiseIn: JSContext.current()) { [weak self] resolve, reject in
-            let requestOperation = RequestOperation(request: request, requestTimeout: self?.requestTimeout ?? 20_000)
+            let requestOperation = RequestOperation(
+                request: request,
+                requestTimeout: self?.requestTimeout ?? 20_000,
+                interceptor: self?.interceptor
+            )
 
             requestOperation.onResult = { result in
                 switch result {
@@ -71,7 +75,7 @@ class RequestManager: NSObject, RequestManagerJSExport {
         return JSManagedValue(value: promise)
     }
 
-    static func createRequestManager(requestTimeout: Int, interceptor: SourceInterceptor?) -> RequestManager {
+    static func createRequestManager(requestTimeout: Int, interceptor: JSValue?) -> RequestManager {
         return RequestManager(requestTimeout: requestTimeout, interceptor: interceptor)
     }
 }

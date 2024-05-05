@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct SourceExtensionDetails: View {
-    @Environment(SourceManager.self) var sourceManger
+    @Environment(SourceManager.self) var sourceManager
 
     let sourceId: String
 
+    @State var uiSection: UISection?
+
     var source: Source? {
-        sourceManger.sources.first(where: { $0.id == sourceId })
+        sourceManager.sources.first(where: { $0.id == sourceId })
     }
 
     var body: some View {
@@ -52,6 +54,13 @@ struct SourceExtensionDetails: View {
                     Text(source?.sourceInfo.sourceUrl?.absoluteString ?? "Unknown")
                 }
             }
+
+            if let uiSection = uiSection {
+                uiSection.render()
+            }
+        }
+        .task {
+            uiSection = await sourceManager.extensions[source?.sourceInfo.id ?? ""]?.getSourceMenu()
         }
     }
 

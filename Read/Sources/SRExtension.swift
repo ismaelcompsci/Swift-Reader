@@ -14,7 +14,7 @@ class SRExtension: Identifiable {
 
     var actor: SRSourceActor!
 
-    var context: JSContext
+    var ctx: JSContext
     var cheerio: JSValue!
     var extensionClass: JSValue!
 
@@ -26,7 +26,7 @@ class SRExtension: Identifiable {
         self.sourceInfo = sourceInfo
         self.sourceURL = sourceURL
 
-        self.context = JSContext()
+        self.ctx = JSContext()
         self.actor = SRSourceActor(source: self)
 
         // init context first
@@ -43,9 +43,9 @@ class SRExtension: Identifiable {
             return
         }
 
-        context.evaluateScript(jsString)
+        ctx.evaluateScript(jsString)
 
-        let sourceClass = context.evaluateScript("source.\(sourceInfo.name)")
+        let sourceClass = ctx.evaluateScript("source.\(sourceInfo.name)")
         if let extensionClass = sourceClass?.construct(withArguments: [cheerio!]) {
             self.extensionClass = extensionClass
         } else {
@@ -56,9 +56,9 @@ class SRExtension: Identifiable {
     }
 
     func initialiseJSContext() throws {
-        context.name = sourceInfo.name
+        ctx.name = sourceInfo.name
         /* DEBUG */
-        context.isInspectable = true
+        ctx.isInspectable = true
 
         guard let baseJS = Bundle.main.path(forResource: "bundle", ofType: "js") else {
             Logger.js.warning("Something went wrong trying to load the main js bundle")
@@ -68,7 +68,7 @@ class SRExtension: Identifiable {
         do {
             var jsString = try String(contentsOfFile: baseJS, encoding: .utf8)
             jsString.append("; cheerio;") // needed to get the JSValue of cheerio
-            cheerio = context.evaluateScript(jsString)
+            cheerio = ctx.evaluateScript(jsString)
         } catch {
             Logger.general.error("Error while processing script file: \(error)")
             return
@@ -78,12 +78,12 @@ class SRExtension: Identifiable {
             throw ExtensionError.invalidContext
         }
 
-        context.setObject(
+        ctx.setObject(
             Console.self,
             forKeyedSubscript: "console" as NSCopying & NSObjectProtocol
         )
 
-        context.exceptionHandler = { (_: JSContext!, value: JSValue!) in
+        ctx.exceptionHandler = { (_: JSContext!, value: JSValue!) in
 
             let stacktrace = value.objectForKeyedSubscript("stack").toString() ?? ""
 
@@ -98,17 +98,19 @@ class SRExtension: Identifiable {
     }
 
     func exportJSObjects() {
-        context.setObject(AppJS.self, forKeyedSubscript: "App" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(Request.self, forKeyedSubscript: "Request" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(Response.self, forKeyedSubscript: "Response" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(RequestManager.self, forKeyedSubscript: "RequestManager" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(BookInfo.self, forKeyedSubscript: "BookInfo" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(SourceBook.self, forKeyedSubscript: "SourceBook" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(SearchRequest.self, forKeyedSubscript: "SearchRequest" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(PartialSourceBook.self, forKeyedSubscript: "PartialSourceBook" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(HomeSection.self, forKeyedSubscript: "HomeSection" as (NSCopying & NSObjectProtocol)?)
-        context.setObject(SourceStateManager.self, forKeyedSubscript: "SourceStateManager"as (NSCopying & NSObjectProtocol)?)
-        context.setObject(SourceInterceptor.self, forKeyedSubscript: "SourceInterceptor"as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(AppJS.self, forKeyedSubscript: "App" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(Request.self, forKeyedSubscript: "Request" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(Response.self, forKeyedSubscript: "Response" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(RequestManager.self, forKeyedSubscript: "RequestManager" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(BookInfo.self, forKeyedSubscript: "BookInfo" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(SourceBook.self, forKeyedSubscript: "SourceBook" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(SearchRequest.self, forKeyedSubscript: "SearchRequest" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(PartialSourceBook.self, forKeyedSubscript: "PartialSourceBook" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(HomeSection.self, forKeyedSubscript: "HomeSection" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(SourceStateManager.self, forKeyedSubscript: "SourceStateManager"as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(SourceInterceptor.self, forKeyedSubscript: "SourceInterceptor"as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(UISection.self, forKeyedSubscript: "UISection" as (NSCopying & NSObjectProtocol)?)
+        ctx.setObject(UIButton.self, forKeyedSubscript: "UIButton" as (NSCopying & NSObjectProtocol)?)
     }
 }
 
@@ -129,6 +131,11 @@ extension SRExtension {
         Task {
             await actor.getHomePageSections(sectionCallback: sectionCallback)
         }
+    }
+
+    func getSourceMenu() async -> UISection? {
+        let menu: UISection? = try? await extensionClass.invokeAsyncMethod(methodKey: "getSourceMenu", args: [])
+        return menu
     }
 }
 

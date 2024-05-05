@@ -19,7 +19,7 @@ struct SRHomeSection {
 class HomeSectionProvider {
     var extensionJS: SRExtension
     var sections: [String: SRHomeSection] = [:]
-    var fetching = false
+    var hasFetched = false
 
     var batchUpdateHomeSections: [String: SRHomeSection] = [:]
     var homeSectionsInitialized = 0
@@ -52,7 +52,9 @@ class HomeSectionProvider {
                     self.batchUpdateHomeSections[srhomeSection.id] = srhomeSection
 
                     DispatchQueue.main.async {
-                        self.sections[srhomeSection.id] = srhomeSection
+                        withAnimation(.bouncy.speed(1.6)) {
+                            self.sections[srhomeSection.id] = srhomeSection
+                        }
                     }
                 }
 
@@ -60,7 +62,7 @@ class HomeSectionProvider {
                     let sendableHoldSections = self.batchUpdateHomeSections
 
                     DispatchQueue.main.async {
-                        withAnimation(.bouncy) {
+                        withAnimation(.bouncy.speed(1.6)) {
                             self.sections = sendableHoldSections
                         }
                     }
@@ -78,14 +80,21 @@ struct SourceExtensionView: View {
     var extensionJS: SRExtension?
 
     @State var homeSectionProvider: HomeSectionProvider?
+    @Binding var tabBarState: ScrollableTabBarScrollingState
 
     let sourceId: String
     let hasHomePageInterface: Bool
 
-    init(sourceId: String, hasHomePageInterface: Bool, extensionJS: SRExtension?) {
+    init(
+        sourceId: String,
+        hasHomePageInterface: Bool,
+        extensionJS: SRExtension?,
+        tabBarState: Binding<ScrollableTabBarScrollingState>
+    ) {
         self.sourceId = sourceId
         self.hasHomePageInterface = hasHomePageInterface
         self.extensionJS = extensionJS
+        self._tabBarState = tabBarState
 
         if let extensionJS = extensionJS {
             self._homeSectionProvider = State(initialValue: HomeSectionProvider(extensionJS: extensionJS))
@@ -119,14 +128,20 @@ struct SourceExtensionView: View {
             }
         }
         .contentMargins(.vertical, 24, for: .scrollContent)
-        .task {
+        .onChange(of: tabBarState) { _, newValue in
+            getHomePageSection(isScrolling: newValue.isScrolling, activeTab: newValue.activeTab)
+        }
+    }
+
+    func getHomePageSection(isScrolling: Bool, activeTab: Tab.ID) {
+        if isScrolling == false, activeTab == (sourceId as Tab.ID) {
             guard let homeSectionProvider = homeSectionProvider, hasHomePageInterface == true else { return }
 
-            if homeSectionProvider.fetching {
+            if homeSectionProvider.hasFetched {
                 return
             }
 
-            homeSectionProvider.fetching = true
+            homeSectionProvider.hasFetched = true
 
             Task {
                 homeSectionProvider.getHomePageSections()
@@ -136,5 +151,10 @@ struct SourceExtensionView: View {
 }
 
 #Preview {
-    SourceExtensionView(sourceId: "", hasHomePageInterface: false, extensionJS: nil)
+    SourceExtensionView(
+        sourceId: "",
+        hasHomePageInterface: false,
+        extensionJS: nil,
+        tabBarState: .constant(.init(isScrolling: false, activeTab: ""))
+    )
 }

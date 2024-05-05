@@ -44,7 +44,7 @@ actor SRSourceActor {
             }
         }
 
-        let callbackFn = JSValue(object: callback, in: source.context)
+        let callbackFn = JSValue(object: callback, in: source.ctx)
 
         if let callbackFn {
             source.extensionClass.invokeMethod("getHomePageSections", withArguments: [callbackFn])
