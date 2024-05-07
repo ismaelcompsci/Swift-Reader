@@ -19,7 +19,7 @@ struct BookList: View {
     @Environment(\.realm) var realm
     @Environment(Navigator.self) var navigator
 
-    var sortedBooks: [Book]
+    let sortedBooks: Results<Book>
 
     @State var selectedBook: Book?
 
@@ -52,6 +52,6 @@ struct BookList: View {
     }
 }
 
-#Preview {
-    BookList(sortedBooks: Book.exampleArray)
-}
+// #Preview {
+//    BookList(sortedBooks: Book.exampleArray)
+// }

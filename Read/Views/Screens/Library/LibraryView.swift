@@ -1,5 +1,5 @@
 //
-//  HomeView.swift
+//  LibraryView.swift
 //  Read
 //
 //  Created by Mirna Olvera on 3/14/24.
@@ -8,7 +8,7 @@
 import RealmSwift
 import SwiftUI
 
-struct HomeView: View {
+struct LibraryView: View {
     @ObservedResults(Book.self) var books
 
     @Environment(AppTheme.self) var theme
@@ -17,32 +17,6 @@ struct HomeView: View {
     @StateObject var searchDebouncer = SearchDebouncer()
 
     @State var showUploadFileView: Bool = false
-
-    var homeHeader: some View {
-        HStack {
-            SearchBar(placeholderText: "Search for book...", searchText: $searchDebouncer.searchText)
-
-            // MARK: Display Mode Buttons
-
-            Button {
-                userPreferences.libraryDisplayMode = .list
-
-            } label: {
-                Image(systemName: "list.bullet")
-            }
-            .font(.system(size: 20))
-            .foregroundStyle(userPreferences.libraryDisplayMode == .list ? theme.tintColor : .primary)
-
-            Button {
-                userPreferences.libraryDisplayMode = .grid
-
-            } label: {
-                Image(systemName: "square.grid.2x2")
-            }
-            .font(.system(size: 20))
-            .foregroundStyle(userPreferences.libraryDisplayMode == .grid ? theme.tintColor : .primary)
-        }
-    }
 
     var body: some View {
         @Bindable var userPreferences = userPreferences
@@ -98,6 +72,7 @@ struct HomeView: View {
                     .background()
                 }
             }
+            .padding(.horizontal, 12)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -111,59 +86,65 @@ struct HomeView: View {
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
-        .padding(.horizontal, 12)
-        .navigationBarTitle("Home", displayMode: .inline)
+        .navigationBarTitle("Home", displayMode: .large)
         .sheet(isPresented: self.$showUploadFileView, content: {
             UploadFileView()
                 .interactiveDismissDisabled()
         })
     }
-}
 
-extension HomeView {
-    var sortedBooks: [Book] {
-        if searchDebouncer.debouncedSearchText.isEmpty {
-            return books.sorted { lhs, rhs in
-                switch userPreferences.librarySortKey {
-                case .title:
-                    if userPreferences.librarySortOrder == .descending {
-                        return lhs.title > rhs.title
-                    } else {
-                        return lhs.title < rhs.title
-                    }
-                case .date:
-                    if userPreferences.librarySortOrder == .descending {
-                        return lhs.addedAt > rhs.addedAt
-                    } else {
-                        return lhs.addedAt < rhs.addedAt
-                    }
-                case .author:
-                    if userPreferences.librarySortOrder == .descending {
-                        return lhs.authors.first?.name ?? "" > rhs.authors.first?.name ?? ""
-                    } else {
-                        return lhs.authors.first?.name ?? "" < rhs.authors.first?.name ?? ""
-                    }
-                case .last_read:
-                    if userPreferences.librarySortOrder == .descending {
-                        return lhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0) > rhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0)
-                    } else {
-                        return lhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0) < rhs.readingPosition?.updatedAt ?? Date(timeIntervalSince1970: 0)
-                    }
-                case .progress:
-                    if userPreferences.librarySortOrder == .descending {
-                        return lhs.readingPosition?.progress ?? 0 > rhs.readingPosition?.progress ?? 0
-                    } else {
-                        return lhs.readingPosition?.progress ?? 0 < rhs.readingPosition?.progress ?? 0
-                    }
-                }
+    var homeHeader: some View {
+        HStack {
+            SearchBar(placeholderText: "Search for book...", searchText: $searchDebouncer.searchText)
+
+            // MARK: Display Mode Buttons
+
+            Button {
+                userPreferences.libraryDisplayMode = .list
+
+            } label: {
+                Image(systemName: "list.bullet")
             }
-        } else {
-            return books.filter { $0.title.lowercased().contains(searchDebouncer.debouncedSearchText.lowercased()) }
+            .font(.system(size: 20))
+            .foregroundStyle(userPreferences.libraryDisplayMode == .list ? theme.tintColor : .primary)
+
+            Button {
+                userPreferences.libraryDisplayMode = .grid
+
+            } label: {
+                Image(systemName: "square.grid.2x2")
+            }
+            .font(.system(size: 20))
+            .foregroundStyle(userPreferences.libraryDisplayMode == .grid ? theme.tintColor : .primary)
         }
     }
 }
 
-extension HomeView {
+extension LibraryView {
+    var sortedBooks: RealmSwift.Results<Book> {
+        if searchDebouncer.debouncedSearchText.isEmpty {
+            switch userPreferences.librarySortKey {
+            case .title:
+                return books.sorted(by: \.title, ascending: userPreferences.librarySortOrder == .ascending)
+            case .date:
+                return books.sorted(by: \.addedAt, ascending: userPreferences.librarySortOrder == .ascending)
+            case .author:
+                return books.sorted(by: \.authors.first?.name, ascending: userPreferences.librarySortOrder == .ascending)
+            case .last_read:
+                return books.sorted(by: \.readingPosition?.updatedAt, ascending: userPreferences.librarySortOrder == .ascending)
+            case .progress:
+                return books.sorted(by: \.readingPosition?.progress, ascending: userPreferences.librarySortOrder == .ascending)
+            }
+        } else {
+            return books.filter(
+                "title CONTAINS[cd] %@",
+                searchDebouncer.debouncedSearchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            )
+        }
+    }
+}
+
+extension LibraryView {
     class SearchDebouncer: ObservableObject {
         @Published var searchText = "" {
             didSet {
@@ -187,7 +168,7 @@ extension HomeView {
 }
 
 #Preview {
-    HomeView()
+    LibraryView()
         .preferredColorScheme(.dark)
         .environment(\.font, Font.custom("Poppins-Regular", size: 16))
 }

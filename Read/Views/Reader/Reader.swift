@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 4/12/24.
 //
 
+import OSLog
 import SwiftUI
 
 struct Reader: View {
@@ -20,10 +21,20 @@ struct Reader: View {
     }
 
     var body: some View {
-        if isPdf {
-            PDF(url: url, book: book)
-        } else {
-            EBookView(url: url, book: book)
+        Group {
+            if isPdf {
+                PDF(url: url, book: book)
+            } else {
+                EBookView(url: url, book: book)
+            }
+        }
+        .task {
+            do {
+                try await Task.sleep(nanoseconds: 7_500_000_000)
+                book.updateLastEngaged(.now)
+            } catch {
+                Logger.general.debug("Did not update last engaged for book: \(book.id)")
+            }
         }
     }
 }

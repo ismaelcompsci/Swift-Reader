@@ -45,21 +45,24 @@ public enum NavigatorDestination: Hashable {
 }
 
 public enum SideMenuNavigation: String, Hashable, CaseIterable {
-    case home = "Home"
+    case library = "Library"
     case discover = "Discover"
     case search = "Search"
     case settings = "Settings"
+    case readingNow = "Reading Now"
 
     var icon: String {
         switch self {
-        case .home:
-            "house"
+        case .library:
+            "books.vertical.fill"
         case .discover:
             "shippingbox"
         case .search:
             "magnifyingglass"
         case .settings:
             "gear"
+        case .readingNow:
+            "book.fill"
         }
     }
 }
@@ -67,7 +70,7 @@ public enum SideMenuNavigation: String, Hashable, CaseIterable {
 @Observable
 public class Navigator {
     public var path: [NavigatorDestination] = []
-    public var sideMenuTab: SideMenuNavigation = .home
+    public var sideMenuTab: SideMenuNavigation = .library
 
     public init() {}
 

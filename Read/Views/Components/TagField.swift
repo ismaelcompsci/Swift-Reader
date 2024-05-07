@@ -36,7 +36,7 @@ struct TagField: View {
             .foregroundStyle(.primary)
         }
         .padding(.horizontal, 8)
-        .frame(width: .infinity, height: 24)
+        .frame(height: 24)
         .background(.background)
         .clipShape(.rect(cornerRadius: 12))
         .colorInvert()

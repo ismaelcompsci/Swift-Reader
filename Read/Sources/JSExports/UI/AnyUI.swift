@@ -34,9 +34,11 @@ class AnyUI: NSObject, AnyUIJSExport {
     }
 
     func setChildren(_ newChildren: [AnyUI]) {
-        props.children = newChildren
+        DispatchQueue.main.async {
+            self.props.children = newChildren
 
-        updateCount()
+            self.updateCount()
+        }
     }
 
     init(id: String) {

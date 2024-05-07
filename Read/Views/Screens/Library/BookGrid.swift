@@ -11,19 +11,19 @@ import SwiftUI
 struct BookGrid: View {
     @Environment(\.realm) var realm
     @Environment(Navigator.self) var navigator
+    @Environment(UserPreferences.self) var preferences
 
     @State var selectedBook: Book?
 
     @State private var gridWidth = UIScreen.main.bounds.width
-    @AppStorage("numberOfGridColumns") var numberOfColumns: Int = 2
 
-    var sortedBooks: [Book]
+    let sortedBooks: Results<Book>
     let spacing: CGFloat = 24
 
     var body: some View {
         VStack {
             let width = gridWidth
-            let cols = CGFloat(numberOfColumns)
+            let cols = CGFloat(preferences.numberOfColumns)
             let availableWidth = width - (spacing * cols)
             let itemWidth = availableWidth / cols
 
@@ -62,6 +62,6 @@ struct BookGrid: View {
     }
 }
 
-#Preview {
-    BookGrid(sortedBooks: Book.exampleArray)
-}
+// #Preview {
+//    BookGrid(sortedBooks: )
+// }

@@ -10,6 +10,11 @@ import PDFKit
 import RealmSwift
 import SwiftReader
 
+enum ListName: String, PersistableEnum {
+    case wantToRead = "want_to_read"
+    case completed
+}
+
 class Author: EmbeddedObject {
     @Persisted var name: String = ""
 }
@@ -32,6 +37,9 @@ public class Book: Object, ObjectKeyIdentifiable {
     @Persisted var readingSeconds: Int = 0
     @Persisted var addedAt: Date = .now
     @Persisted var updatedAt: Date = .now
+    @Persisted var lastEngaged: Date?
+
+    @Persisted var lists: List<ListName> = List()
 
     @Persisted var bookFromSource: Bool = false
 
@@ -181,6 +189,17 @@ public extension Book {
         let book = self.thaw()
         try? realm.write {
             book?.highlights.remove(at: index)
+        }
+    }
+
+    func updateLastEngaged(_ time: Date) {
+        guard let realm = realm?.thaw() else {
+            return
+        }
+
+        let book = self.thaw()
+        try? realm.write {
+            book?.lastEngaged = time
         }
     }
 }

@@ -19,11 +19,13 @@ import OSLog
     static func createHomeSection(_ info: JSValue) -> HomeSection
     static func createDownloadInfo(_ info: JSValue) -> DownloadInfo
     static func createSourceStateManager() -> SourceStateManager
+
     static func createUISection(_ info: JSValue) -> UISection
     static func createUIButton(_ info: JSValue) -> UIButton
     static func createUINavigationButton(_ info: JSValue) -> UINavigationButton
     static func createUIForm(_ info: JSValue) -> UIForm
     static func createUIInputField(_ info: JSValue) -> UIInputField
+    static func createUIMultilineLabel(_ info: JSValue) -> UIMultilineLabel
 }
 
 class AppJS: NSObject, AppJSExport {
@@ -130,6 +132,19 @@ extension AppJS {
 //    static func createUIBinding(_ info: JSValue) -> UIBinding {
 //        return UIBinding()
 //    }
+
+    static func createUIMultilineLabel(_ info: JSValue) -> UIMultilineLabel {
+        let id = info.forProperty("id")
+        let label = info.forProperty("label")
+        let value = info.forProperty("value")
+
+        let multilineLabel = UIMultilineLabel(id: id?.toString() ?? UUID().uuidString)
+        multilineLabel.setProp("id", id)
+        multilineLabel.setProp("label", label)
+        multilineLabel.setProp("value", value)
+
+        return multilineLabel
+    }
 
     static func createUIInputField(_ info: JSValue) -> UIInputField {
         let id = info.forProperty("id")

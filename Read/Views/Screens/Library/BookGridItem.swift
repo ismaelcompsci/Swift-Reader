@@ -124,6 +124,7 @@ struct BookGridItem: View {
         Text("Finished")
             .font(.subheadline)
             .foregroundStyle(.secondary)
+            .minimumScaleFactor(0.001)
     }
 
     var progress: some View {
@@ -131,11 +132,13 @@ struct BookGridItem: View {
 
         return Text("\(Int((position?.progress ?? 0) * 100))%")
             .foregroundStyle(.secondary)
+            .minimumScaleFactor(0.001)
     }
 
     var newtag: some View {
         Text("NEW")
             .font(.caption2)
+            .minimumScaleFactor(0.001)
             .fontWeight(.semibold)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)

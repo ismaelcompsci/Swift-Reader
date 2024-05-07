@@ -87,7 +87,7 @@ struct SourceSearch: View {
                     }
                 }
             }
-            .navigationTitle("Search Everything")
+            .navigationBarTitle("Search Everything", displayMode: .large)
             .searchable(text: $searchText, isPresented: $isSearching)
             .tint(theme.tintColor)
             .onSubmit(of: .search) {
