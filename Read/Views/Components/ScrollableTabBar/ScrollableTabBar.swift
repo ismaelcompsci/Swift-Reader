@@ -5,6 +5,7 @@
 //  Created by Mirna Olvera on 4/22/24.
 //
 
+import OSLog
 import SwiftUI
 import SwiftUIIntrospect
 import UIKit
@@ -181,14 +182,16 @@ struct ScrollableTabBar<Content: View>: View {
 @Observable class Tab: Identifiable {
     private(set) var id: Tab.ID
     var label: String
-    var size: CGSize = .zero
-    var minX: CGFloat = .zero
+    var size: CGSize
+    var minX: CGFloat
 
     public typealias ID = String
 
-    init(id: Tab.ID, label: String) {
+    init(id: Tab.ID, label: String, size: CGSize = .zero, minX: CGFloat = .zero) {
         self.id = id
         self.label = label
+        self.size = size
+        self.minX = minX
     }
 
     func update(size: CGSize) {

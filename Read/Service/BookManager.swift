@@ -108,7 +108,6 @@ extension BookManager {
             newBook.summary = metadata.description ?? ""
             newBook.coverPath = metadata.bookCover
             newBook.bookPath = metadata.bookPath
-            newBook.bookFromSource = fromSource
 
             _ = metadata.subject?.map { item in
                 let newTag = BookTag()

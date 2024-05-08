@@ -14,3 +14,10 @@ extension Logger {
     static let general = Logger(subsystem: subsystem, category: "General")
     static let js = Logger(subsystem: subsystem, category: "Javascript")
 }
+
+class SRLogger {
+    static let general = Logger.general
+    static let js = Logger.general
+
+    init() {}
+}

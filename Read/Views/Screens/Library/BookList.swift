@@ -13,6 +13,7 @@ enum BookItemEvent {
     case onClearProgress
     case onEdit
     case onNavigate
+    case onAddToList(ListName)
 }
 
 struct BookList: View {
@@ -48,6 +49,8 @@ struct BookList: View {
             selectedBook = book
         case .onNavigate:
             navigator.navigate(to: .localDetails(book: book))
+        case .onAddToList(let list):
+            book.addToList(list)
         }
     }
 }

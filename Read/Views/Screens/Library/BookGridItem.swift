@@ -18,20 +18,17 @@ struct BookGridItem: View {
     }
 
     var showNewTag: Bool {
-        book.readingPosition?.progress == nil || book.readingPosition?.progress == 0
+        book.readingPosition?.progress == nil
     }
 
     var tagState: TagState {
-        if showNewTag {
-            return .new
-        } else if let position = book.readingPosition {
-            if position.progress == 1.0 {
-                return .finished
-            }
+        if book.lists.contains(.completed) {
+            return .finished
+        } else if book.readingPosition != nil {
             return .progress
+        } else {
+            return .new
         }
-
-        return .new
     }
 
     var cover: some View {
@@ -75,6 +72,26 @@ struct BookGridItem: View {
             Spacer()
 
             Menu {
+                if book.lists.contains(where: { $0 == .completed }) {
+                    Button("Mark as Still Reading", systemImage: "minus.circle") {
+                        onEvent(.onAddToList(.wantToRead))
+                    }
+                } else {
+                    Button("Mark as Finished", systemImage: "checkmark.circle") {
+                        onEvent(.onAddToList(.completed))
+                    }
+                }
+
+                if book.lists.contains(where: { $0 == .wantToRead }) {
+                    Button("Remove from Want to Read", systemImage: "minus.circle") {
+                        onEvent(.onAddToList(.wantToRead))
+                    }
+                } else {
+                    Button("Add To Want to Read", systemImage: "text.badge.star") {
+                        onEvent(.onAddToList(.wantToRead))
+                    }
+                }
+
                 Button("Share", systemImage: "square.and.arrow.up.fill") {
                     showShareSheet(url: URL.documentsDirectory.appending(path: book.bookPath!))
                 }
@@ -132,6 +149,7 @@ struct BookGridItem: View {
 
         return Text("\(Int((position?.progress ?? 0) * 100))%")
             .foregroundStyle(.secondary)
+            .font(.footnote)
             .minimumScaleFactor(0.001)
     }
 

@@ -49,10 +49,12 @@ struct SourcesDiscoverView: View {
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            tabs = sourceManager.sources.map {
+            tabs = sourceManager.sources.map { source in
                 Tab(
-                    id: $0.id,
-                    label: $0.sourceInfo.name
+                    id: source.id,
+                    label: source.sourceInfo.name,
+                    size: tabs.first(where: { tab in tab.id == source.id })?.size ?? .zero,
+                    minX: tabs.first(where: { tab in tab.id == source.id })?.minX ?? .zero
                 )
             }
 

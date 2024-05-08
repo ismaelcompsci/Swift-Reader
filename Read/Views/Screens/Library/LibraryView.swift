@@ -77,7 +77,7 @@ struct LibraryView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    self.showUploadFileView = true
+                    showUploadFileView = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .foregroundStyle(theme.tintColor)
@@ -86,7 +86,7 @@ struct LibraryView: View {
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
-        .navigationBarTitle("Home", displayMode: .large)
+        .navigationBarTitle("Library", displayMode: .large)
         .sheet(isPresented: self.$showUploadFileView, content: {
             UploadFileView()
                 .interactiveDismissDisabled()

@@ -34,15 +34,13 @@ public class Book: Object, ObjectKeyIdentifiable {
     @Persisted var language: String?
     @Persisted var bookPath: String?
     @Persisted var coverPath: String?
-    @Persisted var readingSeconds: Int = 0
+    
+    @Persisted var dateFinished: Date?
     @Persisted var addedAt: Date = .now
     @Persisted var updatedAt: Date = .now
     @Persisted var lastEngaged: Date?
-
     @Persisted var lists: List<ListName> = List()
-
-    @Persisted var bookFromSource: Bool = false
-
+    
     @Persisted var readingPosition: ReadingPosition?
     @Persisted var highlights: List<BookHighlight> = List()
 }
@@ -73,34 +71,34 @@ public extension Book {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         let thawedBook = self.thaw()
-
+        
         try! realm.write {
             if thawedBook?.readingPosition != nil {
                 thawedBook?.readingPosition = nil
             }
         }
     }
-
+    
     func updateReadingPosition(page: PDFPage, document: PDFDocument) {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         let totalPages = CGFloat(document.pageCount)
         let currentPageIndex = CGFloat(document.index(for: page))
         let updatedAt: Date = .now
-
+        
         let book = self.thaw()
-
+        
         try! realm.write {
             if book?.readingPosition == nil {
                 book?.readingPosition = ReadingPosition()
                 book?.readingPosition?.progress = currentPageIndex / totalPages
                 book?.readingPosition?.updatedAt = updatedAt
                 book?.readingPosition?.chapter = Int(currentPageIndex)
-
+                
             } else {
                 book?.readingPosition?.progress = currentPageIndex / totalPages
                 book?.readingPosition?.updatedAt = updatedAt
@@ -108,15 +106,15 @@ public extension Book {
             }
         }
     }
-
+    
     /// non-pdf books only
     func updateReadingPosition(with location: Relocate) {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         let book = self.thaw()
-
+        
         try? realm.write {
             if book?.readingPosition == nil {
                 book?.readingPosition = ReadingPosition()
@@ -130,26 +128,26 @@ public extension Book {
             }
         }
     }
-
+    
     func addHighlight(pdfHighlight: PDFHighlight) {
         guard let realm = realm?.thaw(), let newHightlight = BookHighlight(pdfHighlight: pdfHighlight) else {
             return
         }
-
+        
         let book = self.thaw()
-
+        
         try? realm.write {
             book?.highlights.append(newHightlight)
         }
     }
-
+    
     func addHighlight(text: String, cfi: String, index: Int, label: String, addedAt: Date, updatedAt: Date) {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         let book = self.thaw()
-
+        
         try? realm.write {
             let pHighlight = BookHighlight()
             pHighlight.highlightText = text
@@ -158,31 +156,31 @@ public extension Book {
             pHighlight.chapterTitle = label
             pHighlight.addedAt = addedAt
             pHighlight.updatedAt = updatedAt
-
+            
             book?.highlights.append(pHighlight)
         }
     }
-
+    
     func removeHighlight(withValue value: String) {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         guard let index = highlights.firstIndex(where: { $0.cfi == value }) else {
             return
         }
-
+        
         let book = self.thaw()
         try? realm.write {
             book?.highlights.remove(at: index)
         }
     }
-
+    
     func removeHighlight(withId highlightId: String) {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         guard let index = highlights.firstIndex(where: { $0.highlightId == highlightId }) else {
             return
         }
@@ -191,15 +189,54 @@ public extension Book {
             book?.highlights.remove(at: index)
         }
     }
-
+    
     func updateLastEngaged(_ time: Date) {
         guard let realm = realm?.thaw() else {
             return
         }
-
+        
         let book = self.thaw()
         try? realm.write {
             book?.lastEngaged = time
+        }
+    }
+    
+    internal func removeFromList(_ list: ListName) {
+        guard let realm = realm?.thaw() else {
+            return
+        }
+        
+        let book = self.thaw()
+        try? realm.write {
+            let index = book?.lists.firstIndex(of: list)
+            
+            if let index = index {
+                book?.lists.remove(at: index)
+                
+                if list == .completed {
+                    book?.dateFinished = nil
+                }
+            }
+        }
+    }
+    
+    internal func addToList(_ list: ListName) {
+        guard let realm = realm?.thaw() else {
+            return
+        }
+        
+        if self.lists.contains(where: { $0 == list }) {
+            self.removeFromList(list)
+            return
+        }
+        
+        let book = self.thaw()
+        try? realm.write {
+            book?.lists.append(list)
+            
+            if list == .completed {
+                book?.dateFinished = .now
+            }
         }
     }
 }
