@@ -133,9 +133,8 @@ extension SRExtension {
         }
     }
 
-    func getSourceMenu() async -> UISection? {
-        let menu: UISection? = try? await extensionClass.invokeAsyncMethod(methodKey: "getSourceMenu", args: [])
-        return menu
+    func getSourceMenu() async throws -> UISection? {
+        try await actor.getSourceMenu()
     }
 }
 

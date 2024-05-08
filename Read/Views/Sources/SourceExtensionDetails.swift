@@ -60,7 +60,7 @@ struct SourceExtensionDetails: View {
             }
         }
         .task {
-            uiSection = await sourceManager.extensions[source?.sourceInfo.id ?? ""]?.getSourceMenu()
+            uiSection = try? await sourceManager.extensions[source?.sourceInfo.id ?? ""]?.getSourceMenu()
         }
     }
 

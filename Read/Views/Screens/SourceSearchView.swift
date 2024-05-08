@@ -73,11 +73,13 @@ struct SourceSearch: View {
                             let resultsItems = results.results?.results ?? []
 
                             SourceSectionView(
-                                title: results.source.name,
-                                containsMoreItems: results.results?.metadata != nil,
-                                items: resultsItems,
+                                section: SRHomeSection(
+                                    id: "",
+                                    title: results.source.name,
+                                    items: resultsItems,
+                                    containsMoreItems: results.results?.metadata != nil
+                                ),
                                 sourceId: results.source.id,
-                                isLoading: false,
                                 searchRequest: query
                             )
 
@@ -126,7 +128,11 @@ struct SourceSearch: View {
                     self.searchResults[key]?.results = paged
 
                     withAnimation {
-                        self.searchResults[key]?.state = .done
+                        if paged.results.isEmpty {
+                            self.searchResults[key]?.state = .error
+                        } else {
+                            self.searchResults[key]?.state = .done
+                        }
                     }
                 } catch {
                     // TODO: ERROR TODO

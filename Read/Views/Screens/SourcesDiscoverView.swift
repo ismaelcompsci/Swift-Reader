@@ -32,14 +32,15 @@ struct SourcesDiscoverView: View {
                         state: $tabBarState
                     ) { size in
                         ForEach(sourceManager.sources) { source in
-
-                            SourceExtensionView(
-                                sourceId: source.id,
-                                hasHomePageInterface: source.sourceInfo.interfaces.homePage,
-                                extensionJS: sourceManager.extensions[source.id],
-                                tabBarState: $tabBarState
-                            )
-                            .frame(width: size.width, height: size.height)
+                            if let extensionJS = sourceManager.extensions[source.id] {
+                                SourceExtensionView(
+                                    sourceId: source.id,
+                                    hasHomePageInterface: source.sourceInfo.interfaces.homePage,
+                                    extensionJS: extensionJS,
+                                    tabBarState: $tabBarState
+                                )
+                                .frame(width: size.width, height: size.height)
+                            }
                         }
                     }
                 }

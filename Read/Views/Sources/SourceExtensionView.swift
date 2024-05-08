@@ -8,6 +8,80 @@
 import OSLog
 import SwiftUI
 
+struct SourceExtensionView: View {
+    @Environment(SourceManager.self) private var sourceManager
+
+    @State var homeSectionProvider: HomeSectionProvider
+    @Binding var tabBarState: ScrollableTabBarScrollingState
+
+    var extensionJS: SRExtension
+    let sourceId: String
+    let hasHomePageInterface: Bool
+
+    init(
+        sourceId: String,
+        hasHomePageInterface: Bool,
+        extensionJS: SRExtension,
+        tabBarState: Binding<ScrollableTabBarScrollingState>
+    ) {
+        self.sourceId = sourceId
+        self.hasHomePageInterface = hasHomePageInterface
+        self.extensionJS = extensionJS
+        self._tabBarState = tabBarState
+        self._homeSectionProvider = State(initialValue: HomeSectionProvider(extensionJS: extensionJS))
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            // MARK: Home
+
+            if hasHomePageInterface == true {
+                LazyVStack {
+                    ForEach(Array(homeSectionProvider.sections.values).sorted(by: { $0.title < $1.title }), id: \.id) { section in
+                        SourceSectionView(section: section, sourceId: sourceId)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
+                }
+                .padding(.bottom, 74)
+                .background()
+
+            } else {
+                ContentUnavailableView(
+                    "Source has no homepage",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text("Use search instead")
+                )
+            }
+        }
+        .contentMargins(.horizontal, 12, for: .scrollContent)
+        .contentMargins(.vertical, 12, for: .scrollContent)
+        .refreshable(action: {
+            if homeSectionProvider.isLoading == true { return }
+
+            homeSectionProvider.getHomePageSections()
+        })
+        .onChange(of: tabBarState) { _, newValue in
+            getHomePageSection(isScrolling: newValue.isScrolling, activeTab: newValue.activeTab)
+        }
+    }
+
+    func getHomePageSection(isScrolling: Bool, activeTab: Tab.ID) {
+        if isScrolling == false, activeTab == (sourceId as Tab.ID) {
+            guard hasHomePageInterface == true else { return }
+
+            if homeSectionProvider.hasFetched {
+                return
+            }
+
+            homeSectionProvider.hasFetched = true
+
+            Task {
+                homeSectionProvider.getHomePageSections()
+            }
+        }
+    }
+}
+
 struct SRHomeSection {
     var id: String
     var title: String
@@ -17,6 +91,7 @@ struct SRHomeSection {
 
 @Observable
 class HomeSectionProvider {
+    var isLoading = false
     var extensionJS: SRExtension
     var sections: [String: SRHomeSection] = [:]
     var hasFetched = false
@@ -30,7 +105,7 @@ class HomeSectionProvider {
     }
 
     func getHomePageSections() {
-        // TODO: Batch update ui
+        isLoading = true
         extensionJS.getHomePageSections { [weak self] result in
 
             guard let self = self else { return }
@@ -52,7 +127,7 @@ class HomeSectionProvider {
                     self.batchUpdateHomeSections[srhomeSection.id] = srhomeSection
 
                     DispatchQueue.main.async {
-                        withAnimation(.bouncy.speed(1.6)) {
+                        withAnimation(.snappy) {
                             self.sections[srhomeSection.id] = srhomeSection
                         }
                     }
@@ -62,7 +137,8 @@ class HomeSectionProvider {
                     let sendableHoldSections = self.batchUpdateHomeSections
 
                     DispatchQueue.main.async {
-                        withAnimation(.bouncy.speed(1.6)) {
+                        self.isLoading = false
+                        withAnimation(.snappy) {
                             self.sections = sendableHoldSections
                         }
                     }
@@ -73,88 +149,4 @@ class HomeSectionProvider {
             }
         }
     }
-}
-
-struct SourceExtensionView: View {
-    @Environment(SourceManager.self) private var sourceManager
-    var extensionJS: SRExtension?
-
-    @State var homeSectionProvider: HomeSectionProvider?
-    @Binding var tabBarState: ScrollableTabBarScrollingState
-
-    let sourceId: String
-    let hasHomePageInterface: Bool
-
-    init(
-        sourceId: String,
-        hasHomePageInterface: Bool,
-        extensionJS: SRExtension?,
-        tabBarState: Binding<ScrollableTabBarScrollingState>
-    ) {
-        self.sourceId = sourceId
-        self.hasHomePageInterface = hasHomePageInterface
-        self.extensionJS = extensionJS
-        self._tabBarState = tabBarState
-
-        if let extensionJS = extensionJS {
-            self._homeSectionProvider = State(initialValue: HomeSectionProvider(extensionJS: extensionJS))
-        }
-    }
-
-    var body: some View {
-        ScrollView(showsIndicators: false) {
-            // MARK: Home
-
-            if hasHomePageInterface == true {
-                LazyVStack {
-                    ForEach(homeSectionProvider?.sections.sorted(by: { $0.value.title < $1.value.title }) ?? [], id: \.value.id) { _, section in
-                        SourceSectionView(
-                            title: section.title,
-                            containsMoreItems: section.containsMoreItems,
-                            items: section.items,
-                            sourceId: sourceId,
-                            id: section.id,
-                            isLoading: section.items.isEmpty
-                        )
-                        .transition(.blurReplace().combined(with: .scale(0, anchor: .bottomTrailing)))
-                    }
-                }
-            } else {
-                ContentUnavailableView(
-                    "Source has no homepage",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text("Use search instead")
-                )
-            }
-        }
-        .contentMargins(.vertical, 24, for: .scrollContent)
-        .onChange(of: tabBarState) { _, newValue in
-            getHomePageSection(isScrolling: newValue.isScrolling, activeTab: newValue.activeTab)
-        }
-    }
-
-    func getHomePageSection(isScrolling: Bool, activeTab: Tab.ID) {
-        if isScrolling == false, activeTab == (sourceId as Tab.ID) {
-            guard let homeSectionProvider = homeSectionProvider, hasHomePageInterface == true else { return }
-
-            if homeSectionProvider.hasFetched {
-                return
-            }
-
-            homeSectionProvider.hasFetched = true
-
-            Task {
-                homeSectionProvider.getHomePageSections()
-            }
-        }
-    }
-}
-
-#Preview {
-    SourceExtensionView(
-        sourceId: "",
-        hasHomePageInterface: false,
-        extensionJS: nil,
-        tabBarState: .constant(.init(isScrolling: false, activeTab: ""))
-    )
 }

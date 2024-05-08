@@ -50,4 +50,9 @@ actor SRSourceActor {
             source.extensionClass.invokeMethod("getHomePageSections", withArguments: [callbackFn])
         }
     }
+
+    func getSourceMenu() async throws -> UISection? {
+        let menu: UISection? = try await source.extensionClass.invokeAsyncMethod(methodKey: "getSourceMenu", args: [])
+        return menu
+    }
 }

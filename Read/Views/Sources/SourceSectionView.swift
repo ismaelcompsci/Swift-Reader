@@ -11,20 +11,14 @@ struct SourceSectionView: View {
     @Environment(Navigator.self) var navigator
     @Environment(AppTheme.self) var theme
 
-    var title: String
-    var containsMoreItems: Bool
-    var items: [PartialSourceBook]
-
+    var section: SRHomeSection
     var sourceId: String
-    var id: String?
-    var isLoading: Bool
-
     var searchRequest: SearchRequest?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text(title)
+                Text(section.title)
                     .font(.title2)
                     .lineLimit(1)
                     .fontWeight(.semibold)
@@ -33,14 +27,14 @@ struct SourceSectionView: View {
                 Spacer()
 
                 Group {
-                    if isLoading {
+                    if section.items.isEmpty {
                         ProgressView()
-                    } else if containsMoreItems == true {
+                    } else if section.containsMoreItems == true {
                         Button {
-                            if let id = id {
-                                navigator.navigate(to: .sourcePagedViewMoreItems(sourceId: sourceId, viewMoreId: id))
-                            } else if let searchRequest = searchRequest {
+                            if let searchRequest = searchRequest {
                                 navigator.navigate(to: .sourceSearchPagedResults(searchRequest: searchRequest, sourceId: sourceId))
+                            } else {
+                                navigator.navigate(to: .sourcePagedViewMoreItems(sourceId: sourceId, viewMoreId: section.id))
                             }
                         } label: {
                             Image(systemName: "arrow.up.left.and.arrow.down.right")
@@ -53,7 +47,7 @@ struct SourceSectionView: View {
 
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 12) {
-                    ForEach(items, id: \.self) { book in
+                    ForEach(section.items, id: \.self) { book in
                         SourceBookCard(book: book, sourceId: sourceId)
                     }
                 }
@@ -61,17 +55,12 @@ struct SourceSectionView: View {
             .contentMargins(10, for: .scrollContent)
             .listRowInsets(EdgeInsets())
         }
-        .transition(.blurReplace().combined(with: .scale(0, anchor: .bottomTrailing)))
     }
 }
 
 #Preview {
     SourceSectionView(
-        title: "",
-        containsMoreItems: false,
-        items: [],
-        sourceId: "123",
-        id: "",
-        isLoading: false
+        section: .init(id: "", title: "", items: [], containsMoreItems: false),
+        sourceId: "123"
     )
 }

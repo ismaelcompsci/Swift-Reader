@@ -63,8 +63,8 @@ struct SettingsView: View {
                         preferences.reset()
                     } label: {
                         Text("Reset All")
+                            .foregroundStyle(.red)
                     }
-                    .tint(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 } header: {
@@ -83,8 +83,8 @@ struct SettingsView: View {
             theme.restoreToDefaults()
         } label: {
             Text("Reset theme")
+                .foregroundStyle(.red)
         }
-        .tint(.red)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -154,7 +154,7 @@ struct SettingsView: View {
                 Spacer()
                 Text("\(formattedString)")
             }
-            .tint(.red)
+            .foregroundStyle(.red)
         }
     }
 }

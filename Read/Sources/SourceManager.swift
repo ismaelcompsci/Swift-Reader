@@ -41,22 +41,25 @@ class SourceManager {
         self.sourceLists = (UserDefaults.standard.array(forKey: "Browse.sourceLists") as? [String] ?? [])
             .compactMap { URL(string: $0) }
 
-        for source in sources {
-            let ext = try? SourceManager.createExtension(from: source)
-
-            if let ext = ext {
-                extensions.updateValue(ext, forKey: source.id)
+        Task {
+            // do not make this in main thread do it some where eslse
+            for source in self.sources {
+                self.createExtension(from: source)
             }
         }
     }
 
-    static func createExtension(from source: Source) throws -> SRExtension {
-        let sourceExt = try SRExtension(
-            sourceURL: URL.documentsDirectory.appending(path: source.path!),
-            sourceInfo: source.sourceInfo
-        )
+    func createExtension(from source: Source) {
+        do {
+            let sourceExt = try SRExtension(
+                sourceURL: URL.documentsDirectory.appending(path: source.path!),
+                sourceInfo: source.sourceInfo
+            )
 
-        return sourceExt
+            extensions.updateValue(sourceExt, forKey: source.id)
+        } catch {
+            Logger.general.error("createExtension error: \(error.localizedDescription)")
+        }
     }
 
     func source(for id: String) -> Source? {
@@ -108,9 +111,8 @@ class SourceManager {
 
                 sources.append(source)
 
-                let ext = try? SourceManager.createExtension(from: source)
-                if let ext = ext {
-                    extensions.updateValue(ext, forKey: source.id)
+                Task {
+                    self.createExtension(from: source)
                 }
 
                 try? modelContext.save()
@@ -123,7 +125,6 @@ class SourceManager {
         return nil
     }
 
-    // todo make the source a object that has name & url
     func addSourceList(url: URL) async -> Bool {
         guard sourceLists.contains(url) == false else {
             return false
