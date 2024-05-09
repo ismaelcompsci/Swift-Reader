@@ -28,7 +28,6 @@ struct BookDetailView: View {
     @State private var openReader = false
     @State private var sImage: Image?
     @State private var infoSize: CGSize = .zero
-    @Namespace private var animation
     
     private func getHeightForHeaderImage(_ geometry: GeometryProxy) -> CGFloat {
         let offset = getScrollOffset(geometry)
@@ -120,7 +119,6 @@ struct BookDetailView: View {
                         ) / 1.4 : geometry.size.width
                         
                         headerImage
-                            .matchedGeometryEffect(id: "bookCover", in: animation)
                             .frame(
                                 width: calcImageWidth,
                                 height: calcImageHeight

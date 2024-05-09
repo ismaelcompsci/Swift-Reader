@@ -10,25 +10,42 @@ import JavaScriptCore
 import OSLog
 
 actor SRSourceActor {
-    var source: SRExtension
+    weak var source: SRExtension?
 
     init(source: SRExtension) {
         self.source = source
     }
 
     func getBookDetails(for id: String) async throws -> SourceBook {
+        guard let source = source else {
+            throw ExtensionError.invalidSourceExtension
+        }
+
         return try await source.extensionClass.invokeAsyncMethod(methodKey: "getBookDetails", args: [id])
     }
 
     func getSearchResults(query: SearchRequest, metadata: Any) async throws -> PagedResults {
+        guard let source = source else {
+            throw ExtensionError.invalidSourceExtension
+        }
+
         return try await source.extensionClass.invokeAsyncMethod(methodKey: "getSearchResults", args: [query, metadata])
     }
 
     func getViewMoreItems(homepageSectionId: String, metadata: Any?) async throws -> PagedResults {
+        guard let source = source else {
+            throw ExtensionError.invalidSourceExtension
+        }
+
         return try await source.extensionClass.invokeAsyncMethod(methodKey: "getViewMoreItems", args: [homepageSectionId, metadata as Any])
     }
 
     func getHomePageSections(sectionCallback: @escaping (Result<HomeSection, ExtensionError>) -> Void) {
+        guard let source = source else {
+            sectionCallback(.failure(ExtensionError.invalidSourceExtension))
+            return
+        }
+
         guard source.extensionClass.hasProperty("getHomePageSections") else {
             sectionCallback(.failure(.invalidPropertyInSource))
             return
@@ -52,6 +69,10 @@ actor SRSourceActor {
     }
 
     func getSourceMenu() async throws -> UISection? {
+        guard let source = source else {
+            throw ExtensionError.invalidSourceExtension
+        }
+
         let menu: UISection? = try await source.extensionClass.invokeAsyncMethod(methodKey: "getSourceMenu", args: [])
         return menu
     }

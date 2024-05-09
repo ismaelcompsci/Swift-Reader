@@ -1,5 +1,5 @@
 //
-//  LastEngagedView.swift
+//  LastEngaged.swift
 //  Read
 //
 //  Created by Mirna Olvera on 5/6/24.
@@ -8,40 +8,38 @@
 import RealmSwift
 import SwiftUI
 
-struct LastEngagedView: View {
+struct LastEngaged: View {
     @Environment(Navigator.self) var navigator
-    @Environment(\.realm) var realm
 
     @ObservedResults(
         Book.self,
         filter: NSPredicate(format: "lastEngaged != nil"),
-        sortDescriptor: SortDescriptor(stringLiteral: "lastEngaged")
+        sortDescriptor: SortDescriptor(keyPath: "lastEngaged", ascending: false)
     ) var lastEngagedBooks
 
-    @State private var recentBooks: [Book] = []
     @State var selectedBook: Book?
 
     var body: some View {
         ScrollView(.horizontal) {
-            if recentBooks.isEmpty == false {
+            if lastEngagedBooks.isEmpty == false {
                 LazyHStack(spacing: 12) {
-                    if let firstBook = recentBooks.first {
+                    if let firstBook = lastEngagedBooks.first {
                         VStack(alignment: .leading) {
                             Text("Current")
                                 .font(.headline)
                                 .fontDesign(.serif)
 
-                            BookGridItem(book: firstBook) { event in
+                            BookGridItem(book: firstBook, withTitle: true) { event in
                                 handleBookItemEvent(firstBook, event)
                             }
-                            .frame(height: 300)
+                            .frame(width: 300 / 1.6, height: 300)
                         }
                     }
 
-                    if recentBooks.count > 1 {
-                        ForEach(recentBooks.dropFirst()) { book in
+                    if lastEngagedBooks.count > 1 {
+                        ForEach(lastEngagedBooks.dropFirst()) { book in
                             VStack(alignment: .leading) {
-                                if recentBooks.dropFirst().first == book {
+                                if lastEngagedBooks.dropFirst().first == book {
                                     Text("Recent")
                                         .font(.headline)
                                         .fontDesign(.serif)
@@ -50,10 +48,10 @@ struct LastEngagedView: View {
                                         .frame(height: 17)
                                 }
 
-                                BookGridItem(book: book) { event in
+                                BookGridItem(book: book, withTitle: true) { event in
                                     handleBookItemEvent(book, event)
                                 }
-                                .frame(height: 300)
+                                .frame(width: 300 / 1.6, height: 300)
                             }
                         }
                     }
@@ -66,25 +64,6 @@ struct LastEngagedView: View {
         .sheet(item: $selectedBook) { book in
             EditDetailsView(book: book)
         }
-        .onAppear {
-            recentBooks = getRecentBooks()
-        }
-    }
-
-    func getRecentBooks() -> [Book] {
-        let books = realm.objects(Book.self)
-
-        let hasRead = books.filter { $0.lastEngaged != nil }
-
-        let sortedLastEngagedBooks = hasRead.sorted { lhs, rhs in
-            lhs.lastEngaged! > rhs.lastEngaged!
-        }
-
-        if sortedLastEngagedBooks.count < 3 {
-            return sortedLastEngagedBooks
-        }
-
-        return Array(sortedLastEngagedBooks.prefix(through: 3))
     }
 
     func handleBookItemEvent(_ book: Book, _ event: BookItemEvent) {

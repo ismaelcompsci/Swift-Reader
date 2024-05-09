@@ -24,19 +24,7 @@ struct SettingsView: View {
 
                     goToSourcesButton
 
-                    HStack {
-                        Text("Home Grid columns")
-
-                        Spacer()
-
-                        Stepper("\(preferences.numberOfColumns)") {
-                            preferences.numberOfColumns += 1
-                        } onDecrement: {
-                            let newValue = preferences.numberOfColumns - 1
-
-                            preferences.numberOfColumns = max(1, newValue)
-                        }
-                    }
+                    homeGridColumn
 
                 } header: {
                     Text("Settings")
@@ -58,14 +46,7 @@ struct SettingsView: View {
                 Section {
                     resetThemeButton
 
-                    Button {
-                        theme.restoreToDefaults()
-                        preferences.reset()
-                    } label: {
-                        Text("Reset All")
-                            .foregroundStyle(.red)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    resetAllButton
 
                 } header: {
                     Text("Advanced")
@@ -73,8 +54,35 @@ struct SettingsView: View {
             }
         }
         .navigationBarTitle("Settings", displayMode: .large)
-        .onAppear {
+        .task {
             downloadFolderSize = BookDownloader.getDownloadFolderSize()
+        }
+    }
+
+    var resetAllButton: some View {
+        Button {
+            theme.restoreToDefaults()
+            preferences.reset()
+        } label: {
+            Text("Reset All")
+                .foregroundStyle(.red)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    var homeGridColumn: some View {
+        HStack {
+            Text("Number of Grid Columns")
+
+            Spacer()
+
+            Stepper("\(preferences.numberOfColumns)") {
+                preferences.numberOfColumns += 1
+            } onDecrement: {
+                let newValue = preferences.numberOfColumns - 1
+
+                preferences.numberOfColumns = max(1, newValue)
+            }
         }
     }
 
@@ -133,7 +141,7 @@ struct SettingsView: View {
             }
         } label: {
             HStack {
-                Text("Open downloads folder")
+                Text("Open Downloads Folder")
                 Spacer()
                 Image(systemName: "link")
                     .foregroundStyle(.secondary)
@@ -150,7 +158,7 @@ struct SettingsView: View {
             downloadFolderSize = BookDownloader.getDownloadFolderSize()
         } label: {
             HStack {
-                Text("Clear download folder")
+                Text("Clear Download Folder")
                 Spacer()
                 Text("\(formattedString)")
             }
