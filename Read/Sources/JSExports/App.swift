@@ -26,6 +26,7 @@ import OSLog
     static func createUIForm(_ info: JSValue) -> UIForm
     static func createUIInputField(_ info: JSValue) -> UIInputField
     static func createUIMultilineLabel(_ info: JSValue) -> UIMultilineLabel
+    static func createUILink(_ info: JSValue) -> UILink
 }
 
 class AppJS: NSObject, AppJSExport {
@@ -133,6 +134,20 @@ extension AppJS {
 //        return UIBinding()
 //    }
 
+    static func createUILink(_ info: JSValue) -> UILink {
+        let id = info.forProperty("id")
+        let label = info.forProperty("label")
+        let value = info.forProperty("value")
+
+        let uilink = UILink(id: id?.toString() ?? UUID().uuidString)
+
+        uilink.setProp("id", id)
+        uilink.setProp("label", label)
+        uilink.setProp("value", value)
+
+        return uilink
+    }
+
     static func createUIMultilineLabel(_ info: JSValue) -> UIMultilineLabel {
         let id = info.forProperty("id")
         let label = info.forProperty("label")
@@ -222,15 +237,15 @@ extension AppJS {
         section.setProp("title", title)
         section.setProp("isHidden", isHidden)
         section.setProp("rows", rows)
-
         rows?.call(completion: { result in
             switch result {
             case .success(let success):
+                SRLogger.js.info("\(success?.toString() ?? "nun")")
                 if let children = success, let children = children.toArray() as? [AnyUI] {
                     section.setChildren(children)
                 }
-            case .failure:
-                Logger.js.warning("Failure making ui section children")
+            case .failure(let error):
+                Logger.js.warning("Failure making ui section children, \(error.localizedDescription) \(error)")
             }
         })
 

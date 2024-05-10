@@ -10,7 +10,7 @@ import JavaScriptCore
 import SwiftUI
 
 class UIButton: AnyUI {
-    struct SRJButton: View {
+    struct _UIButton: View {
         @ObservedObject var props: AnyUIProps
 
         func onPress() {
@@ -29,6 +29,6 @@ class UIButton: AnyUI {
     }
 
     override func render() -> AnyView {
-        return AnyView(SRJButton(props: props))
+        return AnyView(_UIButton(props: props))
     }
 }

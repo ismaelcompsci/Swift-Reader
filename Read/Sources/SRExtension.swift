@@ -109,8 +109,6 @@ class SRExtension: Identifiable {
         ctx.setObject(HomeSection.self, forKeyedSubscript: "HomeSection" as (NSCopying & NSObjectProtocol)?)
         ctx.setObject(SourceStateManager.self, forKeyedSubscript: "SourceStateManager"as (NSCopying & NSObjectProtocol)?)
         ctx.setObject(SourceInterceptor.self, forKeyedSubscript: "SourceInterceptor"as (NSCopying & NSObjectProtocol)?)
-        ctx.setObject(UISection.self, forKeyedSubscript: "UISection" as (NSCopying & NSObjectProtocol)?)
-        ctx.setObject(UIButton.self, forKeyedSubscript: "UIButton" as (NSCopying & NSObjectProtocol)?)
     }
 }
 
