@@ -19,13 +19,13 @@ struct BookCover: View {
     var title: String?
     var author: String?
 
-    init(coverPath: String? = nil, title: String? = nil, author: String? = nil) {
-        if let path = coverPath {
-            isPlaceholderImage = false
-            imageURL = getCoverFullPath(for: path)
+    init(imageURL: URL?, title: String? = nil, author: String? = nil) {
+        if let imageURL = imageURL {
+            self.isPlaceholderImage = false
+            self.imageURL = imageURL
         } else {
-            isPlaceholderImage = true
-            imageURL = nil
+            self.isPlaceholderImage = true
+            self.imageURL = nil
         }
 
         self.title = title
@@ -61,7 +61,7 @@ struct BookCover: View {
 }
 
 #Preview {
-    BookCover(coverPath: nil)
+    BookCover(imageURL: nil)
         .preferredColorScheme(.light)
         .frame(width: 100, height: 160)
 }

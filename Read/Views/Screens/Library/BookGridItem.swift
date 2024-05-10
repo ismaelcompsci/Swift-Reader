@@ -34,7 +34,7 @@ struct BookGridItem: View {
 
     var cover: some View {
         BookCover(
-            coverPath: book.coverPath,
+            imageURL: getCoverFullPath(for: book.coverPath ?? ""),
             title: book.title,
             author: book.authors.first?.name
         )

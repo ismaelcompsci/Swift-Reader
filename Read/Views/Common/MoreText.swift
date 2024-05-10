@@ -15,7 +15,6 @@ struct MoreText: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(text)
-                .padding(.horizontal, 12)
                 .lineLimit(readMore ? 100 : 4)
                 .font(.subheadline)
                 .onTapGesture {
@@ -26,7 +25,6 @@ struct MoreText: View {
                 Button(readMore ? "less" : "more") {
                     readMore.toggle()
                 }
-                .padding(.horizontal, 12)
             }
         }
     }

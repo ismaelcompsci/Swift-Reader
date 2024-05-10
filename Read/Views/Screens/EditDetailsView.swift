@@ -40,9 +40,13 @@ struct EditDetailsView: View {
         NavigationView {
             VStack {
                 ScrollView {
-                    BookCover(coverPath: book.coverPath)
-                        .frame(width: 100, height: 140)
-                        .padding(.vertical)
+                    BookCover(
+                        imageURL: getCoverFullPath(for: book.coverPath ?? ""),
+                        title: book.title,
+                        author: book.authors.first?.name
+                    )
+                    .frame(width: 100, height: 140)
+                    .padding(.vertical)
                     
                     SRFromInput(text: $title, inputTitle: "Title")
                     

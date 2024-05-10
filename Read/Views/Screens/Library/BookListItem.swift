@@ -34,7 +34,7 @@ struct BookListItem: View {
     var compactItem: some View {
         HStack(spacing: 12) {
             BookCover(
-                coverPath: book.coverPath,
+                imageURL: getCoverFullPath(for: book.coverPath ?? ""),
                 title: book.title,
                 author: book.authors.first?.name
             )
