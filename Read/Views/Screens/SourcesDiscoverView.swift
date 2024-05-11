@@ -26,43 +26,45 @@ struct SourcesDiscoverView: View {
                 )
 
             } else {
-                if tabs.isEmpty == false && tabBarState.activeTab != "" {
-                    ScrollableTabBar(
-                        tabs: $tabs,
-                        state: $tabBarState
-                    ) { size in
-                        ForEach(sourceManager.sources) { source in
-                            if let extensionJS = sourceManager.extensions[source.id] {
-                                SourceExtensionView(
-                                    sourceId: source.id,
-                                    hasHomePageInterface: source.sourceInfo.interfaces.homePage,
-                                    extensionJS: extensionJS,
-                                    tabBarState: $tabBarState
-                                )
-                                .frame(width: size.width, height: size.height)
+                VStack {
+                    if tabs.isEmpty == false && tabBarState.activeTab != "" {
+                        ScrollableTabBar(
+                            tabs: $tabs,
+                            state: $tabBarState
+                        ) { size in
+                            ForEach(sourceManager.sources) { source in
+                                if let extensionJS = sourceManager.extensions[source.id] {
+                                    SourceExtensionView(
+                                        sourceId: source.id,
+                                        hasHomePageInterface: source.sourceInfo.interfaces.homePage,
+                                        extensionJS: extensionJS,
+                                        tabBarState: $tabBarState
+                                    )
+                                    .frame(width: size.width, height: size.height)
+                                }
                             }
                         }
                     }
                 }
+                .ignoresSafeArea(.all, edges: .bottom)
+                .onAppear {
+                    tabs = sourceManager.sources.map { source in
+                        Tab(
+                            id: source.id,
+                            label: source.sourceInfo.name,
+                            size: tabs.first(where: { tab in tab.id == source.id })?.size ?? .zero,
+                            minX: tabs.first(where: { tab in tab.id == source.id })?.minX ?? .zero
+                        )
+                    }
+
+                    if tabs.isEmpty == false {
+                        tabBarState = .init(isScrolling: false, activeTab: tabs[0].id)
+                    }
+                }
             }
         }
-        .ignoresSafeArea(.all, edges: .bottom)
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            tabs = sourceManager.sources.map { source in
-                Tab(
-                    id: source.id,
-                    label: source.sourceInfo.name,
-                    size: tabs.first(where: { tab in tab.id == source.id })?.size ?? .zero,
-                    minX: tabs.first(where: { tab in tab.id == source.id })?.minX ?? .zero
-                )
-            }
-
-            if tabs.isEmpty == false {
-                tabBarState = .init(isScrolling: false, activeTab: tabs[0].id)
-            }
-        }
     }
 }
 
