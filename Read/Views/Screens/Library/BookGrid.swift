@@ -50,6 +50,8 @@ struct BookGrid: View {
                             navigator.navigate(to: .localDetails(book: book))
                         case .onAddToList(let list):
                             book.addToList(list)
+                        case .onRemoveFromList(let list):
+                            book.removeFromList(list)
                         }
                     }
                 }

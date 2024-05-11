@@ -63,6 +63,11 @@ struct SourceExtensionView: View {
         .onChange(of: tabBarState) { _, newValue in
             getHomePageSection(isScrolling: newValue.isScrolling, activeTab: newValue.activeTab)
         }
+        .onAppear {
+            if homeSectionProvider.isLoading == false || homeSectionProvider.hasFetched == false { return }
+
+            homeSectionProvider.getHomePageSections()
+        }
     }
 
     func getHomePageSection(isScrolling: Bool, activeTab: Tab.ID) {

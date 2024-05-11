@@ -69,7 +69,9 @@ public class DownloadManager: NSObject {
         downloadQueue.onQueueChangePublisher
             .sink { [weak self] _ in
                 guard let strongSelf = self else { return }
-                strongSelf.onQueueDidChange.send(strongSelf.downloadQueue.downloads)
+                DispatchQueue.main.async {
+                    strongSelf.onQueueDidChange.send(strongSelf.downloadQueue.downloads)
+                }
             }
             .store(in: &subscription)
 

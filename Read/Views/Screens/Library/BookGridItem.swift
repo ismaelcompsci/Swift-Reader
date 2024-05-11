@@ -83,7 +83,7 @@ struct BookGridItem: View {
                 Menu {
                     if book.lists.contains(where: { $0 == .completed }) {
                         Button("Mark as Still Reading", systemImage: "minus.circle") {
-                            onEvent(.onAddToList(.wantToRead))
+                            onEvent(.onRemoveFromList(.completed))
                         }
                     } else {
                         Button("Mark as Finished", systemImage: "checkmark.circle") {
@@ -93,7 +93,7 @@ struct BookGridItem: View {
 
                     if book.lists.contains(where: { $0 == .wantToRead }) {
                         Button("Remove from Want to Read", systemImage: "minus.circle") {
-                            onEvent(.onAddToList(.wantToRead))
+                            onEvent(.onRemoveFromList(.wantToRead))
                         }
                     } else {
                         Button("Add To Want to Read", systemImage: "text.badge.star") {

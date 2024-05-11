@@ -14,6 +14,7 @@ enum BookItemEvent {
     case onEdit
     case onNavigate
     case onAddToList(ListName)
+    case onRemoveFromList(ListName)
 }
 
 struct BookList: View {
@@ -51,6 +52,8 @@ struct BookList: View {
             navigator.navigate(to: .localDetails(book: book))
         case .onAddToList(let list):
             book.addToList(list)
+        case .onRemoveFromList(let list):
+            book.removeFromList(list)
         }
     }
 }

@@ -35,6 +35,8 @@ struct BookDetailView: View {
                 .frame(maxWidth: .infinity)
             }
         }
+        .navigationTitle(book.title)
+        .contentMargins(.vertical, 24, for: .scrollContent)
         .fullScreenCover(isPresented: $openReader, content: {
             Reader(book: book)
         })

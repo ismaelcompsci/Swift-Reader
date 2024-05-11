@@ -39,18 +39,24 @@ struct WantToRead: View {
                 .padding(.leading, 24)
 
                 ScrollView(.horizontal) {
-                    LazyHStack {
+                    LazyHGrid(rows: [GridItem(
+                        .fixed(
+                            300
+                        )
+                    )]) {
                         ForEach(wantToReadBooks) { book in
-                            BookGridItem(book: book, withTitle: true, onEvent: { event in
+                            BookGridItem(book: book, withTitle: false, onEvent: { event in
                                 handleBookItemEvent?(book, event)
                             })
-                            .frame(width: 300 / 1.6, height: 300)
+                            .frame(maxHeight: 300)
                         }
                     }
+                    .scrollTargetLayout()
                 }
+                .scrollTargetBehavior(.viewAligned)
+                .animation(.easeInOut, value: wantToReadBooks)
                 .contentMargins(.horizontal, 24, for: .scrollContent)
                 .scrollIndicators(.hidden)
-                .frame(height: 300)
             }
             .padding(.vertical, 28)
             .background(

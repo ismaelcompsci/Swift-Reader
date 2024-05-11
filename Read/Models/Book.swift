@@ -225,11 +225,6 @@ public extension Book {
             return
         }
         
-        if self.lists.contains(where: { $0 == list }) {
-            self.removeFromList(list)
-            return
-        }
-        
         let book = self.thaw()
         try? realm.write {
             book?.lists.append(list)

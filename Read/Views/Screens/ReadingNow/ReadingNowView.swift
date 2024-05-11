@@ -18,6 +18,8 @@ struct ReadingNowView: View {
             LastEngaged(handleBookItemEvent: handleBookItemEvent)
 
             WantToRead(handleBookItemEvent: handleBookItemEvent)
+
+            Spacer()
         }
         .navigationBarTitle("Reading Now", displayMode: .large)
         .sheet(item: $selectedBook) { book in
@@ -37,6 +39,8 @@ struct ReadingNowView: View {
             navigator.navigate(to: .localDetails(book: book))
         case .onAddToList(let list):
             book.addToList(list)
+        case .onRemoveFromList(let list):
+            book.removeFromList(list)
         }
     }
 }

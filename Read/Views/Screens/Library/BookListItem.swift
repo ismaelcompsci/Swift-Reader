@@ -90,7 +90,7 @@ struct BookListItem: View {
         .contextMenu {
             if book.lists.contains(where: { $0 == .completed }) {
                 Button("Mark as Still Reading", systemImage: "minus.circle") {
-                    onEvent?(.onAddToList(.completed))
+                    onEvent?(.onRemoveFromList(.completed))
                 }
             } else {
                 Button("Mark as Finished", systemImage: "checkmark.circle") {
@@ -100,7 +100,7 @@ struct BookListItem: View {
 
             if book.lists.contains(where: { $0 == .wantToRead }) {
                 Button("Remove from Want to Read", systemImage: "minus.circle") {
-                    onEvent?(.onAddToList(.wantToRead))
+                    onEvent?(.onRemoveFromList(.wantToRead))
                 }
             } else {
                 Button("Add To Want to Read", systemImage: "text.badge.star") {

@@ -18,9 +18,11 @@ struct LastEngaged: View {
     var handleBookItemEvent: ((Book, BookItemEvent) -> Void)?
 
     var body: some View {
-        ScrollView(.horizontal) {
-            if lastEngagedBooks.isEmpty == false {
-                LazyHStack(spacing: 12) {
+        if lastEngagedBooks.isEmpty == false {
+            ScrollView(.horizontal) {
+                LazyHGrid(rows: [
+                    GridItem(.flexible(minimum: 184))
+                ]) {
                     if let firstBook = lastEngagedBooks.first {
                         VStack(alignment: .leading) {
                             Text("Current")
@@ -30,34 +32,35 @@ struct LastEngaged: View {
                             BookGridItem(book: firstBook, withTitle: true) { event in
                                 handleBookItemEvent?(firstBook, event)
                             }
-                            .frame(width: 300 / 1.6, height: 300)
                         }
+                        .frame(maxWidth: 184)
                     }
 
-                    if lastEngagedBooks.count > 1 {
-                        ForEach(lastEngagedBooks.dropFirst()) { book in
-                            VStack(alignment: .leading) {
-                                if lastEngagedBooks.dropFirst().first == book {
-                                    Text("Recent")
-                                        .font(.headline)
-                                        .fontDesign(.serif)
-                                } else {
-                                    Text("")
-                                        .frame(height: 17)
-                                }
-
-                                BookGridItem(book: book, withTitle: true) { event in
-                                    handleBookItemEvent?(book, event)
-                                }
-                                .frame(width: 300 / 1.6, height: 300)
+                    ForEach(lastEngagedBooks.dropFirst()) { book in
+                        VStack(alignment: .leading) {
+                            if lastEngagedBooks.dropFirst().first == book {
+                                Text("Recent")
+                                    .font(.headline)
+                                    .fontDesign(.serif)
+                            } else {
+                                Text("")
+                                    .frame(height: 17)
                             }
+
+                            BookGridItem(book: book, withTitle: true, onEvent: { event in
+                                handleBookItemEvent?(book, event)
+                            })
                         }
+                        .frame(maxWidth: 184)
                     }
                 }
+                .scrollTargetLayout()
             }
+            .scrollTargetBehavior(.viewAligned)
+            .scrollIndicators(.hidden)
+            .contentMargins(.vertical, 12, for: .scrollContent)
+            .contentMargins(.horizontal, 24, for: .scrollContent)
+            .frame(maxHeight: 386)
         }
-        .scrollIndicators(.hidden)
-        .contentMargins(.vertical, 12, for: .scrollContent)
-        .contentMargins(.horizontal, 24, for: .scrollContent)
     }
 }
