@@ -17,6 +17,8 @@ struct WantToRead: View {
         )
     ) var wantToReadBooks
 
+    var handleBookItemEvent: ((Book, BookItemEvent) -> Void)?
+
     var body: some View {
         if wantToReadBooks.isEmpty == false {
             VStack(alignment: .leading, spacing: 24) {
@@ -39,8 +41,10 @@ struct WantToRead: View {
                 ScrollView(.horizontal) {
                     LazyHStack {
                         ForEach(wantToReadBooks) { book in
-                            BookGridItem(book: book, withTitle: true, onEvent: { _ in })
-                                .frame(width: 300 / 1.6, height: 300)
+                            BookGridItem(book: book, withTitle: true, onEvent: { event in
+                                handleBookItemEvent?(book, event)
+                            })
+                            .frame(width: 300 / 1.6, height: 300)
                         }
                     }
                 }
