@@ -27,12 +27,18 @@ struct BookDetailView: View {
                 author: book.authors.first?.name ?? "Unknown Author",
                 tags: book.tags.map { $0.name }
             ) {
-                SRButton(systemName: "book.fill", text: book.readingPosition != nil ? "Continue Reading \(Int((book.readingPosition?.progress ?? 0.0) * 100))%" : "Read") {
+                Button {
                     withAnimation(.spring()) {
                         openReader = true
                     }
+                } label: {
+                    HStack {
+                        Image(systemName: "book.fill")
+
+                        Text(book.readingPosition != nil ? "Continue Reading \(Int((book.readingPosition?.progress ?? 0.0) * 100))%" : "Read")
+                    }
                 }
-                .frame(maxWidth: .infinity)
+                .buttonStyle(.main)
             }
         }
         .navigationTitle(book.title)

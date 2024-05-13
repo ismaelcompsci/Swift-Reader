@@ -85,7 +85,7 @@
 		9FBBE6E62BCDE484004B1A85 /* DownloadManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBBE6E52BCDE484004B1A85 /* DownloadManagerView.swift */; };
 		9FBC726C2B9EA17D0054A7B0 /* SRFromInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726B2B9EA17D0054A7B0 /* SRFromInput.swift */; };
 		9FBC726E2B9EA1920054A7B0 /* AdaptiveStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */; };
-		9FBC72702B9EA5B70054A7B0 /* SRButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726F2B9EA5B70054A7B0 /* SRButton.swift */; };
+		9FBC72702B9EA5B70054A7B0 /* MainButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC726F2B9EA5B70054A7B0 /* MainButtonStyle.swift */; };
 		9FBC72752B9EA6C60054A7B0 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC72742B9EA6C60054A7B0 /* AppTheme.swift */; };
 		9FC1FBB82BC5E90900CA9288 /* MoreText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC1FBB72BC5E90900CA9288 /* MoreText.swift */; };
 		9FC596592B86A56A00ED3734 /* Font+Poppins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC596582B86A56A00ED3734 /* Font+Poppins.swift */; };
@@ -205,7 +205,7 @@
 		9FBBE6E52BCDE484004B1A85 /* DownloadManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerView.swift; sourceTree = "<group>"; };
 		9FBC726B2B9EA17D0054A7B0 /* SRFromInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRFromInput.swift; sourceTree = "<group>"; };
 		9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveStack.swift; sourceTree = "<group>"; };
-		9FBC726F2B9EA5B70054A7B0 /* SRButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRButton.swift; sourceTree = "<group>"; };
+		9FBC726F2B9EA5B70054A7B0 /* MainButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonStyle.swift; sourceTree = "<group>"; };
 		9FBC72742B9EA6C60054A7B0 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		9FC1FBB72BC5E90900CA9288 /* MoreText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreText.swift; sourceTree = "<group>"; };
 		9FC596582B86A56A00ED3734 /* Font+Poppins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Poppins.swift"; sourceTree = "<group>"; };
@@ -330,7 +330,7 @@
 		9F1C69E92BC60371002D6AF4 /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
-				9FBC726F2B9EA5B70054A7B0 /* SRButton.swift */,
+				9FBC726F2B9EA5B70054A7B0 /* MainButtonStyle.swift */,
 				9F3E18BD2BA43353009DDE05 /* SRXButton.swift */,
 				9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */,
 			);
@@ -767,7 +767,7 @@
 				9F8F9CE12BB5096B0081C57F /* JSError.swift in Sources */,
 				9FE631922BE36DF6004CF96C /* UINavigationButton.swift in Sources */,
 				9F8F9CC92BB507C20081C57F /* App.swift in Sources */,
-				9FBC72702B9EA5B70054A7B0 /* SRButton.swift in Sources */,
+				9FBC72702B9EA5B70054A7B0 /* MainButtonStyle.swift in Sources */,
 				9FBC726C2B9EA17D0054A7B0 /* SRFromInput.swift in Sources */,
 				9F44F4442BC3B5C500E63461 /* BookManager.swift in Sources */,
 				9FBA143F2BEDA47400231886 /* BookDetails.swift in Sources */,

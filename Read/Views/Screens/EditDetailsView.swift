@@ -59,7 +59,7 @@ struct EditDetailsView: View {
                 .contentMargins(12, for: .scrollContent)
                 
                 HStack {
-                    SRButton(text: "Save") {
+                    Button("Save") {
                         guard let realm = book.realm?.thaw() else {
                             return
                         }
@@ -89,6 +89,7 @@ struct EditDetailsView: View {
                         
                         dismiss()
                     }
+                    .buttonStyle(.main)
                     
                     Spacer()
                     

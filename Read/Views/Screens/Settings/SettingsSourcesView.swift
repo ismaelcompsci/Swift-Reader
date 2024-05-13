@@ -438,11 +438,12 @@ struct SettingsSourcesView: View {
 
                 Spacer()
 
-                SRButton(text: "Add to Read") {
+                Button("Add to Read") {
                     Task {
                         await addSource()
                     }
                 }
+                .buttonStyle(.main)
             }
             .padding()
             .presentationDetents([.medium])

@@ -43,9 +43,10 @@ struct UploadFileView: View {
                 .font(.subheadline)
                 .foregroundStyle(.gray)
             
-            SRButton(text: "Select Files") {
+            Button("Select Files") {
                 showFilePicker = true
             }
+            .buttonStyle(.main)
             .frame(maxWidth: 120)
         }
         .frame(maxHeight: 198)

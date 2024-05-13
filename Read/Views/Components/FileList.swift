@@ -95,9 +95,14 @@ struct FileList: View {
                     .padding(.horizontal, 28)
                     
                 } footer: {
-                    SRButton(systemName: "square.and.arrow.down.on.square", onPress: { self.processBooks() })
-                        .clipShape(.circle)
-                        .disabled(processingBooks)
+                    Button {
+                        self.processBooks()
+                    } label: {
+                        Image("square.and.arrow.down.on.square")
+                    }
+                    .buttonStyle(.main)
+                    .clipShape(.circle)
+                    .disabled(processingBooks)
                 }
             }
         }
