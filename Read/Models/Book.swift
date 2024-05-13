@@ -15,10 +15,6 @@ enum ListName: String, PersistableEnum {
     case completed
 }
 
-class Author: EmbeddedObject {
-    @Persisted var name: String = ""
-}
-
 class BookTag: EmbeddedObject {
     @Persisted var name: String = ""
 
@@ -28,7 +24,7 @@ class BookTag: EmbeddedObject {
 public class Book: Object, ObjectKeyIdentifiable {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var title = ""
-    @Persisted var authors: List<Author> = List()
+    @Persisted var author: String?
     @Persisted var summary: String?
     @Persisted var tags: List<BookTag> = List()
     @Persisted var language: String?
@@ -237,14 +233,31 @@ public extension Book {
 }
 
 extension Book {
-    static let example1 = Book(value: ["title": "The Witcher", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. ", "language": "en"])
-    static let example2 = Book(value: ["title": "The Game of Thrones", "authors": [Author.exampleAuthor], "summary": "A guy with white hair killin g monsters and stuff. But again", "language": "en"])
+    static let example1 = Book(
+        value: [
+            "title": "The Witcher",
+            "author": "Test Author",
+            "summary": "A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. A guy with white hair killin g monsters and stuff. ",
+            "language": "en"
+        ]
+    )
+    static let example2 = Book(
+        value: [
+            "title": "The Game of Thrones",
+            "author": "Test Author",
+            "summary": "A guy with white hair killin g monsters and stuff. But again",
+            "language": "en"
+        ]
+    )
 
-    static let shortExample = Book(value: ["title": "The Game of Thrones", "authors": [Author.exampleAuthor], "language": "en", "tags": [BookTag.example]])
+    static let shortExample = Book(
+        value: [
+            "title": "The Game of Thrones",
+            "author": "Test Author",
+            "language": "en",
+            "tags": [BookTag.example]
+        ]
+    )
 
     static let exampleArray = [Book.example1, Book.example2]
-}
-
-extension Author {
-    static let exampleAuthor = Author(value: ["name": "Andrew Spacewalwoaski"])
 }

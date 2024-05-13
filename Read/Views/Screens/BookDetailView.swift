@@ -24,7 +24,7 @@ struct BookDetailView: View {
                 image: getCoverFullPath(for: book.coverPath ?? "").absoluteString,
                 title: book.title,
                 description: book.summary ?? "",
-                author: book.authors.first?.name ?? "Unknown Author",
+                author: book.author ?? "Unknown Author",
                 tags: book.tags.map { $0.name }
             ) {
                 Button {

@@ -115,13 +115,7 @@ extension BookManager {
                 newBook.tags.append(newTag)
             }
 
-            _ = metadata.author.map { author in
-                author.map { author in
-                    let newAuthor = Author()
-                    newAuthor.name = author.name ?? "Unknown Author"
-                    newBook.authors.append(newAuthor)
-                }
-            }
+            newBook.author = metadata.author?.first?.name
 
             $books.append(newBook)
         }

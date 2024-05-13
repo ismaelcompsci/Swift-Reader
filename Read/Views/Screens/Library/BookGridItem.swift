@@ -36,7 +36,7 @@ struct BookGridItem: View {
         BookCover(
             imageURL: getCoverFullPath(for: book.coverPath ?? ""),
             title: book.title,
-            author: book.authors.first?.name
+            author: book.author
         )
         .aspectRatio(contentMode: .fit)
         .background()

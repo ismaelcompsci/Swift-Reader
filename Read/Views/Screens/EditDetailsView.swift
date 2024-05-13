@@ -16,26 +16,16 @@ struct EditDetailsView: View {
 
     @State var title: String
     @State var description: String
-    @State var authors: String
-    
-    @State var tags: [Tag]
+    @State var author: String
     
     init(book: Book) {
         self.book = book
 
         _title = State(initialValue: book.title)
         _description = State(initialValue: book.summary ?? "")
-        let authors = book.authors.compactMap { $0.name }
-        let tagsOfAuthors = Array(authors.map { Tag(value: $0) })
-        
-        _tags = State(initialValue: tagsOfAuthors)
-        _authors = State(initialValue: "")
+        _author = State(initialValue: book.author ?? "")
     }
     
-    var authorInput: some View {
-        TagField(tags: $tags, header: "Authors", placeholder: "name...")
-    }
-
     var body: some View {
         NavigationView {
             VStack {
@@ -43,14 +33,14 @@ struct EditDetailsView: View {
                     BookCover(
                         imageURL: getCoverFullPath(for: book.coverPath ?? ""),
                         title: book.title,
-                        author: book.authors.first?.name
+                        author: book.author
                     )
                     .frame(width: 100, height: 140)
                     .padding(.vertical)
                     
                     SRFromInput(text: $title, inputTitle: "Title")
                     
-                    authorInput
+                    SRFromInput(text: $author, inputTitle: "Author")
                     
                     SRFromInput(text: $description, inputTitle: "Description", axis: .vertical)
                     
@@ -71,20 +61,7 @@ struct EditDetailsView: View {
                         try? realm.write {
                             thawedBook.title = title
                             thawedBook.summary = description
-                            
-                            let updatedAuthors: RealmSwift.List<Author> = RealmSwift.List()
-                            
-                            let authors = tags
-                            
-                            authors.forEach { tag in
-                                let author = Author()
-                                author.name = String(
-                                    tag.value
-                                ).trimmingCharacters(in: .whitespacesAndNewlines)
-                                
-                                updatedAuthors.append(author)
-                            }
-                            thawedBook.authors = updatedAuthors
+                            thawedBook.author = author
                         }
                         
                         dismiss()

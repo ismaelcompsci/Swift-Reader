@@ -74,6 +74,7 @@ struct LibraryView: View {
             }
             .padding(.horizontal, 12)
         }
+        .animation(.easeInOut, value: books)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -125,15 +126,30 @@ extension LibraryView {
         if searchDebouncer.debouncedSearchText.isEmpty {
             switch userPreferences.librarySortKey {
             case .title:
-                return books.sorted(by: \.title, ascending: userPreferences.librarySortOrder == .ascending)
+                return books.sorted(
+                    by: \.title,
+                    ascending: userPreferences.librarySortOrder == .ascending
+                )
             case .date:
-                return books.sorted(by: \.addedAt, ascending: userPreferences.librarySortOrder == .ascending)
+                return books.sorted(
+                    by: \.addedAt,
+                    ascending: userPreferences.librarySortOrder == .ascending
+                )
             case .author:
-                return books.sorted(by: \.authors.first?.name, ascending: userPreferences.librarySortOrder == .ascending)
+                return books.sorted(
+                    by: \.author,
+                    ascending: userPreferences.librarySortOrder == .ascending
+                )
             case .last_read:
-                return books.sorted(by: \.readingPosition?.updatedAt, ascending: userPreferences.librarySortOrder == .ascending)
+                return books.sorted(
+                    by: \.readingPosition?.updatedAt,
+                    ascending: userPreferences.librarySortOrder == .ascending
+                )
             case .progress:
-                return books.sorted(by: \.readingPosition?.progress, ascending: userPreferences.librarySortOrder == .ascending)
+                return books.sorted(
+                    by: \.readingPosition?.progress,
+                    ascending: userPreferences.librarySortOrder == .ascending
+                )
             }
         } else {
             return books.filter(

@@ -36,7 +36,7 @@ struct BookListItem: View {
             BookCover(
                 imageURL: getCoverFullPath(for: book.coverPath ?? ""),
                 title: book.title,
-                author: book.authors.first?.name
+                author: book.author
             )
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .overlay {
@@ -55,7 +55,7 @@ struct BookListItem: View {
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
 
-                    Text(book.authors.first?.name ?? "Unkown Author")
+                    Text(book.author ?? "Unkown Author")
                         .font(.footnote)
                         .lineLimit(2)
                         .foregroundStyle(.secondary)

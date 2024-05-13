@@ -62,6 +62,7 @@ struct FileListItem: View {
 struct FileList: View {
     @Environment(\.dismiss) var dismiss
     @Environment(Toaster.self) var toaster
+    @Environment(AppTheme.self) var theme
     
     @State private var processingBooks = false
     
@@ -98,10 +99,10 @@ struct FileList: View {
                     Button {
                         self.processBooks()
                     } label: {
-                        Image("square.and.arrow.down.on.square")
+                        Label("Add Books", systemImage: "plus.circle")
                     }
                     .buttonStyle(.main)
-                    .clipShape(.circle)
+                    .frame(maxWidth: 164)
                     .disabled(processingBooks)
                 }
             }
@@ -139,4 +140,6 @@ struct FileList: View {
 
 #Preview {
     FileList(filesToProcess: .constant([]), totalBytes: .constant(0))
+        .environment(AppTheme.shared)
+        .environment(Toaster.shared)
 }
