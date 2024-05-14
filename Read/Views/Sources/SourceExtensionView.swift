@@ -64,8 +64,11 @@ struct SourceExtensionView: View {
             getHomePageSection(isScrolling: newValue.isScrolling, activeTab: newValue.activeTab)
         }
         .onAppear {
-            if homeSectionProvider.isLoading == false || homeSectionProvider.hasFetched == false { return }
+            if homeSectionProvider.isLoading == true || homeSectionProvider.hasFetched == true {
+                return
+            }
 
+            homeSectionProvider.hasFetched = true
             homeSectionProvider.getHomePageSections()
         }
     }
@@ -80,9 +83,7 @@ struct SourceExtensionView: View {
 
             homeSectionProvider.hasFetched = true
 
-            Task {
-                homeSectionProvider.getHomePageSections()
-            }
+            homeSectionProvider.getHomePageSections()
         }
     }
 }
@@ -111,6 +112,7 @@ class HomeSectionProvider {
 
     func getHomePageSections() {
         isLoading = true
+
         extensionJS.getHomePageSections { [weak self] result in
 
             guard let self = self else { return }

@@ -131,7 +131,8 @@ struct ScrollableTabBar<Content: View>: View {
                         Text(tab.label)
                             .padding(.vertical, 12)
                             .contentShape(.rect)
-                            .foregroundStyle(state.activeTab == tab.id ? Color.primary : Color.gray)
+                            .foregroundStyle(.primary)
+                            .opacity(state.activeTab == tab.id ? 1 : 0.5)
                     }
                     .buttonStyle(.plain)
                     .rect { rect in

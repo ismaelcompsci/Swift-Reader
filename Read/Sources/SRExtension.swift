@@ -11,9 +11,7 @@ import OSLog
 class SRExtension: Identifiable {
     var sourceURL: URL
     var sourceInfo: SourceInfo
-
     var actor: SRSourceActor!
-
     var ctx: JSContext
     var cheerio: JSValue!
     var extensionClass: JSValue!

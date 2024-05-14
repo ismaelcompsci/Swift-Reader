@@ -26,7 +26,7 @@ struct MainButton: View {
 
     var body: some View {
         configuration.label
-            .frame(maxWidth: .infinity, minHeight: 34)
+            .frame(maxWidth: .infinity, minHeight: 36)
             .padding(.horizontal, 12)
             .foregroundStyle(.white)
             .background(theme.tintColor)
