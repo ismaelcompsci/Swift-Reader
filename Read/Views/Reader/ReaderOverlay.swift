@@ -45,7 +45,7 @@ struct ReaderOverlay: View {
                     } label: {
                         Image(systemName: "xmark")
                             .foregroundStyle(theme.tintColor)
-                            .font(.system(size: 22))
+                            .font(.system(size: 16))
                     }
                 }
                 .padding(.horizontal, 16)
@@ -94,31 +94,19 @@ struct ReaderOverlay: View {
                     .background(.black)
                     .clipShape(.circle)
                 }
-
-//                if !showOverlay, let location = viewModel.relocateDetails?.location {
-//                    let rgba = getRGBFromHex(hex: viewModel.theme.fg.rawValue)
-//                    let foregroundColor = UIColor(red: rgba["red"] ?? 0, green: rgba["green"] ?? 0, blue: rgba["blue"] ?? 0, alpha: 1)
-//
-//                    Text("\(location.current) of \(location.total)")
-//                        .foregroundStyle(Color(uiColor: foregroundColor))
-//                        .opacity(0.6)
-//                        .font(.subheadline)
-//
-//                    Spacer()
-//                }
             }
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, maxHeight: 58)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .padding(.horizontal, 16)
         }
-        .padding(.top, safeAreaInsets.top)
-        .padding(.bottom, safeAreaInsets.bottom)
-        .padding(.leading, safeAreaInsets.leading)
-        .padding(.trailing, safeAreaInsets.trailing)
     }
 }
 
 #Preview {
-    ReaderOverlay(title: "TITLE", currentLabel: "", showOverlay: .constant(false))
+    VStack {
+        ReaderOverlay(title: "TITLE", currentLabel: "", showOverlay: .constant(true))
+            .environment(AppTheme.shared)
+            .preferredColorScheme(.dark)
+    }
 }

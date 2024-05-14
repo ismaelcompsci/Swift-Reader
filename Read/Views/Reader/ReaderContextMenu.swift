@@ -7,19 +7,6 @@
 
 import SwiftUI
 
-struct ReaderContextMenuButton: ButtonStyle {
-    let width: CGFloat
-    let height: CGFloat
-    let backgroundColor: Color
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .frame(width: width, height: height)
-            .contentShape(.rect)
-            .background(configuration.isPressed ? Color.secondary : Color.black)
-    }
-}
-
 enum ContextMenuEvent {
     case highlight
     case copy
@@ -31,11 +18,7 @@ struct ReaderContextMenu: View {
     @Binding var showContextMenu: Bool
     @Binding var editMode: Bool
 
-    var height: CGFloat = 44
-    var buttonSizeWidth: CGFloat = 44
-    var buttonSizeHeight: CGFloat {
-        height
-    }
+    var buttonSize: CGFloat = 44
 
     var numberOfButtons: CGFloat = 2
 
@@ -48,6 +31,7 @@ struct ReaderContextMenu: View {
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.red)
+                .frame(width: buttonSize, height: buttonSize)
         }
     }
 
@@ -58,7 +42,8 @@ struct ReaderContextMenu: View {
         label: {
             Circle()
                 .fill(.yellow)
-                .frame(width: buttonSizeWidth / 2, height: buttonSizeHeight / 2)
+                .frame(width: buttonSize / 2, height: buttonSize / 2)
+                .frame(width: buttonSize, height: buttonSize)
         }
     }
 
@@ -68,6 +53,7 @@ struct ReaderContextMenu: View {
         }
         label: {
             Image(systemName: "doc.on.doc.fill")
+                .frame(width: buttonSize, height: buttonSize)
         }
     }
 
@@ -76,6 +62,7 @@ struct ReaderContextMenu: View {
             onEvent?(.lookup)
         } label: {
             Image(systemName: "character.magnify")
+                .frame(width: buttonSize, height: buttonSize)
         }
     }
 
@@ -95,7 +82,7 @@ struct ReaderContextMenu: View {
 
     var divider: some View {
         Divider()
-            .frame(width: 1, height: buttonSizeHeight / 2)
+            .frame(width: 1, height: buttonSize / 2)
     }
 
     var menu: some View {
@@ -120,8 +107,8 @@ struct ReaderContextMenu: View {
                 menu
             }
         }
-        .buttonStyle(ReaderContextMenuButton(width: buttonSizeWidth, height: buttonSizeHeight, backgroundColor: .black))
-        .background(.black)
+        .tint(.primary)
+        .background(.bar)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .position(position)
     }

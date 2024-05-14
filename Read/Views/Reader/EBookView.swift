@@ -88,7 +88,6 @@ struct EBookView: View {
                 }
             }
         }
-        .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showContentSheet, content: {
             ReaderContent(toc: ebookViewModel.toc ?? [], isSelected: { item in ebookViewModel.isBookTocItemSelected(item: item) }, tocItemPressed: { item in
@@ -168,7 +167,7 @@ struct EBookView: View {
     private func handleTappedHighlight(_ highlight: TappedHighlight) {
         showContextMenu = false
 
-        let yPad = highlight.dir == "down" ? 70.0 : 0.0
+        let yPad = highlight.dir == "down" ? 35.0 : -35.0
         let annotationViewPosition = CGPoint(
             x: highlight.x,
             y: highlight.y + yPad
@@ -205,7 +204,7 @@ struct EBookView: View {
             return
         }
 
-        let yPadding = selectionSelected?.dir == "down" ? 70.0 : 0.0
+        let yPadding = selectionSelected?.dir == "down" ? 35.0 : -35.0
         let annotationViewPosition = CGPoint(
             x: bounds.origin.x,
             y: bounds.origin.y + yPadding
