@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		9F075A792BA501580017BFAF /* RefrenceLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F075A782BA501580017BFAF /* RefrenceLibrary.swift */; };
-		9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0763622B840F09003E1351 /* ReadingPosition.swift */; };
-		9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0763642B840F59003E1351 /* BookHighlight.swift */; };
 		9F0B9A182BB7C53200581362 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = 9F0B9A172BB7C53200581362 /* bundle.js */; };
 		9F0C00622BE98BF900984BF4 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0C00612BE98BF900984BF4 /* SwiftUIIntrospect */; };
 		9F0C00642BE9A22000984BF4 /* LastEngaged.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C00632BE9A22000984BF4 /* LastEngaged.swift */; };
@@ -33,13 +31,13 @@
 		9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */; };
 		9F5AADF22B82CB6D00712230 /* BookGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5AADF12B82CB6D00712230 /* BookGrid.swift */; };
 		9F5AADF42B82CB9D00712230 /* BookList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5AADF32B82CB9D00712230 /* BookList.swift */; };
+		9F5F05002BF34CF500F9B026 /* SDBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F04FF2BF34CF500F9B026 /* SDBook.swift */; };
+		9F5F05022BF4295500F9B026 /* SDBook+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F05012BF4295500F9B026 /* SDBook+Extensions.swift */; };
+		9F5F05042BF4299200F9B026 /* SDHighlight+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F05032BF4299200F9B026 /* SDHighlight+Extensions.swift */; };
 		9F608E842B65D05D00D2B5F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9F608E832B65D05D00D2B5F4 /* Assets.xcassets */; };
 		9F608E872B65D05D00D2B5F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9F608E862B65D05D00D2B5F4 /* Preview Assets.xcassets */; };
 		9F608E8F2B65DDD100D2B5F4 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F608E8E2B65DDD100D2B5F4 /* Extensions.swift */; };
 		9F608E922B65E29000D2B5F4 /* UploadFileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F608E912B65E29000D2B5F4 /* UploadFileView.swift */; };
-		9F608E952B65F29D00D2B5F4 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 9F608E942B65F29D00D2B5F4 /* Realm */; };
-		9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9F608E962B65F29D00D2B5F4 /* RealmSwift */; };
-		9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F608E992B65F40A00D2B5F4 /* Book.swift */; };
 		9F612CF82BD891E8006D573C /* WrappingStackLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F612CF72BD891E8006D573C /* WrappingStackLayout.swift */; };
 		9F612CFD2BD8960B006D573C /* TagField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F612CFC2BD8960B006D573C /* TagField.swift */; };
 		9F6B4EBB2BC5C36C00334C21 /* PlaceholderCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6B4EBA2BC5C36C00334C21 /* PlaceholderCover.swift */; };
@@ -134,8 +132,6 @@
 
 /* Begin PBXFileReference section */
 		9F075A782BA501580017BFAF /* RefrenceLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefrenceLibrary.swift; sourceTree = "<group>"; };
-		9F0763622B840F09003E1351 /* ReadingPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPosition.swift; sourceTree = "<group>"; };
-		9F0763642B840F59003E1351 /* BookHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookHighlight.swift; sourceTree = "<group>"; };
 		9F0B9A172BB7C53200581362 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bundle.js; sourceTree = "<group>"; };
 		9F0C00632BE9A22000984BF4 /* LastEngaged.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastEngaged.swift; sourceTree = "<group>"; };
 		9F0C00672BE9CC7000984BF4 /* ReadingNowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingNowView.swift; sourceTree = "<group>"; };
@@ -158,12 +154,14 @@
 		9F5954B82B6E6050009FC2F1 /* BookDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
 		9F5AADF12B82CB6D00712230 /* BookGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookGrid.swift; sourceTree = "<group>"; };
 		9F5AADF32B82CB9D00712230 /* BookList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookList.swift; sourceTree = "<group>"; };
+		9F5F04FF2BF34CF500F9B026 /* SDBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDBook.swift; sourceTree = "<group>"; };
+		9F5F05012BF4295500F9B026 /* SDBook+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SDBook+Extensions.swift"; sourceTree = "<group>"; };
+		9F5F05032BF4299200F9B026 /* SDHighlight+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SDHighlight+Extensions.swift"; sourceTree = "<group>"; };
 		9F608E7C2B65D05B00D2B5F4 /* Read.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Read.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F608E832B65D05D00D2B5F4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9F608E862B65D05D00D2B5F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		9F608E8E2B65DDD100D2B5F4 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9F608E912B65E29000D2B5F4 /* UploadFileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadFileView.swift; sourceTree = "<group>"; };
-		9F608E992B65F40A00D2B5F4 /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
 		9F608E9B2B664D7600D2B5F4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9F612CF72BD891E8006D573C /* WrappingStackLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappingStackLayout.swift; sourceTree = "<group>"; };
 		9F612CFC2BD8960B006D573C /* TagField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagField.swift; sourceTree = "<group>"; };
@@ -257,13 +255,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F8F9CC22BB4FF880081C57F /* ZIPFoundation in Frameworks */,
-				9F608E972B65F29D00D2B5F4 /* RealmSwift in Frameworks */,
 				9FE631972BE43797004CF96C /* KeychainSwift in Frameworks */,
 				9F1C69F32BC634A4002D6AF4 /* DownloadManager in Frameworks */,
 				9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */,
 				9F0C00622BE98BF900984BF4 /* SwiftUIIntrospect in Frameworks */,
 				9FB84A602B9D6681005D7915 /* Nuke in Frameworks */,
-				9F608E952B65F29D00D2B5F4 /* Realm in Frameworks */,
 				9FEEF7DC2BBD2C080079ECDB /* SwiftReader in Frameworks */,
 				9FB84A662B9D6681005D7915 /* NukeVideo in Frameworks */,
 				9FB84A642B9D6681005D7915 /* NukeUI in Frameworks */,
@@ -451,9 +447,9 @@
 		9F608E982B65F3F700D2B5F4 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9F608E992B65F40A00D2B5F4 /* Book.swift */,
-				9F0763622B840F09003E1351 /* ReadingPosition.swift */,
-				9F0763642B840F59003E1351 /* BookHighlight.swift */,
+				9F5F04FF2BF34CF500F9B026 /* SDBook.swift */,
+				9F5F05012BF4295500F9B026 /* SDBook+Extensions.swift */,
+				9F5F05032BF4299200F9B026 /* SDHighlight+Extensions.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -628,8 +624,6 @@
 			);
 			name = Read;
 			packageProductDependencies = (
-				9F608E942B65F29D00D2B5F4 /* Realm */,
-				9F608E962B65F29D00D2B5F4 /* RealmSwift */,
 				9FB84A5F2B9D6681005D7915 /* Nuke */,
 				9FB84A612B9D6681005D7915 /* NukeExtensions */,
 				9FB84A632B9D6681005D7915 /* NukeUI */,
@@ -700,7 +694,6 @@
 			);
 			mainGroup = 9F608E732B65D05B00D2B5F4;
 			packageReferences = (
-				9F608E932B65F29D00D2B5F4 /* XCRemoteSwiftPackageReference "realm-swift" */,
 				9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */,
 				9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				9FE631952BE43797004CF96C /* XCRemoteSwiftPackageReference "keychain-swift" */,
@@ -769,6 +762,7 @@
 				9F8F9CC92BB507C20081C57F /* App.swift in Sources */,
 				9FBC72702B9EA5B70054A7B0 /* MainButtonStyle.swift in Sources */,
 				9FBC726C2B9EA17D0054A7B0 /* SRFromInput.swift in Sources */,
+				9F5F05042BF4299200F9B026 /* SDHighlight+Extensions.swift in Sources */,
 				9F44F4442BC3B5C500E63461 /* BookManager.swift in Sources */,
 				9FBA143F2BEDA47400231886 /* BookDetails.swift in Sources */,
 				9F8F9CCB2BB507E50081C57F /* RequestManager.swift in Sources */,
@@ -777,7 +771,6 @@
 				9FD119BF2BBA418800AB097D /* SourceBookCard.swift in Sources */,
 				9FD9ACFE2BD9FB900006D26B /* SourceExtensionDetails.swift in Sources */,
 				9FE631822BE19F45004CF96C /* AsyncOperation.swift in Sources */,
-				9F0763632B840F09003E1351 /* ReadingPosition.swift in Sources */,
 				9FFFBCA22BD1FD0E0019E6DD /* FileList.swift in Sources */,
 				9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */,
 				9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */,
@@ -786,6 +779,8 @@
 				9F8F9CDD2BB508BC0081C57F /* DownloadInfo.swift in Sources */,
 				9FA3602C2BBE22D800499A4C /* SourceDownloadButton.swift in Sources */,
 				9FE6319B2BE48811004CF96C /* UIInputField.swift in Sources */,
+				9F5F05002BF34CF500F9B026 /* SDBook.swift in Sources */,
+				9F5F05022BF4295500F9B026 /* SDBook+Extensions.swift in Sources */,
 				9FE6318E2BE2EBF5004CF96C /* UIButton.swift in Sources */,
 				9FD119B92BBA411A00AB097D /* SourceExtensionView.swift in Sources */,
 				9F608E8F2B65DDD100D2B5F4 /* Extensions.swift in Sources */,
@@ -810,7 +805,6 @@
 				9F3817AA2BC0D5B700480A56 /* BookListItem.swift in Sources */,
 				9F5AADF22B82CB6D00712230 /* BookGrid.swift in Sources */,
 				9F8F9CC42BB4FF9A0081C57F /* Source.swift in Sources */,
-				9F0763652B840F59003E1351 /* BookHighlight.swift in Sources */,
 				9F0C00642BE9A22000984BF4 /* LastEngaged.swift in Sources */,
 				9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */,
 				9F8F9CBF2BB4FF340081C57F /* SourceManager.swift in Sources */,
@@ -819,7 +813,6 @@
 				9FA730272BD71DE6003294B8 /* ScrollableTabBar.swift in Sources */,
 				9F8F9CD72BB5087D0081C57F /* PartialSourceBook.swift in Sources */,
 				9FBC72752B9EA6C60054A7B0 /* AppTheme.swift in Sources */,
-				9F608E9A2B65F40A00D2B5F4 /* Book.swift in Sources */,
 				9FBBE6E42BCDCA69004B1A85 /* ThemeApplier.swift in Sources */,
 				9FD808842B9819510007D8F6 /* ReaderContextMenu.swift in Sources */,
 				9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */,
@@ -1067,14 +1060,6 @@
 				minimumVersion = 1.1.3;
 			};
 		};
-		9F608E932B65F29D00D2B5F4 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
@@ -1110,16 +1095,6 @@
 		9F1C69F22BC634A4002D6AF4 /* DownloadManager */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DownloadManager;
-		};
-		9F608E942B65F29D00D2B5F4 /* Realm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9F608E932B65F29D00D2B5F4 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = Realm;
-		};
-		9F608E962B65F29D00D2B5F4 /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9F608E932B65F29D00D2B5F4 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
 		};
 		9F8F9CC12BB4FF880081C57F /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -36,10 +36,13 @@ struct ReadApp: App {
 
     init() {
         do {
-            modelContainer = try ModelContainer(for: Source.self)
+            let schema = Schema([Source.self, SDBook.self])
+            modelContainer = try ModelContainer(for: schema)
 
             let sourceManager = SourceManager(modelContext: modelContainer.mainContext)
             _sourceManager = State(initialValue: sourceManager)
+
+            BookManager.shared.modelContext = modelContainer.mainContext
         } catch {
             fatalError("Failed to create ModelContainer for Source")
         }

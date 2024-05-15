@@ -11,9 +11,9 @@ import SwiftUI
 struct Reader: View {
     var isPdf: Bool
     var url: URL
-    var book: Book
+    var book: SDBook
 
-    init(book: Book) {
+    init(book: SDBook) {
         let bookPathURL = URL.documentsDirectory.appending(path: book.bookPath ?? "")
         self.url = bookPathURL
         self.isPdf = bookPathURL.lastPathComponent.hasSuffix(".pdf")
@@ -31,14 +31,10 @@ struct Reader: View {
         .task {
             do {
                 try await Task.sleep(nanoseconds: 7_500_000_000)
-                book.updateLastEngaged(.now)
+                book.lastEngaged = .now
             } catch {
                 Logger.general.debug("Did not update last engaged for book: \(book.id)")
             }
         }
     }
-}
-
-#Preview {
-    Reader(book: .example1)
 }

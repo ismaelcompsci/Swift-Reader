@@ -15,7 +15,7 @@ public extension PDFAnnotationKey {
 
 struct PDF: View {
     let url: URL
-    let book: Book
+    let book: SDBook
 
     @StateObject var pdfViewModel: PDFViewModel
 
@@ -28,10 +28,10 @@ struct PDF: View {
     @State var showRefrenceLibrary = false
     @State var refrenceLibraryText = ""
 
-    init(url: URL, book: Book) {
+    init(url: URL, book: SDBook) {
         self.book = book
         self.url = url
-        self._pdfViewModel = StateObject(wrappedValue: PDFViewModel(pdfFile: url, pdfInitialPageIndex: book.readingPosition?.chapter))
+        self._pdfViewModel = StateObject(wrappedValue: PDFViewModel(pdfFile: url, pdfInitialPageIndex: book.position?.chapter))
     }
 
     var body: some View {
@@ -115,7 +115,7 @@ struct PDF: View {
         case .delete:
 
             if let tappedHighlight = pdfViewModel.tappedHighlight {
-                book.removeHighlight(withId: tappedHighlight.uuidString)
+                book.removeHighlight(id: tappedHighlight.uuidString)
                 pdfViewModel.removeHighlight(withUUIDString: tappedHighlight.uuidString)
             }
 
@@ -141,7 +141,7 @@ struct PDF: View {
     }
 
     func handleHighlight(_ newHighlight: PDFHighlight) {
-        book.addHighlight(pdfHighlight: newHighlight)
+        book.addHighlight(newHighlight)
     }
 
     func relocated(_ currentPage: PDFPage) {
@@ -149,7 +149,10 @@ struct PDF: View {
         editMode = false
         pdfViewModel.pdfView.clearSelection()
 
-        book.updateReadingPosition(page: currentPage, document: pdfViewModel.pdfDocument)
+        book.updatePosition(
+            page: currentPage,
+            document: pdfViewModel.pdfDocument
+        )
     }
 
     func selectionChanged(_ _: Any?) {
@@ -210,8 +213,4 @@ struct PDF: View {
         }
         showContextMenu = false
     }
-}
-
-#Preview {
-    PDF(url: URL(string: "")!, book: .example1)
 }

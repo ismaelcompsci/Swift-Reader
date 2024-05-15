@@ -5,17 +5,25 @@
 //  Created by Mirna Olvera on 5/6/24.
 //
 
-import RealmSwift
+import SwiftData
 import SwiftUI
 
-struct LastEngaged: View {
-    @ObservedResults(
-        Book.self,
-        filter: NSPredicate(format: "lastEngaged != nil"),
-        sortDescriptor: SortDescriptor(keyPath: "lastEngaged", ascending: false)
-    ) var lastEngagedBooks
+var descriptor: FetchDescriptor<SDBook> {
+    var descriptor = FetchDescriptor<SDBook>(
+        predicate: #Predicate<SDBook> { book in
+            book.lastEngaged != nil
+        },
+        sortBy: [SortDescriptor(\.lastEngaged, order: .reverse)]
+    )
 
-    var handleBookItemEvent: ((Book, BookItemEvent) -> Void)?
+    descriptor.fetchLimit = 4
+    return descriptor
+}
+
+struct LastEngaged: View {
+    @Query(descriptor) var lastEngagedBooks: [SDBook]
+
+    var handleBookItemEvent: ((SDBook, BookItemEvent) -> Void)?
 
     var body: some View {
         if lastEngagedBooks.isEmpty == false {

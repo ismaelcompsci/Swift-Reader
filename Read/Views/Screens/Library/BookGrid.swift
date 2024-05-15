@@ -5,28 +5,26 @@
 //  Created by Mirna Olvera on 2/18/24.
 //
 
-import RealmSwift
 import SwiftUI
 
 struct BookGrid: View {
-    @Environment(\.realm) var realm
     @Environment(Navigator.self) var navigator
     @Environment(UserPreferences.self) var preferences
-
-    @State var selectedBook: Book?
-
+    
+    @State var selectedBook: SDBook?
+    
     @State private var gridWidth = UIScreen.main.bounds.width
-
-    let sortedBooks: Results<Book>
+    
+    let sortedBooks: [SDBook]
     let spacing: CGFloat = 24
-
+    
     var body: some View {
         VStack {
             let width = gridWidth
             let cols = CGFloat(preferences.numberOfColumns)
             let availableWidth = width - (spacing * cols)
             let itemWidth = availableWidth / cols
-
+            
             LazyVGrid(
                 columns: [GridItem(
                     .adaptive(
@@ -37,21 +35,21 @@ struct BookGrid: View {
                 spacing: spacing
             ) {
                 ForEach(sortedBooks) { book in
-
+                    
                     BookGridItem(book: book) { event in
                         switch event {
                         case .onDelete:
                             BookManager.shared.delete(book)
                         case .onClearProgress:
-                            book.removeReadingPosition()
+                            book.removePosition()
                         case .onEdit:
                             selectedBook = book
                         case .onNavigate:
                             navigator.navigate(to: .localDetails(book: book))
                         case .onAddToList(let list):
-                            book.addToList(list)
+                            book.addToCollection(name: list)
                         case .onRemoveFromList(let list):
-                            book.removeFromList(list)
+                            book.removeFromCollection(name: list)
                         }
                     }
                 }
@@ -65,7 +63,3 @@ struct BookGrid: View {
         }
     }
 }
-
-// #Preview {
-//    BookGrid(sortedBooks: )
-// }

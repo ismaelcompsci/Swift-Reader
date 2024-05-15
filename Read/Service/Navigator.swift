@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 public enum NavigatorDestination: Hashable {
-    case localDetails(book: Book)
+    case localDetails(book: SDBook)
     case downloadManager
 
     case sourceSearch(search: String)

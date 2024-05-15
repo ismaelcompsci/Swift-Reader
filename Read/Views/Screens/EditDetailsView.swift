@@ -5,20 +5,21 @@
 //  Created by Mirna Olvera on 3/10/24.
 //
 
-import RealmSwift
+import SwiftData
 import SwiftUI
 
 struct EditDetailsView: View {
+    @Environment(\.modelContext) var context
     @Environment(\.dismiss) var dismiss
     @Environment(AppTheme.self) var theme
 
-    var book: Book
+    var book: SDBook
 
     @State var title: String
     @State var description: String
     @State var author: String
     
-    init(book: Book) {
+    init(book: SDBook) {
         self.book = book
 
         _title = State(initialValue: book.title)
@@ -50,19 +51,11 @@ struct EditDetailsView: View {
                 
                 HStack {
                     Button("Save") {
-                        guard let realm = book.realm?.thaw() else {
-                            return
-                        }
+                        book.title = title
+                        book.summary = description
+                        book.author = author
                         
-                        guard let thawedBook = book.thaw() else {
-                            return
-                        }
-                        
-                        try? realm.write {
-                            thawedBook.title = title
-                            thawedBook.summary = description
-                            thawedBook.author = author
-                        }
+//                        context.save()
                         
                         dismiss()
                     }
@@ -111,8 +104,7 @@ struct EditDetailsView: View {
     NavigationStack {
         VStack {}
             .sheet(isPresented: .constant(true), onDismiss: nil) {
-                EditDetailsView(book: .example1)
-                    .environment(\.font, Font.custom("Poppins-Regular", size: 16))
+                EditDetailsView(book: .init(id: .init(), title: "Unkn"))
                     .environment(AppTheme.shared)
             }
     }

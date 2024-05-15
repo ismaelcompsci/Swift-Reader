@@ -5,16 +5,15 @@
 //  Created by Mirna Olvera on 1/30/24.
 //
 
-import RealmSwift
 import SwiftUI
 
 struct BookDetailView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
     @Environment(\.dismiss) var dismiss
-    @Environment(AppTheme.self) var theme
     @Environment(\.colorScheme) var colorScheme
+    @Environment(AppTheme.self) var theme
 
-    var book: Book
+    var book: SDBook
 
     @State private var openReader = false
 
@@ -35,7 +34,7 @@ struct BookDetailView: View {
                     HStack {
                         Image(systemName: "book.fill")
 
-                        Text(book.readingPosition != nil ? "Continue Reading \(Int((book.readingPosition?.progress ?? 0.0) * 100))%" : "Read")
+                        Text(book.position != nil ? "Continue Reading \(Int((book.position?.progress ?? 0.0) * 100))%" : "Read")
                     }
                 }
                 .buttonStyle(.main)
@@ -50,6 +49,6 @@ struct BookDetailView: View {
 }
 
 #Preview {
-    BookDetailView(book: .shortExample)
+    BookDetailView(book: SDBook(id: .init(), title: "Unknown Title"))
         .environment(AppTheme.shared)
 }

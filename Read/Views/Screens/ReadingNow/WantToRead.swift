@@ -5,19 +5,15 @@
 //  Created by Mirna Olvera on 5/9/24.
 //
 
-import RealmSwift
+import SwiftData
 import SwiftUI
 
 struct WantToRead: View {
-    @ObservedResults(
-        Book.self,
-        filter: NSPredicate(
-            format: "ANY lists CONTAINS %@",
-            ListName.wantToRead.rawValue
-        )
-    ) var wantToReadBooks
+    @Query(filter: #Predicate<SDBook> { book in
+        book.collections.contains(where: { $0.name == "Want To Read" })
+    }, animation: .easeInOut) var wantToReadBooks: [SDBook]
 
-    var handleBookItemEvent: ((Book, BookItemEvent) -> Void)?
+    var handleBookItemEvent: ((SDBook, BookItemEvent) -> Void)?
 
     var body: some View {
         if wantToReadBooks.isEmpty == false {

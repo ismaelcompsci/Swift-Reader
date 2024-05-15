@@ -5,18 +5,42 @@
 //  Created by Mirna Olvera on 3/14/24.
 //
 
-import RealmSwift
+import SwiftData
 import SwiftUI
 
-struct LibraryView: View {
-    @ObservedResults(Book.self) var books
+struct Books: View {
+    var displayMode: LibraryDisplayMode
 
+    @Query var books: [SDBook]
+
+    init(descriptor: FetchDescriptor<SDBook>, displayMode: LibraryDisplayMode) {
+        _books = Query(
+            descriptor,
+            animation: .easeInOut
+        )
+
+        self.displayMode = displayMode
+    }
+
+    var body: some View {
+        switch displayMode {
+        case .grid:
+            BookGrid(sortedBooks: books)
+
+        case .list:
+            BookList(sortedBooks: books)
+        }
+    }
+}
+
+struct LibraryView: View {
     @Environment(AppTheme.self) var theme
     @Environment(UserPreferences.self) private var userPreferences
 
     @StateObject var searchDebouncer = SearchDebouncer()
-
     @State var showUploadFileView: Bool = false
+
+    @Query var books: [SDBook]
 
     var body: some View {
         @Bindable var userPreferences = userPreferences
@@ -41,13 +65,10 @@ struct LibraryView: View {
                         .tint(theme.tintColor)
 
                     } else {
-                        switch userPreferences.libraryDisplayMode {
-                        case .grid:
-                            BookGrid(sortedBooks: sortedBooks)
-
-                        case .list:
-                            BookList(sortedBooks: sortedBooks)
-                        }
+                        Books(
+                            descriptor: sortDescriptor,
+                            displayMode: userPreferences.libraryDisplayMode
+                        )
                     }
                 } header: {
                     VStack {
@@ -74,7 +95,6 @@ struct LibraryView: View {
             }
             .padding(.horizontal, 12)
         }
-        .animation(.easeInOut, value: books)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -122,39 +142,67 @@ struct LibraryView: View {
 }
 
 extension LibraryView {
-    var sortedBooks: RealmSwift.Results<Book> {
+    var sortDescriptor: FetchDescriptor<SDBook> {
         if searchDebouncer.debouncedSearchText.isEmpty {
             switch userPreferences.librarySortKey {
             case .title:
-                return books.sorted(
-                    by: \.title,
-                    ascending: userPreferences.librarySortOrder == .ascending
+
+                return FetchDescriptor<SDBook>(
+                    sortBy: [
+                        SortDescriptor(
+                            \.title,
+                            order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
+                        ),
+                    ]
                 )
+
             case .date:
-                return books.sorted(
-                    by: \.addedAt,
-                    ascending: userPreferences.librarySortOrder == .ascending
+                return FetchDescriptor<SDBook>(
+                    sortBy: [
+                        SortDescriptor(
+                            \.addedAt,
+                            order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
+                        ),
+                    ]
                 )
             case .author:
-                return books.sorted(
-                    by: \.author,
-                    ascending: userPreferences.librarySortOrder == .ascending
+                return FetchDescriptor<SDBook>(
+                    sortBy: [
+                        SortDescriptor(
+                            \.author,
+                            order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
+                        ),
+                    ]
                 )
             case .last_read:
-                return books.sorted(
-                    by: \.readingPosition?.updatedAt,
-                    ascending: userPreferences.librarySortOrder == .ascending
+                return FetchDescriptor<SDBook>(
+                    sortBy: [
+                        SortDescriptor(
+                            \.position?.updatedAt,
+                            order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
+                        ),
+                    ]
                 )
             case .progress:
-                return books.sorted(
-                    by: \.readingPosition?.progress,
-                    ascending: userPreferences.librarySortOrder == .ascending
+                return FetchDescriptor<SDBook>(
+                    sortBy: [
+                        SortDescriptor(
+                            \.position?.progress,
+                            order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
+                        ),
+                    ]
                 )
             }
         } else {
-            return books.filter(
-                "title CONTAINS[cd] %@",
-                searchDebouncer.debouncedSearchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let title = searchDebouncer
+                .debouncedSearchText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+
+            return FetchDescriptor<SDBook>(
+                predicate: #Predicate<SDBook> { book in
+                    book.title.localizedStandardContains(title)
+                }
             )
         }
     }

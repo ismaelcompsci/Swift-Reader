@@ -5,7 +5,6 @@
 //  Created by Mirna Olvera on 2/18/24.
 //
 
-import RealmSwift
 import SwiftUI
 
 enum BookItemEvent {
@@ -13,17 +12,16 @@ enum BookItemEvent {
     case onClearProgress
     case onEdit
     case onNavigate
-    case onAddToList(ListName)
-    case onRemoveFromList(ListName)
+    case onAddToList(String)
+    case onRemoveFromList(String)
 }
 
 struct BookList: View {
-    @Environment(\.realm) var realm
     @Environment(Navigator.self) var navigator
 
-    let sortedBooks: Results<Book>
+    let sortedBooks: [SDBook]
 
-    @State var selectedBook: Book?
+    @State var selectedBook: SDBook?
 
     var body: some View {
         LazyVStack {
@@ -40,24 +38,20 @@ struct BookList: View {
         }
     }
 
-    func bookItemEventHandler(_ event: BookItemEvent, _ book: Book) {
+    func bookItemEventHandler(_ event: BookItemEvent, _ book: SDBook) {
         switch event {
         case .onDelete:
             BookManager.shared.delete(book)
         case .onClearProgress:
-            book.removeReadingPosition()
+            book.removePosition()
         case .onEdit:
             selectedBook = book
         case .onNavigate:
             navigator.navigate(to: .localDetails(book: book))
         case .onAddToList(let list):
-            book.addToList(list)
+            book.addToCollection(name: list)
         case .onRemoveFromList(let list):
-            book.removeFromList(list)
+            book.removeFromCollection(name: list)
         }
     }
 }
-
-// #Preview {
-//    BookList(sortedBooks: Book.exampleArray)
-// }

@@ -12,7 +12,7 @@ struct EBookView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var ebookViewModel: EBookReaderViewModel
 
-    var book: Book
+    var book: SDBook
     var url: URL
 
     @State var contextMenuPosition: CGPoint = .zero
@@ -25,14 +25,25 @@ struct EBookView: View {
     @State var showRefrenceLibrary = false
     @State var refrenceLibraryText = "" { didSet { showRefrenceLibrary = true }}
 
-    init(url: URL, book: Book) {
+    init(url: URL, book: SDBook) {
         self.book = book
         self.url = url
-        if let cfi = book.readingPosition?.epubCfi {
-            self._ebookViewModel = StateObject(wrappedValue: EBookReaderViewModel(file: url, delay: .milliseconds(500), startCfi: cfi))
+        if let cfi = book.position?.epubCfi {
+            self._ebookViewModel = StateObject(
+                wrappedValue: EBookReaderViewModel(
+                    file: url,
+                    delay: .milliseconds(500),
+                    startCfi: cfi
+                )
+            )
 
         } else {
-            self._ebookViewModel = StateObject(wrappedValue: EBookReaderViewModel(file: url, delay: .milliseconds(500)))
+            self._ebookViewModel = StateObject(
+                wrappedValue: EBookReaderViewModel(
+                    file: url,
+                    delay: .milliseconds(500)
+                )
+            )
         }
     }
 
@@ -146,7 +157,7 @@ struct EBookView: View {
         case .delete:
             if let value = currentHighlight?.value {
                 ebookViewModel.removeHighlight(value)
-                book.removeHighlight(withValue: value)
+                book.removeHighlight(value: value)
             }
         case .lookup:
             if editMode == true {
@@ -187,7 +198,14 @@ struct EBookView: View {
             return
         }
 
-        book.addHighlight(text: text, cfi: cfi, index: index, label: label, addedAt: .now, updatedAt: .now)
+        book.addHighlight(
+            text: text,
+            cfi: cfi,
+            index: index,
+            label: label,
+            addedAt: .now,
+            updatedAt: .now
+        )
     }
 
     private func selectionChanged(selectionSelected: Selection?) {
@@ -215,7 +233,7 @@ struct EBookView: View {
     }
 
     private func relocated(relocate: Relocate) {
-        book.updateReadingPosition(with: relocate)
+        book.updatePosition(with: relocate)
     }
 
     private func handleTap(point: CGPoint) {
@@ -225,8 +243,4 @@ struct EBookView: View {
             showOverlay.toggle()
         }
     }
-}
-
-#Preview {
-    EBookView(url: URL(string: "L")!, book: .example1)
 }

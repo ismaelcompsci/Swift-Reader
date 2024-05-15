@@ -5,13 +5,12 @@
 //  Created by Mirna Olvera on 5/6/24.
 //
 
-import RealmSwift
 import SwiftUI
 
 struct ReadingNowView: View {
     @Environment(Navigator.self) var navigator
 
-    @State var selectedBook: Book?
+    @State var selectedBook: SDBook?
 
     var body: some View {
         ScrollView {
@@ -27,20 +26,20 @@ struct ReadingNowView: View {
         }
     }
 
-    func handleBookItemEvent(_ book: Book, _ event: BookItemEvent) {
+    func handleBookItemEvent(_ book: SDBook, _ event: BookItemEvent) {
         switch event {
         case .onDelete:
             BookManager.shared.delete(book)
         case .onClearProgress:
-            book.removeReadingPosition()
+            book.removePosition()
         case .onEdit:
             selectedBook = book
         case .onNavigate:
             navigator.navigate(to: .localDetails(book: book))
         case .onAddToList(let list):
-            book.addToList(list)
+            book.addToCollection(name: list)
         case .onRemoveFromList(let list):
-            book.removeFromList(list)
+            book.removeFromCollection(name: list)
         }
     }
 }

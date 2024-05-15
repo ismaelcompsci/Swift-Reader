@@ -6,8 +6,7 @@
 //
 
 import Foundation
-import OSLog
-import RealmSwift
+import SwiftData
 import SwiftReader
 
 enum BookImporterError: String, Error {
@@ -16,7 +15,7 @@ enum BookImporterError: String, Error {
 
 class BookManager {
     static let shared = BookManager()
-    @ObservedResults(Book.self) var books
+    var modelContext: ModelContext!
 
     private func downloadImage(with url: String) async -> URL? {
         guard let url = URL(string: url) else {
@@ -25,17 +24,17 @@ class BookManager {
 
         do {
             let (file, _) = try await URLSession.shared.download(from: url)
-            Logger.general.info("Downloaded image with url: \(url)")
+            SRLogger.general.info("Downloaded image with url: \(url)")
             return file
         } catch {
-            Logger.general.error("Failed to download image with url: \(url), error: \(error.localizedDescription)")
+            SRLogger.general.error("Failed to download image with url: \(url), error: \(error.localizedDescription)")
         }
 
         return nil
     }
 
     func process(for file: URL, with bookInfo: BookInfo) async throws {
-        Logger.general.info("Processing book with book info")
+        SRLogger.general.info("Processing book with book info")
 
         let bookId = UUID()
         let documents = URL.documentsDirectory
@@ -56,7 +55,7 @@ class BookManager {
             do {
                 try FileManager.default.moveItem(at: downloadedImageUrl, to: newImageLocation)
             } catch {
-                Logger.general.error("Download image error: \(error.localizedDescription)")
+                SRLogger.general.error("Download image error: \(error.localizedDescription)")
             }
         }
 
@@ -76,7 +75,7 @@ class BookManager {
             bookCover: coverPath
         )
 
-        append(with: metadata, fromSource: true)
+        add(with: metadata, fromSource: true)
     }
 
     func process(for file: URL) async throws {
@@ -94,48 +93,40 @@ class BookManager {
             throw BookImporterError.failedToGetMetadata
         }
 
-        append(with: metadata, fromSource: false)
+        add(with: metadata, fromSource: false)
     }
 }
 
 extension BookManager {
-    func append(with metadata: BookMetadata, fromSource: Bool) {
-        let realm = try! Realm()
+    func add(with metadata: BookMetadata, fromSource: Bool) {
+        let book = SDBook(
+            id: .init(),
+            title: metadata.title ?? "Unknown Title",
+            author: metadata.author?.first?.name,
+            summary: metadata.description,
+            bookPath: metadata.bookPath,
+            coverPath: metadata.bookCover
+        )
 
-        try! realm.write {
-            let newBook = Book()
-            newBook.title = metadata.title ?? "Untitled"
-            newBook.summary = metadata.description ?? ""
-            newBook.coverPath = metadata.bookCover
-            newBook.bookPath = metadata.bookPath
+        modelContext.insert(book)
 
-            _ = metadata.subject?.map { item in
-                let newTag = BookTag()
-                newTag.name = item
-                newBook.tags.append(newTag)
-            }
-
-            newBook.author = metadata.author?.first?.name
-
-            $books.append(newBook)
-        }
+        do {
+            try modelContext.save()
+        } catch { SRLogger.general.error("Failed to save new book \(error.localizedDescription)") }
     }
 
-    func delete(_ book: Book) {
-        let thawedBook = book.thaw()
+    func delete(_ book: SDBook) {
+        modelContext.delete(book)
 
-        if let thawedBook, let bookRealm = thawedBook.realm {
-            try! bookRealm.write {
-                bookRealm.delete(thawedBook)
-            }
-
+        do {
+            try modelContext.save()
             removeBookFromDisk(book: book)
-        }
+        } catch { SRLogger.general.error("Failed to delete book \(error.localizedDescription)") }
     }
 }
 
 extension BookManager {
-    func removeBookFromDisk(book: Book) {
+    func removeBookFromDisk(book: SDBook) {
         guard let bookPath = book.bookPath else {
             print("Book has no path")
             return
@@ -147,7 +138,7 @@ extension BookManager {
         do {
             try FileManager.default.removeItem(at: directoryPath)
         } catch {
-            Logger.general.error("Failed to remove book \(error.localizedDescription)")
+            SRLogger.general.error("Failed to remove book \(error.localizedDescription)")
         }
     }
 }

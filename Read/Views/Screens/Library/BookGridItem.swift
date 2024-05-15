@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookGridItem: View {
-    var book: Book
+    var book: SDBook
     var withTitle: Bool = false
     let onEvent: (BookItemEvent) -> Void
 
@@ -19,13 +19,13 @@ struct BookGridItem: View {
     }
 
     var showNewTag: Bool {
-        book.readingPosition?.progress == nil
+        book.position?.progress == nil
     }
 
     var tagState: TagState {
-        if book.lists.contains(.completed) {
+        if book.isFinsihed == true {
             return .finished
-        } else if book.readingPosition != nil {
+        } else if book.position != nil {
             return .progress
         } else {
             return .new
@@ -81,23 +81,25 @@ struct BookGridItem: View {
                 Spacer()
 
                 Menu {
-                    if book.lists.contains(where: { $0 == .completed }) {
+                    if book.isFinsihed == true {
                         Button("Mark as Still Reading", systemImage: "minus.circle") {
-                            onEvent(.onRemoveFromList(.completed))
+                            book.isFinsihed = false
+                            book.dateFinished = nil
                         }
                     } else {
                         Button("Mark as Finished", systemImage: "checkmark.circle") {
-                            onEvent(.onAddToList(.completed))
+                            book.isFinsihed = true
+                            book.dateFinished = .now
                         }
                     }
 
-                    if book.lists.contains(where: { $0 == .wantToRead }) {
+                    if book.collections.contains(where: { $0.name == "Want To Read" }) {
                         Button("Remove from Want to Read", systemImage: "minus.circle") {
-                            onEvent(.onRemoveFromList(.wantToRead))
+                            onEvent(.onRemoveFromList("Want To Read"))
                         }
                     } else {
                         Button("Add To Want to Read", systemImage: "text.badge.star") {
-                            onEvent(.onAddToList(.wantToRead))
+                            onEvent(.onAddToList("Want To Read"))
                         }
                     }
 
@@ -109,7 +111,7 @@ struct BookGridItem: View {
                         onEvent(.onEdit)
                     }
 
-                    if book.readingPosition != nil {
+                    if book.position != nil {
                         Button("Clear progress", systemImage: "clear.fill") {
                             onEvent(.onClearProgress)
                         }
@@ -155,7 +157,7 @@ struct BookGridItem: View {
     }
 
     var progress: some View {
-        let position = book.readingPosition
+        let position = book.position
 
         return Text("\(Int((position?.progress ?? 0) * 100))%")
             .foregroundStyle(.secondary)
@@ -177,7 +179,13 @@ struct BookGridItem: View {
 }
 
 #Preview {
-    BookGridItem(book: .example1, onEvent: { _ in })
-        .frame(width: 120, height: 120 * 1.6)
-        .preferredColorScheme(.dark)
+    BookGridItem(book: SDBook(
+        id: .init(),
+        title: "Unknown Title"
+    ),
+    onEvent: {
+        _ in
+    })
+    .frame(width: 120, height: 120 * 1.6)
+    .preferredColorScheme(.dark)
 }

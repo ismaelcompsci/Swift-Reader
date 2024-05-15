@@ -6,7 +6,6 @@
 //
 
 import OSLog
-import RealmSwift
 import SwiftReader
 import SwiftUI
 
