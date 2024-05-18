@@ -8,6 +8,10 @@
 import SwiftReader
 import SwiftUI
 
+/**
+
+ */
+
 struct EBookView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var ebookViewModel: EBookReaderViewModel
@@ -48,9 +52,22 @@ struct EBookView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color(hex: ebookViewModel.theme.bg.rawValue)
-                .ignoresSafeArea()
+        VStack(spacing: 0) {
+            HStack {
+                let section = ebookViewModel.currentLocation?.section
+
+                if let section = section, showOverlay == true {
+                    Text(verbatim: "\(section.total - section.current) pages left in chapter")
+
+                } else {
+                    Text("\(book.title)")
+                }
+            }
+            .foregroundStyle(Color(hex: ebookViewModel.theme.fg.rawValue))
+            .font(.footnote)
+            .transition(.blurReplace.combined(with: .opacity))
+            .frame(minHeight: 30)
+            .padding(.horizontal, 16)
 
             EBookReader(viewModel: ebookViewModel)
                 .onTapGesture {
@@ -63,16 +80,72 @@ struct EBookView: View {
                     }
                 }
 
-            ReaderOverlay(title: book.title, currentLabel: ebookViewModel.currentLabel, showOverlay: $showOverlay, settingsButtonPressed: {
-                showSettingsSheet.toggle()
-            }) {
-                showContentSheet.toggle()
-            }
+            HStack {
+                let current = ebookViewModel.currentLocation?.location?.current
+                let total = ebookViewModel.currentLocation?.location?.total
 
+                Group {
+                    if let current = current, showOverlay == false {
+                        Text(verbatim: "\(current)")
+                    } else if let current = current, let total = total, showOverlay == true {
+                        Text(verbatim: "\(current) of \(total)")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+            }
+            .frame(minHeight: 30)
+            .font(.footnote)
+            .foregroundStyle(Color(hex: ebookViewModel.theme.fg.rawValue))
+            .transition(.blurReplace.combined(with: .opacity))
+            .padding(.horizontal, 16)
+        }
+        .overlay {
             if showContextMenu && contextMenuPosition != .zero {
-                ReaderContextMenu(showContextMenu: $showContextMenu, editMode: $editMode, position: contextMenuPosition, onEvent: handleContentMenuEvent)
+                ReaderContextMenu(
+                    showContextMenu: $showContextMenu,
+                    editMode: $editMode,
+                    position: contextMenuPosition,
+                    onEvent: handleContentMenuEvent
+                )
             }
         }
+        .overlay {
+            VStack {
+                HStack {
+                    Spacer()
+                    if showOverlay == true {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.primary)
+                                .frame(width: 30, height: 30)
+                        }
+                        .background(.ultraThinMaterial)
+                        .clipShape(.circle)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+                }
+                .padding(.horizontal, 16)
+
+                Spacer()
+
+                ReaderSettingsButton(show: $showOverlay) { event in
+                    switch event {
+                    case .settings:
+                        showSettingsSheet = true
+
+                    case .bookmarks:
+                        break
+
+                    case .content:
+                        showContentSheet = true
+                    }
+                }
+            }
+        }
+        .background(Color(hex: ebookViewModel.theme.bg.rawValue))
         .overlay {
             switch ebookViewModel.state {
             case .loading:
@@ -178,7 +251,7 @@ struct EBookView: View {
     private func handleTappedHighlight(_ highlight: TappedHighlight) {
         showContextMenu = false
 
-        let yPad = highlight.dir == "down" ? 35.0 : -35.0
+        let yPad = highlight.dir == "down" ? 70 : -35.0
         let annotationViewPosition = CGPoint(
             x: highlight.x,
             y: highlight.y + yPad
@@ -222,7 +295,7 @@ struct EBookView: View {
             return
         }
 
-        let yPadding = selectionSelected?.dir == "down" ? 35.0 : -35.0
+        let yPadding = selectionSelected?.dir == "down" ? 70.0 : -35.0
         let annotationViewPosition = CGPoint(
             x: bounds.origin.x,
             y: bounds.origin.y + yPadding

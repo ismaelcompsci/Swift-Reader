@@ -247,8 +247,6 @@ public class EBookReaderViewModel: ObservableObject {
             }
 
             if success != nil {
-                print("DONE SETTING THEME")
-
                 if !self.didSetTheme {
                     self.didSetTheme = true
                 }

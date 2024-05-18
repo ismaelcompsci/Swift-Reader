@@ -160,17 +160,17 @@ public struct RelocateTocItem: Codable {
 }
 
 public struct Location: Codable {
-    var current: Int
-    var next: Int
-    var total: Int
+    public var current: Int
+    public var next: Int
+    public var total: Int
 }
 
 public struct BookSection: Codable {
-    var current: Int
-    var total: Int
+    public var current: Int
+    public var total: Int
 }
 
 public struct Time: Codable {
-    var section: Double
-    var total: Double
+    public var section: Double
+    public var total: Double
 }

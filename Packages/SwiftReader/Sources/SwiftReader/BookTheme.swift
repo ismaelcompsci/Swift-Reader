@@ -13,7 +13,7 @@ public enum ThemeBackground: String, Codable, CaseIterable, Identifiable {
     }
 
     case light = "#ffffff"
-    case dark = "#09090b"
+    case dark = "#000000"
     case sepia = "#f1e8d0"
 
     public func fromForeground(foreground: ThemeForeground) -> ThemeBackground {

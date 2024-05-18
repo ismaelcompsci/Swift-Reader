@@ -35,12 +35,10 @@ struct PDF: View {
     }
 
     var body: some View {
-        ZStack {
-            Color(hex: pdfViewModel.theme.bg.rawValue)
-                .ignoresSafeArea()
-
+        VStack(spacing: 0) {
             PDFReader(viewModel: pdfViewModel, url: url)
-
+        }
+        .overlay {
             ReaderOverlay(title: book.title, currentLabel: pdfViewModel.currentLabel, showOverlay: $showOverlay, settingsButtonPressed: {
                 showSettingsSheet.toggle()
             }) {
@@ -51,7 +49,7 @@ struct PDF: View {
                 ReaderContextMenu(showContextMenu: $showContextMenu, editMode: $editMode, position: contextMenuPosition, onEvent: handleContentMenuEvent)
             }
         }
-
+        .background(Color(hex: pdfViewModel.theme.bg.rawValue))
         .sheet(isPresented: $showContentSheet, content: {
             ReaderContent(toc: pdfViewModel.toc ?? [], isSelected: { item in pdfViewModel.isBookTocItemSelected(item: item) }, tocItemPressed: { item in
                 guard let page = item.outline?.destination?.page else {
@@ -79,7 +77,6 @@ struct PDF: View {
                 pdfViewModel.addHighlightToPages(highlight: pdfHighlight)
             }
         }
-        .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
     }
 
