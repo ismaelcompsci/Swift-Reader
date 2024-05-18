@@ -45,6 +45,7 @@ struct ReaderSettingsButton: View {
     @State var showSettings = false
     @State var rows = [ReaderSettingsAction]()
     
+    var progress: Double
     var onEvent: ((ReaderSettingsAction) -> Void)?
     
     func close() {
@@ -95,10 +96,10 @@ struct ReaderSettingsButton: View {
                             
                 } label: {
                     Image(systemName: "slider.horizontal.3")
-                        .font(.system(size: 22))
+                        .font(.system(size: 18))
                         .frame(width: 24, height: 24)
                 }
-                .padding(6)
+                .padding(4)
                 .background(.ultraThickMaterial)
                 .clipShape(.rect(cornerRadius: 10))
                 .tint(.primary)
@@ -116,16 +117,20 @@ struct ReaderSettingsButton: View {
                         close()
                     } label: {
                         HStack {
-                            Text(title)
+                            if item.label == ReaderSettingsAction.content.label {
+                                Text("\(ReaderSettingsAction.content.label) ∙ \(Int(progress * 100))%")
+                            } else {
+                                Text(title)
+                            }
                                     
                             Spacer()
                                     
                             Image(systemName: image)
                         }
                         .padding()
-                        .background(.bar)
-                        .clipShape(.rect(cornerRadius: 12))
                     }
+                    .background(.ultraThinMaterial)
+                    .clipShape(.rect(cornerRadius: 12))
                     .tint(.primary)
                     .transition(
                         .blurReplace
@@ -157,7 +162,7 @@ struct ReaderSettingsButton: View {
     VStack(alignment: .trailing) {
         Spacer()
 
-        ReaderSettingsButton(show: .constant(true))
+        ReaderSettingsButton(show: .constant(true), progress: .zero)
     }
     .preferredColorScheme(.dark)
 }

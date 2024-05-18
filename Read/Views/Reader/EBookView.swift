@@ -8,10 +8,6 @@
 import SwiftReader
 import SwiftUI
 
-/**
-
- */
-
 struct EBookView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var ebookViewModel: EBookReaderViewModel
@@ -24,6 +20,7 @@ struct EBookView: View {
     @State var showContentSheet = false
     @State var showSettingsSheet = false
     @State var showContextMenu = false
+    @State var showHighlightSheet = false
     @State var showOverlay = false
     @State var currentHighlight: TappedHighlight? = nil
     @State var showRefrenceLibrary = false
@@ -61,10 +58,15 @@ struct EBookView: View {
 
                 } else {
                     Text("\(book.title)")
+                        .transition(
+                            .move(edge: .leading).combined(with: .opacity).animation(
+                                .snappy
+                            )
+                        )
                 }
             }
-            .foregroundStyle(Color(hex: ebookViewModel.theme.fg.rawValue))
-            .font(.footnote)
+            .foregroundStyle(Color(hex: ebookViewModel.theme.fg.rawValue).opacity(0.5))
+            .font(.footnote.bold())
             .transition(.blurReplace.combined(with: .opacity))
             .frame(minHeight: 30)
             .padding(.horizontal, 16)
@@ -94,8 +96,8 @@ struct EBookView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
             }
             .frame(minHeight: 30)
-            .font(.footnote)
-            .foregroundStyle(Color(hex: ebookViewModel.theme.fg.rawValue))
+            .font(.footnote.bold())
+            .foregroundStyle(Color(hex: ebookViewModel.theme.fg.rawValue).opacity(0.5))
             .transition(.blurReplace.combined(with: .opacity))
             .padding(.horizontal, 16)
         }
@@ -131,13 +133,16 @@ struct EBookView: View {
 
                 Spacer()
 
-                ReaderSettingsButton(show: $showOverlay) { event in
+                ReaderSettingsButton(
+                    show: $showOverlay,
+                    progress: ebookViewModel.currentLocation?.fraction ?? .zero
+                ) { event in
                     switch event {
                     case .settings:
                         showSettingsSheet = true
 
                     case .bookmarks:
-                        break
+                        showHighlightSheet = true
 
                     case .content:
                         showContentSheet = true
@@ -184,6 +189,9 @@ struct EBookView: View {
                 ebookViewModel.setBookTheme()
             }
 
+        })
+        .sheet(isPresented: $showHighlightSheet, content: {
+            Text("Not implemented.")
         })
         .refrenceLibrary(isPresented: $showRefrenceLibrary, term: refrenceLibraryText)
         .onReceive(ebookViewModel.onTapped, perform: handleTap)
