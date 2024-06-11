@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import SReader
 import SwiftData
 
 @Model
@@ -27,18 +28,21 @@ public class SDBook: Identifiable {
     var addedAt = Date.now
     var updatedAt = Date.now
     var lastEngaged: Date?
+    var lastOpened: Date?
+
+    var position: SDPosition?
+
+    var fullPath: URL? {
+        if let path = bookPath {
+            return URL.documentsDirectory.appending(path: path)
+        } else {
+            return nil
+        }
+    }
 
     var tags = [SDTag]()
     @Relationship(inverse: \SDCollection.books) var collections = [SDCollection]()
-    @Relationship(
-        deleteRule: .cascade,
-        inverse: \SDHighlight.book
-    ) var highlights = [SDHighlight]()
-
-    @Relationship(
-        deleteRule: .cascade,
-        inverse: \SDReadingPosition.book
-    ) var position: SDReadingPosition?
+    @Relationship(deleteRule: .cascade, inverse: \SDHighlight.book) var highlights = [SDHighlight]()
 
     @Transient
     var titleNormalized: String {
@@ -53,8 +57,10 @@ public class SDBook: Identifiable {
         bookPath: String? = nil,
         coverPath: String? = nil,
         dateFinished: Date? = nil,
+        position: SDPosition? = nil,
         addedAt: Foundation.Date = Date.now,
         updatedAt: Foundation.Date = Date.now,
+        lastOpened: Foundation.Date? = nil,
         lastEngaged: Date? = nil
     ) {
         self.id = id
@@ -64,8 +70,10 @@ public class SDBook: Identifiable {
         self.bookPath = bookPath
         self.coverPath = coverPath
         self.dateFinished = dateFinished
+        self.position = position
         self.addedAt = addedAt
         self.updatedAt = updatedAt
+        self.lastOpened = lastOpened
         self.lastEngaged = lastEngaged
     }
 }
@@ -76,7 +84,7 @@ class SDTag {
     var name: String
 
     init(name: String) {
-        self.id = .init()
+        id = .init()
 
         self.name = name
     }
@@ -92,7 +100,7 @@ class SDCollection {
     var books: [SDBook]
 
     init(createdAt: Date, name: String, books: [SDBook]) {
-        self.id = .init()
+        id = .init()
         self.createdAt = createdAt
         self.name = name
         self.books = books
@@ -101,66 +109,81 @@ class SDCollection {
 
 @Model
 class SDHighlight {
-    @Attribute(.unique) var id: UUID
+    @Attribute(.unique) var id: String
 
-    var cfi: String?
-    var ranges: String?
-    var chapter: Int?
-    var chapterTitle: String?
-    var backgroundColor = "#FFFF00"
-    var highlightText: String?
-    var addedAt = Date.now
-    var updatedAt = Date.now
-    var highlightId: String?
+    var locator: SRLocator
+    var color: HighlightColor
+    var created = Date()
+    var progression: Double?
 
     var book: SDBook?
 
     init(
-        id: UUID,
-        cfi: String? = nil,
-        ranges: String? = nil,
-        chapter: Int? = nil,
-        chapterTitle: String? = nil,
-        backgroundColor: String = "#FFFF00",
-        highlightText: String? = nil,
-        addedAt: Foundation.Date = Date.now,
-        updatedAt: Foundation.Date = Date.now,
-        highlightId: String? = nil
+        id: String,
+        locator: SRLocator,
+        color: HighlightColor,
+        created: Date = .now,
+        progression: Double? = nil
     ) {
         self.id = id
-        self.cfi = cfi
-        self.ranges = ranges
-        self.chapter = chapter
-        self.chapterTitle = chapterTitle
-        self.backgroundColor = backgroundColor
-        self.highlightText = highlightText
-        self.addedAt = addedAt
-        self.updatedAt = updatedAt
-        self.highlightId = highlightId
+        self.locator = locator
+        self.color = color
+        self.created = created
+        self.progression = progression
+        book = nil
+    }
+
+    init(_ highlight: SRHighlight) {
+        id = highlight.id
+        locator = highlight.locator
+        color = highlight.color
+        created = highlight.created
+        progression = highlight.progression
+    }
+
+    func toSRHiglight() -> SRHighlight {
+        SRHighlight(
+            id: id,
+            locator: locator,
+            color: color,
+            created: created
+        )
     }
 }
 
 @Model
-class SDReadingPosition {
-    var chapterProgress: Double?
-    var chapter: Int
-    var updatedAt: Date
-    var epubCfi: String?
-    var progress: Double?
+class SDPosition {
+    var type: BookType
+    var title: String?
+    var text: String?
 
-    var book: SDBook?
+    var fragments: [String]
+    var progression: Double?
+    var totalProgression: Double?
+    var position: Int?
 
-    init(
-        chapterProgress: Double? = nil,
-        chapter: Int,
-        updatedAt: Date,
-        epubCfi: String? = nil,
-        progress: Double? = nil
-    ) {
-        self.chapterProgress = chapterProgress
-        self.chapter = chapter
-        self.updatedAt = updatedAt
-        self.epubCfi = epubCfi
-        self.progress = progress
+    init(_ locater: SRLocator) {
+        type = locater.type
+        title = locater.title
+        text = locater.text
+
+        fragments = locater.locations.fragments
+        progression = locater.locations.progression
+        totalProgression = locater.locations.totalProgression
+        position = locater.locations.position
+    }
+
+    func toSRLocater() -> SRLocator {
+        SRLocator(
+            type: type,
+            title: title ?? "",
+            locations: .init(
+                fragments: fragments,
+                progression: progression,
+                totalProgression: totalProgression,
+                position: position
+            ),
+            text: text
+        )
     }
 }

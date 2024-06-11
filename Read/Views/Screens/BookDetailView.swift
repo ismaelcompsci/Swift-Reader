@@ -34,7 +34,11 @@ struct BookDetailView: View {
                     HStack {
                         Image(systemName: "book.fill")
 
-                        Text(book.position != nil ? "Continue Reading \(Int((book.position?.progress ?? 0.0) * 100))%" : "Read")
+                        if book.position != nil {
+                            Text("Continue Reading \(Int((book.position?.totalProgression ?? 0) * 100))%")
+                        } else {
+                            Text("Read")
+                        }
                     }
                 }
                 .buttonStyle(.main)

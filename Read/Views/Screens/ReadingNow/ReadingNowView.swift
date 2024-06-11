@@ -31,7 +31,7 @@ struct ReadingNowView: View {
         case .onDelete:
             BookManager.shared.delete(book)
         case .onClearProgress:
-            book.removePosition()
+            book.removeLocator()
         case .onEdit:
             selectedBook = book
         case .onNavigate:

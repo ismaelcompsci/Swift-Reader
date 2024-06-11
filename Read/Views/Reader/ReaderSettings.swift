@@ -5,41 +5,40 @@
 //  Created by Mirna Olvera on 3/5/24.
 //
 
-import SwiftReader
+import SReader
 import SwiftUI
 
 struct ReaderSettings: View {
     @Environment(\.dismiss) var dismiss
     @Environment(AppTheme.self) var theme
-    
+
     @Binding var bookTheme: BookTheme
-    
+
     var isPDF: Bool
-    
     var updateTheme: (() -> Void)?
-    
+
     var body: some View {
         VStack {
             VStack(alignment: .leading) {
                 HStack {
                     Spacer()
-                    
+
                     Button("Done") {
                         dismiss()
                     }
                     .foregroundStyle(theme.tintColor)
                 }
-                
+
                 VStack(alignment: .center) {
                     // MARK: Reader Theme
-                    
+
                     HStack {
                         ForEach(ThemeBackground.allCases) { themeBg in
                             ZStack {
                                 Button {
                                     bookTheme.bg = themeBg
                                     bookTheme.fg = themeBg.fromBackground(background: themeBg)
-                                    
+
                                     updateTheme?()
                                 } label: {
                                     Image(systemName: "textformat")
@@ -54,7 +53,7 @@ struct ReaderSettings: View {
                                     }
                                 }
                                 .foregroundStyle(Color(hex: themeBg.fromBackground(background: themeBg).rawValue))
-                                
+
                                 if themeBg == bookTheme.bg {
                                     Circle()
                                         .stroke(theme.tintColor)
@@ -65,10 +64,10 @@ struct ReaderSettings: View {
                             }
                         }
                     }
-                    
+
                     if !isPDF {
                         // MARK: Reader Line Height
-                        
+
                         HStack(spacing: 12) {
                             Button {
                                 // decrease line height
@@ -77,28 +76,28 @@ struct ReaderSettings: View {
                             } label: {
                                 Image(systemName: "blinds.horizontal.closed")
                                     .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.white, .black)
+                                    .foregroundStyle(bookTheme.fg.color, bookTheme.bg.color)
                                     .font(.system(size: 24))
                             }
-                            
+
                             Divider()
                                 .frame(maxHeight: 24)
-                            
+
                             Button {
                                 bookTheme.increaseLineHeight()
                                 updateTheme?()
                             } label: {
                                 Image(systemName: "blinds.horizontal.open")
                                     .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.white, .black)
+                                    .foregroundStyle(bookTheme.fg.color, bookTheme.bg.color)
                                     .font(.system(size: 24))
                             }
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bookTheme.fg.color)
                         .frame(maxWidth: 74, maxHeight: 52)
 
                         // MARK: Reader Font Size
-                        
+
                         HStack(spacing: 12) {
                             Button {
                                 bookTheme.decreaseFontSize()
@@ -107,10 +106,10 @@ struct ReaderSettings: View {
                                 Image(systemName: "textformat.size.smaller")
                                     .font(.system(size: 24))
                             }
-                            
+
                             Divider()
                                 .frame(maxHeight: 24)
-                            
+
                             Button {
                                 bookTheme.increaseFontSize()
                                 updateTheme?()
@@ -119,11 +118,11 @@ struct ReaderSettings: View {
                                     .font(.system(size: 24))
                             }
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bookTheme.fg.color)
                         .frame(maxWidth: 74, maxHeight: 52)
-                        
+
                         // MARK: Reader Gap Size
-                        
+
                         HStack {
                             Button {
                                 bookTheme.decreaseGap()
@@ -132,10 +131,10 @@ struct ReaderSettings: View {
                                 Image(systemName: "rectangle.portrait.arrowtriangle.2.outward")
                                     .font(.system(size: 24))
                             }
-                            
+
                             Divider()
                                 .frame(maxHeight: 24)
-                            
+
                             Button {
                                 bookTheme.increaseGap()
                                 updateTheme?()
@@ -144,9 +143,9 @@ struct ReaderSettings: View {
                                     .font(.system(size: 24))
                             }
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bookTheme.fg.color)
                         .frame(maxWidth: 74, maxHeight: 52)
-                        
+
                         HStack {
                             Button {
                                 bookTheme.increaseMargin()
@@ -155,10 +154,10 @@ struct ReaderSettings: View {
                                 Image(systemName: "rectangle.compress.vertical")
                                     .font(.system(size: 24))
                             }
-                            
+
                             Divider()
                                 .frame(maxHeight: 24)
-                            
+
                             Button {
                                 bookTheme.decreaseMargin()
                                 updateTheme?()
@@ -167,9 +166,9 @@ struct ReaderSettings: View {
                                     .font(.system(size: 24))
                             }
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bookTheme.fg.color)
                         .frame(maxWidth: 74, maxHeight: 52)
-                        
+
                         HStack {
                             Button {
                                 bookTheme.setMaxColumnCount(1)
@@ -178,13 +177,13 @@ struct ReaderSettings: View {
                                 Image(systemName: "square")
                                     .font(.system(size: 24))
                                     .foregroundStyle(
-                                        bookTheme.maxColumnCount == 1 ? theme.tintColor : .white
+                                        bookTheme.maxColumnCount == 1 ? theme.tintColor : bookTheme.fg.color
                                     )
                             }
-                            
+
                             Divider()
                                 .frame(maxHeight: 24)
-                            
+
                             Button {
                                 bookTheme.setMaxColumnCount(2)
                                 updateTheme?()
@@ -192,22 +191,22 @@ struct ReaderSettings: View {
                                 Image(systemName: "square.split.2x1")
                                     .font(.system(size: 24))
                                     .foregroundStyle(
-                                        bookTheme.maxColumnCount == 2 ? theme.tintColor : .white
+                                        bookTheme.maxColumnCount == 2 ? theme.tintColor : bookTheme.fg.color
                                     )
                             }
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(bookTheme.fg.color)
                         .frame(maxWidth: 74, maxHeight: 52)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .padding()
-            
+
             Spacer()
         }
         .presentationDetents([.height(300)])
-        .background(.black)
+        .background(bookTheme.bg.color)
     }
 }
 

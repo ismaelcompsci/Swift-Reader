@@ -178,16 +178,17 @@ extension LibraryView {
                 return FetchDescriptor<SDBook>(
                     sortBy: [
                         SortDescriptor(
-                            \.position?.updatedAt,
+                            \.lastOpened,
                             order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
                         ),
                     ]
                 )
+
             case .progress:
                 return FetchDescriptor<SDBook>(
                     sortBy: [
                         SortDescriptor(
-                            \.position?.progress,
+                            \.position?.totalProgression,
                             order: userPreferences.librarySortOrder == .ascending ? .forward : .reverse
                         ),
                     ]

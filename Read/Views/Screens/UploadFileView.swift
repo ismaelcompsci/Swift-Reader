@@ -6,7 +6,7 @@
 //
 
 import OSLog
-import SwiftReader
+import SReader
 import SwiftUI
 
 struct UploadFileView: View {
@@ -25,13 +25,13 @@ struct UploadFileView: View {
     }
     
     init() {
-        let _ = HeadlessWebView.shared.greet()
+        MetadataExtractor.shared.loadMetadataExtractor()
     }
     
     var uploadCard: some View {
         VStack(spacing: 18) {
             WrappingStackLayout {
-                ForEach(SupportedFileTypes.allCases, id: \.self) { type in
+                ForEach(SReaderFileTypes.allCases, id: \.self) { type in
                     TagItem(name: ".\(type.rawValue.uppercased())", small: true)
                 }
             }

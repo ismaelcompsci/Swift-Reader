@@ -9,7 +9,7 @@ import SwiftUI
 
 enum ReaderSettingsAction: String, CaseIterable {
     case content
-    case bookmarks
+//    case bookmarks
 //    case search
     case settings
 
@@ -17,8 +17,8 @@ enum ReaderSettingsAction: String, CaseIterable {
         switch self {
         case .content:
             "Contents"
-        case .bookmarks:
-            "Bookmarks & Highlights"
+//        case .bookmarks:
+//            "Bookmarks & Highlights"
 //        case .search:
 //            "Search Book"
         case .settings:
@@ -30,8 +30,8 @@ enum ReaderSettingsAction: String, CaseIterable {
         switch self {
         case .content:
             "list.bullet"
-        case .bookmarks:
-            "pencil.tip"
+//        case .bookmarks:
+//            "pencil.tip"
 //        case .search:
 //            "magnifyingglass"
         case .settings:
@@ -44,14 +44,14 @@ struct ReaderSettingsButton: View {
     @Binding var show: Bool
     @State var showSettings = false
     @State var rows = [ReaderSettingsAction]()
-    
+
     var progress: Double
     var onEvent: ((ReaderSettingsAction) -> Void)?
-    
+
     func close() {
         for index in ReaderSettingsAction.allCases.indices.reversed() {
             let delay = 0.02 * Double((ReaderSettingsAction.allCases.count) - index)
-            
+
             let _ = withAnimation(
                 .interactiveSpring(
                     response: 0.13,
@@ -62,11 +62,11 @@ struct ReaderSettingsButton: View {
                 if rows.isEmpty == true {
                     return
                 }
-                
+
                 rows.remove(at: index)
             }
         }
-        
+
         withAnimation {
             showSettings = false
         }
@@ -79,10 +79,10 @@ struct ReaderSettingsButton: View {
                     withAnimation {
                         showSettings = true
                     }
-                            
+
                     for index in ReaderSettingsAction.allCases.indices {
                         let delay = 0.02 * Double(index)
-                            
+
                         withAnimation(
                             .interactiveSpring(
                                 response: 0.13,
@@ -93,25 +93,25 @@ struct ReaderSettingsButton: View {
                             rows.append(ReaderSettingsAction.allCases[index])
                         }
                     }
-                            
+
                 } label: {
                     Image(systemName: "slider.horizontal.3")
                         .font(.system(size: 18))
                         .frame(width: 24, height: 24)
+                        .tint(.primary)
                 }
                 .padding(4)
-                .background(.ultraThickMaterial)
+                .background(.ultraThinMaterial)
                 .clipShape(.rect(cornerRadius: 10))
-                .tint(.primary)
                 .transition(.scale.combined(with: .opacity))
             }
-                    
+
             VStack {
                 ForEach(rows, id: \.self) {
                     item in
                     let title = item.label
                     let image = item.icon
-                            
+
                     Button {
                         onEvent?(item)
                         close()
@@ -122,9 +122,9 @@ struct ReaderSettingsButton: View {
                             } else {
                                 Text(title)
                             }
-                                    
+
                             Spacer()
-                                    
+
                             Image(systemName: image)
                         }
                         .padding()

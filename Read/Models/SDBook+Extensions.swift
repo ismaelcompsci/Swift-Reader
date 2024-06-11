@@ -7,7 +7,7 @@
 
 import Foundation
 import PDFKit
-import SwiftReader
+import SReader
 
 extension SDBook {
     func removeFromCollection(name: String) {
@@ -33,93 +33,21 @@ extension SDBook {
         }
     }
 
-    func removePosition() {
+    func removeLocator() {
         position = nil
     }
 
-    func updatePosition(with relocate: Relocate) {
-        if position == nil {
-            position = SDReadingPosition(
-                chapter: relocate.tocItem?.id ?? -1,
-                updatedAt: relocate.updatedAt ?? .now,
-                epubCfi: relocate.cfi,
-                progress: relocate.fraction
-            )
-
-            position?.book = self
-        } else {
-            position?.progress = relocate.fraction
-            position?.updatedAt = relocate.updatedAt ?? .now
-            position?.epubCfi = relocate.cfi
-        }
+    func update(_ locator: SRLocator) {
+        self.position = SDPosition(locator)
     }
 
-    func updatePosition(page: PDFPage, document: PDFDocument) {
-        let totalPages = CGFloat(document.pageCount)
-        let currentPageIndex = CGFloat(document.index(for: page))
-
-        if position == nil {
-            position = SDReadingPosition(
-                chapter: Int(currentPageIndex),
-                updatedAt: .now,
-                progress: currentPageIndex / totalPages
-            )
-
-            position?.book = self
-        } else {
-            position?.progress = currentPageIndex / totalPages
-            position?.updatedAt = .now
-            position?.chapter = Int(currentPageIndex)
-        }
+    func highlighted(_ highlight: SRHighlight) {
+        let persistedHighlight = SDHighlight(highlight)
+        highlights.append(persistedHighlight)
+        persistedHighlight.book = self
     }
 
-    func addHighlight(_ pdfHighlight: PDFHighlight) {
-        let positionData = try? JSONEncoder().encode(pdfHighlight.pos)
-
-        var positionJSON: String?
-        if let positionData = positionData {
-            positionJSON = String(data: positionData, encoding: .utf8)
-        }
-
-        let new = SDHighlight(
-            id: .init(),
-            ranges: positionJSON,
-            chapter: pdfHighlight.pos.first?.page,
-            highlightText: pdfHighlight.content,
-            highlightId: pdfHighlight.uuid.uuidString
-        )
-
-        highlights.append(new)
-
-        new.book = self
-    }
-
-    func addHighlight(
-        text: String,
-        cfi: String,
-        index: Int,
-        label: String,
-        addedAt: Date,
-        updatedAt: Date
-    ) {
-        let highlight = SDHighlight(
-            id: .init(),
-            cfi: cfi,
-            chapter: index,
-            chapterTitle: label,
-            highlightText: text
-        )
-
-        highlights.append(highlight)
-
-        highlight.book = self
-    }
-
-    func removeHighlight(id: String) {
-        highlights.removeAll(where: { $0.highlightId == id })
-    }
-
-    func removeHighlight(value: String) {
-        highlights.removeAll(where: { $0.cfi == value })
+    func unhighlighted(_ highlight: SRHighlight) {
+        highlights.removeAll(where: { $0.id == highlight.id })
     }
 }

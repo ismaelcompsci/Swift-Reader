@@ -6,8 +6,8 @@
 //
 
 import Foundation
+import SReader
 import SwiftData
-import SwiftReader
 
 enum BookImporterError: String, Error {
     case failedToGetMetadata = "Failed to get metadata"
@@ -38,7 +38,7 @@ class BookManager {
 
         let bookId = UUID()
         let documents = URL.documentsDirectory
-        let bookPath = BookMetadataExtractor.shared.makeBookBasePath(bookId: bookId.uuidString)
+        let bookPath = "books/\(bookId)"
         let destination = documents.appending(path: bookPath)
 
         try? FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
@@ -59,7 +59,7 @@ class BookManager {
             }
         }
 
-        guard let fullDestinationPath = BookMetadataExtractor.shared.copyBook(from: file, id: bookId) else {
+        guard let fullDestinationPath = MetadataExtractor.shared.copyBook(from: file, id: bookId) else {
             try? FileManager.default.removeItem(at: destination)
             throw BookImporterError.failedToGetMetadata
         }
@@ -84,9 +84,9 @@ class BookManager {
         var metadata: BookMetadata?
 
         if isPdf {
-            metadata = BookMetadataExtractor.shared.parsePDF(from: file)
+            metadata = await MetadataExtractor.shared.getPDFMetadata(from: file)
         } else {
-            metadata = await BookMetadataExtractor.shared.parseEBook(from: file)
+            metadata = await MetadataExtractor.shared.getEbookMetadata(from: file)
         }
 
         guard let metadata = metadata else {

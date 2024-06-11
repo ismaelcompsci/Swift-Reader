@@ -5,74 +5,74 @@
 //  Created by Mirna Olvera on 3/5/24.
 //
 
-import SwiftReader
+import SReader
 import SwiftUI
 
-struct ReaderContent<T: TocItem>: View {
+struct ReaderContent: View {
     @Environment(\.dismiss) var dismiss
     @Environment(AppTheme.self) var theme
 
-    var toc: [T]
-    var isSelected: ((T) -> Bool)?
-    var tocItemPressed: ((T) -> Void)?
-    var currentTocItemId: Int?
+    var currentTocItem: SRLink?
+    var tocItems: [(level: Int, link: SRLink)]
+    var onTocItemPress: (SRLink) -> Void
 
     var body: some View {
         NavigationView {
             ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack {
-                        ForEach(toc) { tocItem in
-                            let selected = isSelected?(tocItem) ?? false
+                List {
+                    ForEach(tocItems, id: \.link.href) { _, item in
+                        let selected = item.href == currentTocItem?.href
 
-                            VStack {
-                                Button {
-                                    tocItemPressed?(tocItem)
-
-                                } label: {
-                                    HStack {
-                                        Text(tocItem.label)
-                                            .lineLimit(2)
-                                            .multilineTextAlignment(.leading)
-                                            .fontWeight(tocItem.depth == 0 ? .semibold : .light)
-
-                                        Spacer()
-
-                                        if let pageNumber = tocItem.pageNumber {
-                                            Text("\(pageNumber)")
-                                        }
-                                        Image(systemName: "chevron.right")
-                                    }
-                                    .foregroundStyle(selected ? theme.tintColor : .white)
-                                }
-                                .padding(.leading, CGFloat(tocItem.depth ?? 0) * 10)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .id(tocItem.id)
+                        Button {
+                            onTocItemPress(item)
+                            dismiss()
+                        } label: {
+                            ContentRow(item: item)
+                        }
+                        .listRowInsets(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                        .listRowBackground(
+                            selected ? Color(uiColor: UIColor.tertiarySystemBackground) : nil
+                        )
+                        .id(item.href)
+                    }
+                }
+                .listStyle(.plain)
+                .navigationTitle("Content")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        SRXButton {
+                            dismiss()
                         }
                     }
                 }
-                .scrollIndicators(.hidden)
                 .onAppear {
-                    if let currentTocItemId {
-                        proxy.scrollTo(currentTocItemId, anchor: .center)
-                    }
-                }
-            }
-            .navigationTitle("Content")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    SRXButton {
-                        dismiss()
-                    }
+                    proxy.scrollTo(currentTocItem?.href, anchor: .center)
                 }
             }
         }
     }
 }
 
+extension ReaderContent {
+    struct ContentRow: View {
+        let item: SRLink
+
+        var body: some View {
+            Text(item.title ?? "Unknown")
+                .lineLimit(1)
+        }
+    }
+}
+
 #Preview {
-    ReaderContent(toc: [PDFTocItem(outline: nil, depth: 4)])
+    ReaderContent(
+        tocItems: [
+            (0, SRLink(href: "1", title: "Chapter One")),
+            (0, SRLink(href: "2", title: "Chapter Two")),
+            (0, SRLink(href: "3", title: "Chapter Three")),
+            (0, SRLink(href: "4", title: "Chapter Four")),
+        ], onTocItemPress: { _ in }
+    )
+    .environment(AppTheme.shared)
 }

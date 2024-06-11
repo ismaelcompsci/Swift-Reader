@@ -1,9 +1,9 @@
-//
-//  Reader.swift
-//  Read
-//
-//  Created by Mirna Olvera on 4/12/24.
-//
+////
+////  Reader.swift
+////  Read
+////
+////  Created by Mirna Olvera on 4/12/24.
+////
 
 import OSLog
 import SwiftUI
@@ -23,9 +23,9 @@ struct Reader: View {
     var body: some View {
         Group {
             if isPdf {
-                PDF(url: url, book: book)
+                PDFReader(book: book)
             } else {
-                EBookView(url: url, book: book)
+                EBookReader(book: book)
             }
         }
         .task {

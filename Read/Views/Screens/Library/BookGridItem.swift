@@ -18,10 +18,6 @@ struct BookGridItem: View {
         case finished
     }
 
-    var showNewTag: Bool {
-        book.position?.progress == nil
-    }
-
     var tagState: TagState {
         if book.isFinsihed == true {
             return .finished
@@ -157,9 +153,9 @@ struct BookGridItem: View {
     }
 
     var progress: some View {
-        let position = book.position
+        let position = book.position?.totalProgression ?? 0
 
-        return Text("\(Int((position?.progress ?? 0) * 100))%")
+        return Text("\(Int(position * 100))%")
             .foregroundStyle(.secondary)
             .font(.footnote)
             .minimumScaleFactor(0.001)
