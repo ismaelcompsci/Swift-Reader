@@ -59,7 +59,7 @@ class BookManager {
             }
         }
 
-        guard let fullDestinationPath = MetadataExtractor.shared.copyBook(from: file, id: bookId) else {
+        guard let fullDestinationPath = await MetadataExtractor.shared.copyBook(from: file, id: bookId) else {
             try? FileManager.default.removeItem(at: destination)
             throw BookImporterError.failedToGetMetadata
         }

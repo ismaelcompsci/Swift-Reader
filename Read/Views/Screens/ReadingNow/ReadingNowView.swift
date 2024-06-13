@@ -8,39 +8,15 @@
 import SwiftUI
 
 struct ReadingNowView: View {
-    @Environment(Navigator.self) var navigator
-
-    @State var selectedBook: SDBook?
-
     var body: some View {
         ScrollView {
-            LastEngaged(handleBookItemEvent: handleBookItemEvent)
+            LastEngaged()
 
-            WantToRead(handleBookItemEvent: handleBookItemEvent)
+            WantToRead()
 
             Spacer()
         }
         .navigationBarTitle("Reading Now", displayMode: .large)
-        .sheet(item: $selectedBook) { book in
-            EditDetailsView(book: book)
-        }
-    }
-
-    func handleBookItemEvent(_ book: SDBook, _ event: BookItemEvent) {
-        switch event {
-        case .onDelete:
-            BookManager.shared.delete(book)
-        case .onClearProgress:
-            book.removeLocator()
-        case .onEdit:
-            selectedBook = book
-        case .onNavigate:
-            navigator.navigate(to: .localDetails(book: book))
-        case .onAddToList(let list):
-            book.addToCollection(name: list)
-        case .onRemoveFromList(let list):
-            book.removeFromCollection(name: list)
-        }
     }
 }
 

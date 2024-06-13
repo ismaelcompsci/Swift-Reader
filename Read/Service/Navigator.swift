@@ -44,7 +44,29 @@ public enum NavigatorDestination: Hashable {
     }
 }
 
-public enum SideMenuNavigation: String, Hashable, CaseIterable {
+public enum SheetDestination: Identifiable, Hashable {
+    case editBookDetails(book: SDBook)
+    case uploadFile
+
+    public static func == (lhs: SheetDestination, rhs: SheetDestination) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    public var id: String {
+        switch self {
+        case .editBookDetails:
+            return "edit-book-details"
+        case .uploadFile:
+            return "upload-file"
+        }
+    }
+}
+
+public enum TabNavigation: String, Hashable, CaseIterable {
     case library = "Library"
     case discover = "Discover"
     case search = "Search"
@@ -70,7 +92,9 @@ public enum SideMenuNavigation: String, Hashable, CaseIterable {
 @Observable
 public class Navigator {
     public var path: [NavigatorDestination] = []
-    public var sideMenuTab: SideMenuNavigation = .library
+    public var sideMenuTab: TabNavigation = .library
+
+    public var presentedSheet: SheetDestination?
 
     public init() {}
 
@@ -101,6 +125,17 @@ extension View {
                 DownloadManagerView()
             case .sourceExtensionDetails(sourceId: let sourceId):
                 SourceExtensionDetails(sourceId: sourceId)
+            }
+        }
+    }
+
+    func withSheetDestinations(sheetDestinations: Binding<SheetDestination?>) -> some View {
+        sheet(item: sheetDestinations) { destination in
+            switch destination {
+            case .editBookDetails(let book):
+                EditDetailsView(book: book)
+            case .uploadFile:
+                UploadFileView()
             }
         }
     }

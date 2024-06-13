@@ -25,7 +25,9 @@ struct UploadFileView: View {
     }
     
     init() {
-        MetadataExtractor.shared.loadMetadataExtractor()
+        DispatchQueue.main.async {
+            MetadataExtractor.shared.loadMetadataExtractor()
+        }
     }
     
     var uploadCard: some View {

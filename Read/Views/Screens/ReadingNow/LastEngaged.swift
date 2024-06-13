@@ -23,8 +23,6 @@ var descriptor: FetchDescriptor<SDBook> {
 struct LastEngaged: View {
     @Query(descriptor) var lastEngagedBooks: [SDBook]
 
-    var handleBookItemEvent: ((SDBook, BookItemEvent) -> Void)?
-
     var body: some View {
         if lastEngagedBooks.isEmpty == false {
             ScrollView(.horizontal) {
@@ -37,9 +35,7 @@ struct LastEngaged: View {
                                 .font(.headline)
                                 .fontDesign(.serif)
 
-                            BookGridItem(book: firstBook, withTitle: true) { event in
-                                handleBookItemEvent?(firstBook, event)
-                            }
+                            BookGrid.BookGridItem(book: firstBook, withTitle: true)
                         }
                         .frame(maxWidth: 184)
                     }
@@ -55,9 +51,7 @@ struct LastEngaged: View {
                                     .frame(height: 17)
                             }
 
-                            BookGridItem(book: book, withTitle: true, onEvent: { event in
-                                handleBookItemEvent?(book, event)
-                            })
+                            BookGrid.BookGridItem(book: book, withTitle: true)
                         }
                         .frame(maxWidth: 184)
                     }

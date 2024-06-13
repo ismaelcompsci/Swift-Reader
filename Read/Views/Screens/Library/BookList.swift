@@ -7,51 +7,119 @@
 
 import SwiftUI
 
-enum BookItemEvent {
-    case onDelete
-    case onClearProgress
-    case onEdit
-    case onNavigate
-    case onAddToList(String)
-    case onRemoveFromList(String)
-}
-
 struct BookList: View {
     @Environment(Navigator.self) var navigator
-
     let sortedBooks: [SDBook]
-
-    @State var selectedBook: SDBook?
 
     var body: some View {
         LazyVStack {
             ForEach(sortedBooks) { book in
-                BookListItem(book: book, onEvent: { bookItemEventHandler($0, book) })
-
-                if sortedBooks.last?.id != book.id {
-                    Divider()
-                }
+                BookRow(book: book)
+                    .tint(.primary)
+                    .modifier(ContextMenuModifier(navigator: navigator, book: book))
             }
         }
-        .sheet(item: $selectedBook) { book in
-            EditDetailsView(book: book)
-        }
     }
+}
 
-    func bookItemEventHandler(_ event: BookItemEvent, _ book: SDBook) {
-        switch event {
-        case .onDelete:
-            BookManager.shared.delete(book)
-        case .onClearProgress:
-            book.removeLocator()
-        case .onEdit:
-            selectedBook = book
-        case .onNavigate:
-            navigator.navigate(to: .localDetails(book: book))
-        case .onAddToList(let list):
-            book.addToCollection(name: list)
-        case .onRemoveFromList(let list):
-            book.removeFromCollection(name: list)
+extension BookList {
+    struct BookRow: View {
+        @Environment(Navigator.self) var navigator
+        var book: SDBook
+
+        var body: some View {
+            Button {
+                navigator.navigate(to: .localDetails(book: book))
+            } label: {
+                HStack(spacing: 12) {
+                    BookCover(
+                        imageURL: getCoverFullPath(for: book.coverPath ?? ""),
+                        title: book.title,
+                        author: book.author
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.gray, lineWidth: 0.2)
+                    }
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 62, height: 62 * 1.77)
+                    .shadow(color: .black.opacity(0.3), radius: 4, x: 3, y: 5)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+
+                            Text(book.author ?? "Unkown Author")
+                                .font(.footnote)
+                                .lineLimit(2)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
+
+                        HStack(alignment: .center) {
+                            switch tagState {
+                            case .new:
+                                newtag
+                            case .progress:
+                                progress
+                            case .finished:
+                                finished
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background()
+            }
+        }
+
+        enum TagState {
+            case new
+            case progress
+            case finished
+        }
+
+        var tagState: TagState {
+            if book.isFinsihed == true {
+                return .finished
+            } else if book.position != nil {
+                return .progress
+            } else {
+                return .new
+            }
+        }
+
+        var finished: some View {
+            Text("Finished")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+
+        var progress: some View {
+            let position = book.position?.totalProgression ?? 0
+
+            return Text("\(Int(position * 100))%")
+                .foregroundStyle(.secondary)
+                .font(.footnote)
+                .minimumScaleFactor(0.001)
+        }
+
+        var newtag: some View {
+            Text("NEW")
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(.indigo)
+                .clipShape(.rect(cornerRadius: 8))
+                .foregroundStyle(.white)
         }
     }
 }

@@ -53,7 +53,7 @@ struct SourceDownloadButton: View {
                             Image(systemName: "pause.fill")
                             Text("paused")
                         case .finished:
-                            Text("")
+                            Text("Downloaded")
                         case .failed:
                             Text("Failed")
                         case nil:

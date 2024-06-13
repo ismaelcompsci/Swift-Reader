@@ -36,45 +36,46 @@ struct ContentView: View {
                     NavigationView {
                         ReadingNowView()
                     }
-                    .tag(SideMenuNavigation.readingNow)
+                    .tag(TabNavigation.readingNow)
                     .tabItem {
-                        Label(SideMenuNavigation.readingNow.rawValue, systemImage: SideMenuNavigation.readingNow.icon)
+                        Label(TabNavigation.readingNow.rawValue, systemImage: TabNavigation.readingNow.icon)
                     }
 
                     NavigationView {
                         LibraryView()
                     }
-                    .tag(SideMenuNavigation.library)
+                    .tag(TabNavigation.library)
                     .tabItem {
-                        Label("Library", systemImage: SideMenuNavigation.library.icon)
+                        Label("Library", systemImage: TabNavigation.library.icon)
                     }
 
                     NavigationView {
                         SourcesDiscoverView()
                     }
-                    .tag(SideMenuNavigation.discover)
+                    .tag(TabNavigation.discover)
                     .tabItem {
-                        Label("Discover", systemImage: SideMenuNavigation.discover.icon)
+                        Label("Discover", systemImage: TabNavigation.discover.icon)
                     }
 
                     NavigationView {
                         SourceSearch()
                     }
-                    .tag(SideMenuNavigation.search)
+                    .tag(TabNavigation.search)
                     .tabItem {
-                        Label("Search", systemImage: SideMenuNavigation.search.icon)
+                        Label("Search", systemImage: TabNavigation.search.icon)
                     }
 
                     NavigationView {
                         SettingsView()
                     }
-                    .tag(SideMenuNavigation.settings)
+                    .tag(TabNavigation.settings)
                     .tabItem {
-                        Label("Settings", systemImage: SideMenuNavigation.settings.icon)
+                        Label("Settings", systemImage: TabNavigation.settings.icon)
                     }
                 }
             }
             .withNavigator()
+            .withSheetDestinations(sheetDestinations: $navigator.presentedSheet)
         }
     }
 }

@@ -8,38 +8,12 @@
 import SwiftData
 import SwiftUI
 
-struct Books: View {
-    var displayMode: LibraryDisplayMode
-
-    @Query var books: [SDBook]
-
-    init(descriptor: FetchDescriptor<SDBook>, displayMode: LibraryDisplayMode) {
-        _books = Query(
-            descriptor,
-            animation: .easeInOut
-        )
-
-        self.displayMode = displayMode
-    }
-
-    var body: some View {
-        switch displayMode {
-        case .grid:
-            BookGrid(sortedBooks: books)
-
-        case .list:
-            BookList(sortedBooks: books)
-        }
-    }
-}
-
 struct LibraryView: View {
     @Environment(AppTheme.self) var theme
     @Environment(UserPreferences.self) private var userPreferences
+    @Environment(Navigator.self) var navigator
 
     @StateObject var searchDebouncer = SearchDebouncer()
-    @State var showUploadFileView: Bool = false
-
     @Query var books: [SDBook]
 
     var body: some View {
@@ -57,7 +31,7 @@ struct LibraryView: View {
                             Text("Add books to your library.")
                         } actions: {
                             Button {
-                                showUploadFileView = true
+                                navigator.presentedSheet = .uploadFile
                             } label: {
                                 Text("Get started")
                             }
@@ -98,7 +72,7 @@ struct LibraryView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    showUploadFileView = true
+                    navigator.presentedSheet = .uploadFile
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .foregroundStyle(theme.tintColor)
@@ -108,10 +82,6 @@ struct LibraryView: View {
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .navigationBarTitle("Library", displayMode: .large)
-        .sheet(isPresented: self.$showUploadFileView, content: {
-            UploadFileView()
-                .interactiveDismissDisabled()
-        })
     }
 
     var homeHeader: some View {
@@ -137,6 +107,33 @@ struct LibraryView: View {
             }
             .font(.system(size: 20))
             .foregroundStyle(userPreferences.libraryDisplayMode == .grid ? theme.tintColor : .primary)
+        }
+    }
+}
+
+extension LibraryView {
+    struct Books: View {
+        var displayMode: LibraryDisplayMode
+
+        @Query var books: [SDBook]
+
+        init(descriptor: FetchDescriptor<SDBook>, displayMode: LibraryDisplayMode) {
+            _books = Query(
+                descriptor,
+                animation: .easeInOut
+            )
+
+            self.displayMode = displayMode
+        }
+
+        var body: some View {
+            switch displayMode {
+            case .grid:
+                BookGrid(sortedBooks: books)
+
+            case .list:
+                BookList(sortedBooks: books)
+            }
         }
     }
 }

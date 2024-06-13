@@ -13,8 +13,6 @@ struct WantToRead: View {
         book.collections.contains(where: { $0.name == "Want To Read" })
     }, animation: .easeInOut) var wantToReadBooks: [SDBook]
 
-    var handleBookItemEvent: ((SDBook, BookItemEvent) -> Void)?
-
     var body: some View {
         if wantToReadBooks.isEmpty == false {
             VStack(alignment: .leading, spacing: 24) {
@@ -41,10 +39,8 @@ struct WantToRead: View {
                         )
                     )]) {
                         ForEach(wantToReadBooks) { book in
-                            BookGridItem(book: book, withTitle: false, onEvent: { event in
-                                handleBookItemEvent?(book, event)
-                            })
-                            .frame(maxHeight: 300)
+                            BookGrid.BookGridItem(book: book, withTitle: false)
+                                .frame(maxHeight: 300)
                         }
                     }
                     .scrollTargetLayout()
