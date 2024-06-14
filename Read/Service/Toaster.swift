@@ -7,17 +7,16 @@
 
 import SwiftUI
 
-@Observable
-public class Toaster {
+@MainActor
+@Observable public class Toaster {
     public static let shared = Toaster()
 
     func presentToast(message: String, type: ToastType) {
-        DispatchQueue.main.async {
-            ToastPresenter().show(toast: message, type: type)
-        }
+        ToastPresenter().show(toast: message, type: type)
     }
 }
 
+@MainActor
 class ToastPresenter {
     private var toastWindow: UIWindow?
 

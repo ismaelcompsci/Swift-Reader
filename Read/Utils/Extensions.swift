@@ -44,7 +44,6 @@ extension URL {
 }
 
 let htmlReplaceString: String = "<[^>]+>"
-
 extension String {
     /**
      Takes the current String struct and strips out HTML using regular expression. All tags get stripped out.
@@ -53,17 +52,6 @@ extension String {
      */
     func stripHTML() -> String {
         return self.replacingOccurrences(of: htmlReplaceString, with: "", options: .regularExpression)
-    }
-}
-
-extension UINavigationController: UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
     }
 }
 
@@ -94,41 +82,7 @@ extension Color {
     }
 }
 
-// https://stackoverflow.com/a/68989580
-extension UIApplication {
-    var keyWindow: UIWindow? {
-        // Get connected scenes
-        return self.connectedScenes
-            // Keep only active scenes, onscreen and visible to the user
-            .filter { $0.activationState == .foregroundActive }
-            // Keep only the first `UIWindowScene`
-            .first(where: { $0 is UIWindowScene })
-            // Get its associated windows
-            .flatMap { $0 as? UIWindowScene }?.windows
-            // Finally, keep only the key window
-            .first(where: \.isKeyWindow)
-    }
-}
-
-// https://stackoverflow.com/a/66880368
-private struct SafeAreaInsetsKey: EnvironmentKey {
-    static var defaultValue: EdgeInsets {
-        (UIApplication.shared.keyWindow?.safeAreaInsets ?? .zero).insets
-    }
-}
-
-extension EnvironmentValues {
-    var safeAreaInsets: EdgeInsets {
-        self[SafeAreaInsetsKey.self]
-    }
-}
-
-private extension UIEdgeInsets {
-    var insets: EdgeInsets {
-        EdgeInsets(top: top, leading: left, bottom: bottom, trailing: right)
-    }
-}
-
+@MainActor
 func showShareSheet(url: URL) {
     let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
     UIApplication.shared.currentUIWindow()?.rootViewController?.present(activityVC, animated: true, completion: nil)
@@ -184,6 +138,6 @@ extension View {
 }
 
 struct SizePreferenceKey: PreferenceKey {
-    static var defaultValue: CGSize = .zero
+    static let defaultValue: CGSize = .zero
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
 }

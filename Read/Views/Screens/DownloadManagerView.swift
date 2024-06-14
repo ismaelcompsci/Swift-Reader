@@ -108,7 +108,7 @@ struct DownloadManagerView: View {
 }
 
 #Preview {
-    @State var downloader = BookDownloader()
+    var downloader = BookDownloader.shared
 
     return NavigationView {
         DownloadManagerView()

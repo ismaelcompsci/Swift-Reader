@@ -119,7 +119,6 @@
 		9FEE4F1F2BDAFC8600B2C2BB /* SourceStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE4F1E2BDAFC8600B2C2BB /* SourceStateManager.swift */; };
 		9FEE4F212BDC6CEA00B2C2BB /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE4F202BDC6CEA00B2C2BB /* Console.swift */; };
 		9FEE4F242BDDBBDB00B2C2BB /* JSValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE4F232BDDBBDB00B2C2BB /* JSValue.swift */; };
-		9FF92A8D2B788C9400025405 /* PieProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF92A8C2B788C9400025405 /* PieProgress.swift */; };
 		9FF989B82BCA430000B6CF97 /* Reader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989B72BCA430000B6CF97 /* Reader.swift */; };
 		9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */; };
 		9FFFBC9F2BD1F7A20019E6DD /* ThemeColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */; };
@@ -248,7 +247,6 @@
 		9FEE4F1E2BDAFC8600B2C2BB /* SourceStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceStateManager.swift; sourceTree = "<group>"; };
 		9FEE4F202BDC6CEA00B2C2BB /* Console.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Console.swift; sourceTree = "<group>"; };
 		9FEE4F232BDDBBDB00B2C2BB /* JSValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSValue.swift; sourceTree = "<group>"; };
-		9FF92A8C2B788C9400025405 /* PieProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieProgress.swift; sourceTree = "<group>"; };
 		9FF989B72BCA430000B6CF97 /* Reader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reader.swift; sourceTree = "<group>"; };
 		9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Filemanger+Ext.swift"; sourceTree = "<group>"; };
 		9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColorPicker.swift; sourceTree = "<group>"; };
@@ -370,7 +368,6 @@
 				9F1C69EA2BC6037D002D6AF4 /* Inputs */,
 				9F1C69E92BC60371002D6AF4 /* Buttons */,
 				9F1C69E82BC60364002D6AF4 /* Covers */,
-				9FF92A8C2B788C9400025405 /* PieProgress.swift */,
 				9FBA143E2BEDA47400231886 /* BookDetails.swift */,
 				9FBC726D2B9EA1920054A7B0 /* AdaptiveStack.swift */,
 				9F075A782BA501580017BFAF /* RefrenceLibrary.swift */,
@@ -825,7 +822,6 @@
 				9FD16EC12BA3DFF500A18F3B /* LibraryView.swift in Sources */,
 				9F3DDA132BDF73B40052F8A4 /* SRSourceActor.swift in Sources */,
 				9F4772D72C095EBD001A183E /* EBookReader.swift in Sources */,
-				9FF92A8D2B788C9400025405 /* PieProgress.swift in Sources */,
 				9F8F9CD12BB5083F0081C57F /* SourceBook.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -893,6 +889,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
 			};
 			name = Debug;
 		};
@@ -948,6 +945,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -981,6 +979,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.olvera.SReader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1015,6 +1014,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.olvera.SReader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

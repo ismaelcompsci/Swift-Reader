@@ -8,8 +8,8 @@
 import Foundation
 import SwiftUI
 
-@Observable
-public class AppTheme {
+@MainActor
+@Observable public class AppTheme {
     public class ThemeStorage {
         enum ThemeKey: String {
             case tintColor

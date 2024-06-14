@@ -11,8 +11,8 @@ import Foundation
 import OSLog
 import UIKit
 
-@Observable
-public class BookDownloader {
+@MainActor
+@Observable public class BookDownloader {
     public static let shared = BookDownloader()
     var manager: DownloadManager
 
@@ -84,11 +84,7 @@ public class BookDownloader {
         }
         .store(in: &subscriptions)
 
-        #if DEBUG
-        manager.maxConcurrentDownloads = 1
-        #else
         manager.maxConcurrentDownloads = 3
-        #endif
 
         NotificationCenter.default.publisher(
             for: UIApplication.didReceiveMemoryWarningNotification

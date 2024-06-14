@@ -14,8 +14,8 @@ import ZIPFoundation
  insparation from Aidoku
  https://github.com/Aidoku/Aidoku/blob/main/Shared/Sources/SourceManager.swift#L11
  */
-@Observable
-class SourceManager {
+@MainActor
+@Observable class SourceManager {
     static let directory = URL.documentsDirectory.appendingPathComponent("Sources", isDirectory: true)
 
     var modelContext: ModelContext

@@ -8,8 +8,8 @@
 import Combine
 import SwiftUI
 
-@Observable
-class UserPreferences {
+@MainActor
+@Observable class UserPreferences {
     class Storage {
         @AppStorage("library_sort_key") public var librarySortKey: LibrarySortKeys = .title
         @AppStorage("library_sort_order") public var librarySortOrder: LibrarySortOrder = .descending

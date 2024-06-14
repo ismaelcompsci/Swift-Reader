@@ -46,7 +46,7 @@ struct UIInputFieldValue: Equatable {
 }
 
 struct UIInputFieldKey: PreferenceKey {
-    static var defaultValue: UIInputFieldValue? = nil
+    static let defaultValue: UIInputFieldValue? = nil
 
     static func reduce(value: inout UIInputFieldValue?, nextValue: () -> UIInputFieldValue?) {
         value = nextValue()
