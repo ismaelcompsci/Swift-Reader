@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		9F075A792BA501580017BFAF /* RefrenceLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F075A782BA501580017BFAF /* RefrenceLibrary.swift */; };
-		9F0C00622BE98BF900984BF4 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0C00612BE98BF900984BF4 /* SwiftUIIntrospect */; };
 		9F0C00642BE9A22000984BF4 /* LastEngaged.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C00632BE9A22000984BF4 /* LastEngaged.swift */; };
 		9F0C00682BE9CC7000984BF4 /* ReadingNowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C00672BE9CC7000984BF4 /* ReadingNowView.swift */; };
 		9F0EA4592B89773900B7B009 /* ReadApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EA4582B89773900B7B009 /* ReadApp.swift */; };
@@ -45,8 +44,6 @@
 		9F8F9CC22BB4FF880081C57F /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 9F8F9CC12BB4FF880081C57F /* ZIPFoundation */; };
 		9F8F9CE62BB52C2A0081C57F /* View+If.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8F9CE52BB52C2A0081C57F /* View+If.swift */; };
 		9F9205DA2BA275D7000AED7D /* Color+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9205D92BA275D7000AED7D /* Color+Codable.swift */; };
-		9FA730272BD71DE6003294B8 /* ScrollableTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */; };
-		9FA7302A2BD73405003294B8 /* RectPrefrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA730292BD73405003294B8 /* RectPrefrence.swift */; };
 		9FB62D832B8D841F00A10EF5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB62D822B8D841F00A10EF5 /* SettingsView.swift */; };
 		9FB77EB32BCCE38500D37521 /* search.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FB77EB02BCCE38500D37521 /* search.PNG */; };
 		9FB77EB42BCCE38500D37521 /* list.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FB77EB12BCCE38500D37521 /* list.PNG */; };
@@ -70,7 +67,6 @@
 		9FDC05F42C1CCDB40005F64B /* SReader in Frameworks */ = {isa = PBXBuildFile; productRef = 9FDC05F32C1CCDB40005F64B /* SReader */; };
 		9FE324442B85D30E003E61F6 /* bookDetails.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243E2B85D30E003E61F6 /* bookDetails.PNG */; };
 		9FE324452B85D30E003E61F6 /* reader.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243F2B85D30E003E61F6 /* reader.PNG */; };
-		9FE631972BE43797004CF96C /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9FE631962BE43797004CF96C /* KeychainSwift */; };
 		9FF989B82BCA430000B6CF97 /* Reader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989B72BCA430000B6CF97 /* Reader.swift */; };
 		9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */; };
 		9FFFBC9F2BD1F7A20019E6DD /* ThemeColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9E2BD1F7A20019E6DD /* ThemeColorPicker.swift */; };
@@ -130,8 +126,6 @@
 		9F86C52C2B89B3F300DB61A6 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		9F8F9CE52BB52C2A0081C57F /* View+If.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+If.swift"; sourceTree = "<group>"; };
 		9F9205D92BA275D7000AED7D /* Color+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Codable.swift"; sourceTree = "<group>"; };
-		9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTabBar.swift; sourceTree = "<group>"; };
-		9FA730292BD73405003294B8 /* RectPrefrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectPrefrence.swift; sourceTree = "<group>"; };
 		9FB62D822B8D841F00A10EF5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9FB77EB02BCCE38500D37521 /* search.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.PNG; sourceTree = "<group>"; };
 		9FB77EB12BCCE38500D37521 /* list.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = list.PNG; sourceTree = "<group>"; };
@@ -163,11 +157,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F8F9CC22BB4FF880081C57F /* ZIPFoundation in Frameworks */,
-				9FE631972BE43797004CF96C /* KeychainSwift in Frameworks */,
 				9F1C69F32BC634A4002D6AF4 /* DownloadManager in Frameworks */,
 				9FDC05F42C1CCDB40005F64B /* SReader in Frameworks */,
 				9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */,
-				9F0C00622BE98BF900984BF4 /* SwiftUIIntrospect in Frameworks */,
 				9FB84A602B9D6681005D7915 /* Nuke in Frameworks */,
 				9FB84A662B9D6681005D7915 /* NukeVideo in Frameworks */,
 				9FB84A642B9D6681005D7915 /* NukeUI in Frameworks */,
@@ -362,15 +354,6 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		9FA730282BD733E2003294B8 /* ScrollableTabBar */ = {
-			isa = PBXGroup;
-			children = (
-				9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */,
-				9FA730292BD73405003294B8 /* RectPrefrence.swift */,
-			);
-			path = ScrollableTabBar;
-			sourceTree = "<group>";
-		};
 		9FCFBE202B9D84D800BD9E3D /* Reader */ = {
 			isa = PBXGroup;
 			children = (
@@ -399,7 +382,6 @@
 		9FFFBCA02BD1FD000019E6DD /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				9FA730282BD733E2003294B8 /* ScrollableTabBar */,
 				9F612CFC2BD8960B006D573C /* TagField.swift */,
 				9F612CF72BD891E8006D573C /* WrappingStackLayout.swift */,
 				9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */,
@@ -431,8 +413,6 @@
 				9FB84A652B9D6681005D7915 /* NukeVideo */,
 				9F8F9CC12BB4FF880081C57F /* ZIPFoundation */,
 				9F1C69F22BC634A4002D6AF4 /* DownloadManager */,
-				9FE631962BE43797004CF96C /* KeychainSwift */,
-				9F0C00612BE98BF900984BF4 /* SwiftUIIntrospect */,
 				9FDC05F32C1CCDB40005F64B /* SReader */,
 			);
 			productName = Read;
@@ -497,8 +477,6 @@
 			packageReferences = (
 				9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */,
 				9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				9FE631952BE43797004CF96C /* XCRemoteSwiftPackageReference "keychain-swift" */,
-				9F0C00602BE98BF900984BF4 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 			);
 			productRefGroup = 9F608E7D2B65D05B00D2B5F4 /* Products */;
 			projectDirPath = "";
@@ -541,7 +519,6 @@
 				9F0C00682BE9CC7000984BF4 /* ReadingNowView.swift in Sources */,
 				9F35B6D82C1B76D000259C1E /* ContextMenuModifier.swift in Sources */,
 				9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */,
-				9FA7302A2BD73405003294B8 /* RectPrefrence.swift in Sources */,
 				9F8F9CE62BB52C2A0081C57F /* View+If.swift in Sources */,
 				9FBC72702B9EA5B70054A7B0 /* MainButtonStyle.swift in Sources */,
 				9FBC726C2B9EA17D0054A7B0 /* SRFromInput.swift in Sources */,
@@ -569,7 +546,6 @@
 				9F0C00642BE9A22000984BF4 /* LastEngaged.swift in Sources */,
 				9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */,
 				9F115F3F2BC4E0F0006C74F3 /* UserPreferences.swift in Sources */,
-				9FA730272BD71DE6003294B8 /* ScrollableTabBar.swift in Sources */,
 				9FBC72752B9EA6C60054A7B0 /* AppTheme.swift in Sources */,
 				9FBBE6E42BCDCA69004B1A85 /* ThemeApplier.swift in Sources */,
 				9F5954B92B6E6050009FC2F1 /* BookDetailView.swift in Sources */,
@@ -740,7 +716,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -775,7 +751,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -804,14 +780,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		9F0C00602BE98BF900984BF4 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/siteline/swiftui-introspect";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.3;
-			};
-		};
 		9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
@@ -828,22 +796,9 @@
 				minimumVersion = 12.4.0;
 			};
 		};
-		9FE631952BE43797004CF96C /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 24.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9F0C00612BE98BF900984BF4 /* SwiftUIIntrospect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9F0C00602BE98BF900984BF4 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
-			productName = SwiftUIIntrospect;
-		};
 		9F1C69F22BC634A4002D6AF4 /* DownloadManager */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DownloadManager;
@@ -876,11 +831,6 @@
 		9FDC05F32C1CCDB40005F64B /* SReader */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SReader;
-		};
-		9FE631962BE43797004CF96C /* KeychainSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9FE631952BE43797004CF96C /* XCRemoteSwiftPackageReference "keychain-swift" */;
-			productName = KeychainSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

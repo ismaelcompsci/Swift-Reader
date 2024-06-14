@@ -5,7 +5,7 @@
 //  Created by Mirna Olvera on 4/18/24.
 //
 
-import QuickLookThumbnailing
+@preconcurrency import QuickLookThumbnailing
 import SwiftUI
 
 struct FileListItem: View {
