@@ -35,51 +35,6 @@ class BookManager {
         return nil
     }
 
-    func process(for file: URL, with bookInfo: BookInfo) async throws {
-        SRLogger.general.info("Processing book with book info")
-
-        let bookId = UUID()
-        let documents = URL.documentsDirectory
-        let bookPath = "books/\(bookId)"
-        let destination = documents.appending(path: bookPath)
-
-        try? FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
-
-        var coverPath: String?
-
-        if let imageUrl = bookInfo.image,
-           let downloadedImageUrl = await downloadImage(with: imageUrl)
-        {
-            let filename = downloadedImageUrl.lastPathComponent
-            coverPath = "\(bookPath)/\(filename)"
-            let newImageLocation = destination.appending(path: filename)
-
-            do {
-                try FileManager.default.moveItem(at: downloadedImageUrl, to: newImageLocation)
-            } catch {
-                SRLogger.general.error("Download image error: \(error.localizedDescription)")
-            }
-        }
-
-        guard let fullDestinationPath = metadataExtractor.copyBook(from: file, id: bookId) else {
-            try? FileManager.default.removeItem(at: destination)
-            throw BookImporterError.failedToGetMetadata
-        }
-
-        let author = MetadataAuthor(name: bookInfo.author ?? "Unknown Author")
-
-        let metadata = BookMetadata(
-            title: bookInfo.title,
-            author: [author],
-            description: bookInfo.desc,
-            subject: bookInfo.tags,
-            bookPath: "\(bookPath)/\(fullDestinationPath.lastPathComponent)",
-            bookCover: coverPath
-        )
-
-        add(with: metadata, fromSource: true)
-    }
-
     func process(for file: URL) async throws {
         let isPdf = file.lastPathComponent.hasSuffix(".pdf")
 

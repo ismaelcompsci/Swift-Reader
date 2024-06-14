@@ -22,24 +22,10 @@ struct SettingsView: View {
                 Section {
                     ThemeColorPicker()
 
-                    goToSourcesButton
-
                     homeGridColumn
 
                 } header: {
                     Text("Settings")
-                }
-                .tint(.primary)
-
-                Section {
-                    goToDownloadManagerButton
-
-                    openDownloadFolderButton
-
-                    clearDownloadFolderButton
-
-                } header: {
-                    Text("Storage")
                 }
                 .tint(.primary)
 
@@ -54,9 +40,6 @@ struct SettingsView: View {
             }
         }
         .navigationBarTitle("Settings", displayMode: .large)
-        .task {
-            downloadFolderSize = BookDownloader.getDownloadFolderSize()
-        }
     }
 
     var resetAllButton: some View {
@@ -72,7 +55,7 @@ struct SettingsView: View {
 
     var homeGridColumn: some View {
         HStack {
-            Text("Number of Grid Columns")
+            Text("Columns")
 
             Spacer()
 
@@ -94,76 +77,6 @@ struct SettingsView: View {
                 .foregroundStyle(.red)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    var goToSourcesButton: some View {
-        Button {
-            navigator.navigate(
-                to: .sourceSettings
-            )
-        } label: {
-            HStack {
-                Text("Sources")
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
-            }
-        }
-    }
-
-    var goToDownloadManagerButton: some View {
-        Button {
-            navigator.navigate(to: .downloadManager)
-        } label: {
-            HStack {
-                Text("Download Manager")
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
-            }
-        }
-    }
-
-    @ViewBuilder
-    var openDownloadFolderButton: some View {
-        Button {
-            let path = DownloadManager.downloadsPath
-            let sharedurl = path.absoluteString.replacingOccurrences(of: "file://", with: "shareddocuments://")
-            let furl = URL(string: sharedurl)!
-            if UIApplication.shared.canOpenURL(furl) {
-                UIApplication.shared.open(furl, options: [:])
-            }
-        } label: {
-            HStack {
-                Text("Open Downloads Folder")
-                Spacer()
-                Image(systemName: "link")
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    @ViewBuilder
-    var clearDownloadFolderButton: some View {
-        let formattedString = ByteCountFormatter.string(fromByteCount: Int64(downloadFolderSize), countStyle: .file)
-
-        Button {
-            BookDownloader.clearDownloadFolder()
-            downloadFolderSize = BookDownloader.getDownloadFolderSize()
-        } label: {
-            HStack {
-                Text("Clear Download Folder")
-                Spacer()
-                Text("\(formattedString)")
-            }
-            .foregroundStyle(.red)
-        }
     }
 }
 

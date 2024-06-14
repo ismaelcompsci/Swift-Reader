@@ -10,8 +10,6 @@ import SwiftUI
 
 @main
 struct ReadApp: App {
-    @State var bookDownloader = BookDownloader.shared
-    @State var sourceManager: SourceManager
     @State var theme = AppTheme.shared
     @State var userPreferences = UserPreferences.shared
     @State var toaster = Toaster.shared
@@ -23,8 +21,6 @@ struct ReadApp: App {
         WindowGroup {
             ContentView()
                 .modelContainer(modelContainer)
-                .environment(sourceManager)
-                .environment(bookDownloader)
                 .environment(theme)
                 .environment(userPreferences)
                 .environment(toaster)
@@ -36,11 +32,8 @@ struct ReadApp: App {
 
     init() {
         do {
-            let schema = Schema([Source.self, SDBook.self])
+            let schema = Schema([SDBook.self])
             modelContainer = try ModelContainer(for: schema)
-
-            let sourceManager = SourceManager(modelContext: modelContainer.mainContext)
-            _sourceManager = State(initialValue: sourceManager)
 
             BookManager.shared.modelContext = modelContainer.mainContext
         } catch {

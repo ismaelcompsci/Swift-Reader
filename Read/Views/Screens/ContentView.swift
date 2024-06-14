@@ -50,22 +50,6 @@ struct ContentView: View {
                     }
 
                     NavigationView {
-                        SourcesDiscoverView()
-                    }
-                    .tag(TabNavigation.discover)
-                    .tabItem {
-                        Label("Discover", systemImage: TabNavigation.discover.icon)
-                    }
-
-                    NavigationView {
-                        SourceSearch()
-                    }
-                    .tag(TabNavigation.search)
-                    .tabItem {
-                        Label("Search", systemImage: TabNavigation.search.icon)
-                    }
-
-                    NavigationView {
                         SettingsView()
                     }
                     .tag(TabNavigation.settings)
