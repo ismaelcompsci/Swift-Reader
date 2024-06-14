@@ -26,7 +26,6 @@
 		9F44F4442BC3B5C500E63461 /* BookManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F44F4432BC3B5C500E63461 /* BookManager.swift */; };
 		9F4602B42BA65A9000E15D0C /* UIImage+Quality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4602B32BA65A9000E15D0C /* UIImage+Quality.swift */; };
 		9F4772D72C095EBD001A183E /* EBookReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4772D62C095EBD001A183E /* EBookReader.swift */; };
-		9F4772D92C097398001A183E /* SReader in Frameworks */ = {isa = PBXBuildFile; productRef = 9F4772D82C097398001A183E /* SReader */; };
 		9F4772DB2C09B86F001A183E /* PDFReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4772DA2C09B86F001A183E /* PDFReader.swift */; };
 		9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954AE2B6DCCF8009FC2F1 /* ContentView.swift */; };
 		9F5954B22B6DD11C009FC2F1 /* LibrarySortPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5954B12B6DD11C009FC2F1 /* LibrarySortPopover.swift */; };
@@ -101,6 +100,7 @@
 		9FD808862B981E020007D8F6 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808852B981E020007D8F6 /* ReaderSettings.swift */; };
 		9FD8088A2B982CE40007D8F6 /* ReaderContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808892B982CE40007D8F6 /* ReaderContent.swift */; };
 		9FD9ACFE2BD9FB900006D26B /* SourceExtensionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9ACFD2BD9FB900006D26B /* SourceExtensionDetails.swift */; };
+		9FDC05F42C1CCDB40005F64B /* SReader in Frameworks */ = {isa = PBXBuildFile; productRef = 9FDC05F32C1CCDB40005F64B /* SReader */; };
 		9FE324442B85D30E003E61F6 /* bookDetails.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243E2B85D30E003E61F6 /* bookDetails.PNG */; };
 		9FE324452B85D30E003E61F6 /* reader.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FE3243F2B85D30E003E61F6 /* reader.PNG */; };
 		9FE631822BE19F45004CF96C /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE631812BE19F45004CF96C /* AsyncOperation.swift */; };
@@ -126,6 +126,19 @@
 		9FFFBCA22BD1FD0E0019E6DD /* FileList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		9F3561BC2C1CC222003146FB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		9F075A782BA501580017BFAF /* RefrenceLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefrenceLibrary.swift; sourceTree = "<group>"; };
 		9F0B9A172BB7C53200581362 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bundle.js; sourceTree = "<group>"; };
@@ -137,6 +150,7 @@
 		9F1C69EF2BC622F1002D6AF4 /* Toaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toaster.swift; sourceTree = "<group>"; };
 		9F1C69F12BC6324A002D6AF4 /* DownloadManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DownloadManager; sourceTree = "<group>"; };
 		9F2CF0B82BCB708800E36801 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		9F3561C62C1CCD36003146FB /* SReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SReader; sourceTree = "<group>"; };
 		9F35B6D72C1B76D000259C1E /* ContextMenuModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuModifier.swift; sourceTree = "<group>"; };
 		9F3DDA102BDF64A90052F8A4 /* SRExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRExtension.swift; sourceTree = "<group>"; };
 		9F3DDA122BDF73B40052F8A4 /* SRSourceActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRSourceActor.swift; sourceTree = "<group>"; };
@@ -190,7 +204,6 @@
 		9FA3602B2BBE22D800499A4C /* SourceDownloadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceDownloadButton.swift; sourceTree = "<group>"; };
 		9FA730262BD71DE6003294B8 /* ScrollableTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTabBar.swift; sourceTree = "<group>"; };
 		9FA730292BD73405003294B8 /* RectPrefrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectPrefrence.swift; sourceTree = "<group>"; };
-		9FB0B6CD2C094A33000E4755 /* SReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SReader; path = ../../../../Desktop/SReader/SReader; sourceTree = "<group>"; };
 		9FB62D822B8D841F00A10EF5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9FB77EB02BCCE38500D37521 /* search.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.PNG; sourceTree = "<group>"; };
 		9FB77EB12BCCE38500D37521 /* list.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = list.PNG; sourceTree = "<group>"; };
@@ -248,9 +261,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F8F9CC22BB4FF880081C57F /* ZIPFoundation in Frameworks */,
-				9F4772D92C097398001A183E /* SReader in Frameworks */,
 				9FE631972BE43797004CF96C /* KeychainSwift in Frameworks */,
 				9F1C69F32BC634A4002D6AF4 /* DownloadManager in Frameworks */,
+				9FDC05F42C1CCDB40005F64B /* SReader in Frameworks */,
 				9FB84A622B9D6681005D7915 /* NukeExtensions in Frameworks */,
 				9F0C00622BE98BF900984BF4 /* SwiftUIIntrospect in Frameworks */,
 				9FB84A602B9D6681005D7915 /* Nuke in Frameworks */,
@@ -372,10 +385,11 @@
 			children = (
 				9FE38F012B7DCDC9005A446A /* README.md */,
 				9FE324212B85CE36003E61F6 /* Screenshots */,
-				9F7011892BC5F37E001E3955 /* Packages */,
 				9F608E7E2B65D05B00D2B5F4 /* Read */,
 				9F608E7D2B65D05B00D2B5F4 /* Products */,
 				9F023BC02BB69CB70061BE7A /* Frameworks */,
+				9F1C69F12BC6324A002D6AF4 /* DownloadManager */,
+				9F3561C62C1CCD36003146FB /* SReader */,
 			);
 			sourceTree = "<group>";
 		};
@@ -443,15 +457,6 @@
 				9F5F05012BF4295500F9B026 /* SDBook+Extensions.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		9F7011892BC5F37E001E3955 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				9FB0B6CD2C094A33000E4755 /* SReader */,
-				9F1C69F12BC6324A002D6AF4 /* DownloadManager */,
-			);
-			path = Packages;
 			sourceTree = "<group>";
 		};
 		9F8F9CBD2BB4FF240081C57F /* Sources */ = {
@@ -607,6 +612,7 @@
 				9F608E782B65D05B00D2B5F4 /* Sources */,
 				9F608E792B65D05B00D2B5F4 /* Frameworks */,
 				9F608E7A2B65D05B00D2B5F4 /* Resources */,
+				9F3561BC2C1CC222003146FB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -622,7 +628,7 @@
 				9F1C69F22BC634A4002D6AF4 /* DownloadManager */,
 				9FE631962BE43797004CF96C /* KeychainSwift */,
 				9F0C00612BE98BF900984BF4 /* SwiftUIIntrospect */,
-				9F4772D82C097398001A183E /* SReader */,
+				9FDC05F32C1CCDB40005F64B /* SReader */,
 			);
 			productName = Read;
 			productReference = 9F608E7C2B65D05B00D2B5F4 /* Read.app */;
@@ -635,7 +641,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1510;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					9F608E7B2B65D05B00D2B5F4 = {
@@ -1082,10 +1088,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = DownloadManager;
 		};
-		9F4772D82C097398001A183E /* SReader */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SReader;
-		};
 		9F8F9CC12BB4FF880081C57F /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9F8F9CC02BB4FF880081C57F /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
@@ -1110,6 +1112,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FB84A5E2B9D6681005D7915 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeVideo;
+		};
+		9FDC05F32C1CCDB40005F64B /* SReader */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SReader;
 		};
 		9FE631962BE43797004CF96C /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;

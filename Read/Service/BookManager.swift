@@ -13,8 +13,10 @@ enum BookImporterError: String, Error {
     case failedToGetMetadata = "Failed to get metadata"
 }
 
+@MainActor
 class BookManager {
     static let shared = BookManager()
+    let metadataExtractor = MetadataExtractor()
     var modelContext: ModelContext!
 
     private func downloadImage(with url: String) async -> URL? {
@@ -59,7 +61,7 @@ class BookManager {
             }
         }
 
-        guard let fullDestinationPath = await MetadataExtractor.shared.copyBook(from: file, id: bookId) else {
+        guard let fullDestinationPath = await metadataExtractor.copyBook(from: file, id: bookId) else {
             try? FileManager.default.removeItem(at: destination)
             throw BookImporterError.failedToGetMetadata
         }
@@ -84,9 +86,9 @@ class BookManager {
         var metadata: BookMetadata?
 
         if isPdf {
-            metadata = await MetadataExtractor.shared.getPDFMetadata(from: file)
+            metadata = await metadataExtractor.getPDFMetadata(from: file)
         } else {
-            metadata = await MetadataExtractor.shared.getEbookMetadata(from: file)
+            metadata = await metadataExtractor.getEbookMetadata(from: file)
         }
 
         guard let metadata = metadata else {

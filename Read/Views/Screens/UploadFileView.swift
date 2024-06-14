@@ -24,12 +24,6 @@ struct UploadFileView: View {
         filesToProcess.isEmpty == false
     }
     
-    init() {
-        DispatchQueue.main.async {
-            MetadataExtractor.shared.loadMetadataExtractor()
-        }
-    }
-    
     var uploadCard: some View {
         VStack(spacing: 18) {
             WrappingStackLayout {
