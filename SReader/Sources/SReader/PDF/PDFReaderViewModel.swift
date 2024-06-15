@@ -11,6 +11,7 @@ import PDFKit
 import SwiftUI
 import UniformTypeIdentifiers
 
+@MainActor
 public protocol Reader {
     var file: URL { get }
     var state: ReaderState { get }
@@ -49,8 +50,8 @@ public extension PDFAnnotationKey {
     static let highlightId: PDFAnnotationKey = .init(rawValue: "/HID")
 }
 
-@Observable
-public class PDFReaderViewModel: Reader {
+@MainActor
+@Observable public class PDFReaderViewModel: Reader {
     public var file: URL
     public var pdfDocument: PDFDocument
     public var pdfView: NoContextMenuPDFView

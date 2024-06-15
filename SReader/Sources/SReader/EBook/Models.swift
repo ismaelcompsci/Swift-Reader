@@ -8,12 +8,6 @@
 import Foundation
 import PDFKit
 
-protocol BaseAnnotation: Codable {
-    var index: Int { get } // index of loaded document in foliate-js
-    var value: String { get } // cfi range  "epubcfi(/6/12!/4/12,/1:16,/1:354)"
-    var color: String { get }
-}
-
 public class FoliateToc: Identifiable, Codable {
     public var href: String
     public var id: Int
@@ -47,7 +41,7 @@ public struct PDFHighlight {
 }
 
 // minimal info to inject saved annotation into book
-public struct Annotation: BaseAnnotation {
+public struct Annotation: Codable {
     public var index: Int // index of loaded document in foliate-js
     public var value: String // cfi range  "epubcfi(/6/12!/4/12,/1:16,/1:354)"
     public var color: String
@@ -59,7 +53,7 @@ public struct Annotation: BaseAnnotation {
     }
 }
 
-public struct TappedHighlight: BaseAnnotation {
+public struct TappedHighlight: Codable {
     public var dir: String
     public var height: Double
     public var index: Int

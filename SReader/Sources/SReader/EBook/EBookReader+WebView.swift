@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-enum BookWebViewMessageHandlers: String {
+enum BookWebViewMessageHandlers: String, Sendable {
     case initiatedSwiftReader
     case tapHandler
     case selectedText
@@ -16,21 +16,37 @@ enum BookWebViewMessageHandlers: String {
     case didTapHighlight
 }
 
-public class EBookWebViewCoordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
-    var viewModel: EBookReaderViewModel
+public final class EBookWebViewCoordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate, Sendable {
+    let viewModel: EBookReaderViewModel
 
     init(viewModel: EBookReaderViewModel) {
         self.viewModel = viewModel
     }
 
+    @MainActor
+    private func handleUserMessage(handlerCase: BookWebViewMessageHandlers, data: Data) {
+        viewModel.handleMessage(from: handlerCase, with: data)
+    }
+
+    @MainActor
+    private func handleNavigationFinished() {
+        viewModel.finishedLoadingJavascript = true
+    }
+
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if let handlerCase = BookWebViewMessageHandlers(rawValue: message.name) {
-            viewModel.handleMessage(from: handlerCase, with: message.body)
+        if let handlerCase = BookWebViewMessageHandlers(rawValue: message.name),
+           let data = try? JSONSerialization.data(withJSONObject: message.body, options: .fragmentsAllowed)
+        {
+            Task { @MainActor in
+                self.handleUserMessage(handlerCase: handlerCase, data: data)
+            }
         }
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        viewModel.finishedLoadingJavascript = true
+        Task { @MainActor in
+            self.handleNavigationFinished()
+        }
     }
 }
 

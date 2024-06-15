@@ -215,7 +215,7 @@ class Reader {
   isAndroid = false;
   constructor() {
       console.log("CONSRUCTED READER")
-      window.webkit.messageHandlers.initiatedSwiftReader?.postMessage("true");
+      window.webkit.messageHandlers.initiatedSwiftReader?.postMessage({initiated: "true"});
       
   }
   async initBook(bookPath, initLocation, ext) {
@@ -422,7 +422,8 @@ class Reader {
         this.selection.value = value
         this.selection.index = this.index
         if (this.selection) {
-          window.webkit.messageHandlers.selectedText.postMessage(JSON.stringify(this.selection));
+          delete  this.selection["range"]
+          window.webkit.messageHandlers.selectedText.postMessage(this.selection);
             this.selection = null
         }
     })

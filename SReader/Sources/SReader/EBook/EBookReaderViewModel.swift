@@ -17,8 +17,8 @@ struct InjectedHighlight: Codable {
     var color: String
 }
 
-@Observable
-public class EBookReaderViewModel: Reader {
+@MainActor
+@Observable public class EBookReaderViewModel: Reader {
     let webView: NoContextMenuWebView
     let webServer: WebServer
     public let file: URL
@@ -60,7 +60,7 @@ public class EBookReaderViewModel: Reader {
         self.file = file
         self.webView = NoContextMenuWebView()
         self.initialLocation = initialLocation
-        self.webServer = WebServer.shared
+        self.webServer = WebServer()
         self.toc = []
 
         webServer.setUpWebServer()
@@ -85,7 +85,7 @@ public class EBookReaderViewModel: Reader {
         if finishedLoadingJavascript == true, constructedJavascriptReader == true, state != .ready {
             Task {
                 await renderEBook(initialLocation: initialLocation)
-                await setTheme()
+                setTheme()
                 self.toc = await generateLinks()
 
                 self.injectInitialHighlights()
@@ -169,13 +169,13 @@ public class EBookReaderViewModel: Reader {
         }
     }
 
-    func handleMessage(from messageCase: BookWebViewMessageHandlers, with message: Any) {
+    func handleMessage(from messageCase: BookWebViewMessageHandlers, with message: Data) {
         switch messageCase {
         case .initiatedSwiftReader:
             constructedJavascriptReader = true
         case .tapHandler:
             // convert to correct space coordinates
-            if let pointData = message as? [String: Double],
+            if let pointData = try? JSONDecoder().decode([String: Double].self, from: message),
                let x = pointData["x"],
                let y = pointData["y"]
             {
@@ -183,7 +183,7 @@ public class EBookReaderViewModel: Reader {
             }
         case .selectedText:
             selectedHighlight = nil
-            if let selectedTextString = message as? String, let selectionData = selectedTextString.data(using: .utf8), let selectedText = try? JSONDecoder().decode(FoliateSelection.self, from: selectionData) {
+            if let selectedText = try? JSONDecoder().decode(FoliateSelection.self, from: message) {
                 guard var selectionLocater = currentLocation else {
                     return
                 }
@@ -207,10 +207,9 @@ public class EBookReaderViewModel: Reader {
                 currentSelection = selection
                 editingActions.selection = selection
             }
+
         case .relocate:
-            if let jsonData = try? JSONSerialization.data(withJSONObject: message),
-               let relocateDetails = try? JSONDecoder().decode(Relocate.self, from: jsonData)
-            {
+            if let relocateDetails = try? JSONDecoder().decode(Relocate.self, from: message) {
                 currentTocLink = SRLink(
                     href: "#cfi=\(relocateDetails.tocItem?.href ?? "")",
                     title: relocateDetails.tocItem?.label,
@@ -232,9 +231,7 @@ public class EBookReaderViewModel: Reader {
                 onRelocated.send(locater)
             }
         case .didTapHighlight:
-            if let json = try? JSONSerialization.data(withJSONObject: message),
-               let foliateHighlight = try? JSONDecoder().decode(TappedHighlight.self, from: json)
-            {
+            if let foliateHighlight = try? JSONDecoder().decode(TappedHighlight.self, from: message) {
                 let cfi = foliateHighlight.value
                 if let highlight = highlightsByCFI[cfi] {
                     selectedHighlight = highlight
@@ -429,9 +426,8 @@ public extension EBookReaderViewModel {
             switch actionType {
             case .highlight:
                 highlightActions.selection = currentSelection
-                Task {
-                    await highlightSelection()
-                }
+                highlightSelection()
+
             case .removeHighlight:
                 if let selectedHighlight = selectedHighlight {
                     removeHighlight(selectedHighlight)

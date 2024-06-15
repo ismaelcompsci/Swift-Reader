@@ -80,7 +80,7 @@ public class NoContextMenuPDFView: PDFView {
 }
 
 class PDFPageCustomBackground: PDFPage {
-    static var bg: CGColor?
+    @MainActor static var bg: CGColor?
     static let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     override init() {
@@ -88,11 +88,15 @@ class PDFPageCustomBackground: PDFPage {
     }
 
     // https://github.com/drearycold/YetAnotherEBookReader/blob/6b1c67cee92917d53aea418956e5fbbd46342420/YetAnotherEBookReader/Views/PDFView/PDFPageWithBackground.swift#L11
-    override func draw(with box: PDFDisplayBox, to context: CGContext) {
+    @MainActor override func draw(with box: PDFDisplayBox, to context: CGContext) {
         super.draw(with: box, to: context)
 
         guard let fillColor = PDFPageCustomBackground.bg,
-              let fillColorDeviceRGB = fillColor.converted(to: PDFPageCustomBackground.colorSpace, intent: .defaultIntent, options: nil)
+              let fillColorDeviceRGB = fillColor.converted(
+                  to: PDFPageCustomBackground.colorSpace,
+                  intent: .defaultIntent,
+                  options: nil
+              )
         else {
             print("[PDFPageCustomBackground] draw:  NO FILL COLOR OR DEVICE RGB")
             return
@@ -139,7 +143,7 @@ public class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelega
         return PDFPageCustomBackground.self
     }
 
-    @objc func handleAnnotationHit(notification: Notification) {
+    @MainActor @objc func handleAnnotationHit(notification: Notification) {
         if let highlight = notification.userInfo?["PDFAnnotationHit"] as? PDFAnnotation {
             if let id = highlight.annotationKeyValues[PDFAnnotationKey.highlightId] as? String {
                 viewModel.highlightHit(id)
@@ -149,11 +153,11 @@ public class PDFKitViewCoordinator: NSObject, PDFViewDelegate, PDFDocumentDelega
 
     @objc func handleVisiblePagesChanged(notification: Notification) {}
 
-    @objc func handlePageChange(notification: Notification) {
+    @MainActor @objc func handlePageChange(notification: Notification) {
         viewModel.pdfPageChanged()
     }
 
-    @objc func selectionDidChange(notification: Notification) {
+    @MainActor @objc func selectionDidChange(notification: Notification) {
         if viewModel.pdfView.currentSelection != nil {
             viewModel.selectionDidChange()
         }

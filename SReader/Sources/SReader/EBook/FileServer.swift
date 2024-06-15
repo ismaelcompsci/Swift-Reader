@@ -10,14 +10,14 @@ import GCDWebServers
 class FileServer {
     let server: GCDWebServer
 
-    static let FileServerSharedInstance = FileServer()
+    nonisolated(unsafe) static let FileServerSharedInstance = FileServer()
 
     class var sharedInstance: FileServer {
         return FileServerSharedInstance
     }
 
     var base: String {
-        return "http://localhost:\(6578)"
+        "http://localhost:\(6578)"
     }
 
     /// A random, transient token used for authenticating requests.

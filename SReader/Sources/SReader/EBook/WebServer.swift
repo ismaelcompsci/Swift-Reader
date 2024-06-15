@@ -9,7 +9,6 @@ import Foundation
 import GCDWebServers
 
 class WebServer {
-    static var shared = WebServer()
     var fileServer: FileServer
     var file: URL?
 

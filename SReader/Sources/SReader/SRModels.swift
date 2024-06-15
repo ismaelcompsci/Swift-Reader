@@ -8,7 +8,7 @@
 import Foundation
 
 /// A Link to a resource.
-public struct SRLink {
+public struct SRLink: Codable {
     public let href: String
     public let title: String?
     public let type: BookType?
@@ -27,10 +27,7 @@ public struct SRLink {
     }
 }
 
-/**
- https://github.com/readium/swift-toolkit/blob/develop/Sources/Shared/Publication/Locator.swift#L11
- */
-public struct SRLocator: Hashable, CustomStringConvertible, Codable {
+public struct SRLocator: Hashable, Codable {
     public var type: BookType
     public var title: String
     public var locations: SRLocations
@@ -39,52 +36,13 @@ public struct SRLocator: Hashable, CustomStringConvertible, Codable {
     public init(
         type: BookType,
         title: String = "",
-        locations: SRLocations = .init(),
+        locations: SRLocations = SRLocations(fragments: []),
         text: String? = nil
     ) {
         self.type = type
         self.title = title
         self.locations = locations
         self.text = text
-    }
-
-    public var json: [String: Any] {
-        [
-            "type": type.rawValue,
-            "title": encodeIfNotNil(title),
-            "locations": encodeIfNotEmpty(locations.json),
-            "text": encodeIfNotNil(text),
-        ]
-    }
-
-    public var jsonString: String? {
-        return serializeJSONString(json)
-    }
-
-    public var description: String { jsonString ?? "{}" }
-
-    public init?(jsonString: String) {
-        do {
-            let json = try JSONSerialization.jsonObject(with: jsonString.data(using: .utf8)!) as? [String: Any]
-
-            guard let json = json, let typeString = json["type"] as? String else {
-                return nil
-            }
-
-            guard let typeInt = Int(typeString), let type = BookType(rawValue: typeInt) else {
-                return nil
-            }
-
-            self.init(
-                type: type,
-                title: json["title"] as? String ?? "",
-                locations: SRLocations(jsonString: json["locations"] as? String),
-                text: json["text"] as? String
-            )
-
-        } catch {
-            return nil
-        }
     }
 }
 
@@ -99,53 +57,11 @@ public struct SRLocations: Hashable, Codable {
     public var totalProgression: Double?
     public var position: Int?
 
-    public var json: [String: Any] {
-        makeJSON([
-            "fragments": encodeIfNotEmpty(fragments),
-            "progression": encodeIfNotNil(progression),
-            "totalProgression": encodeIfNotNil(totalProgression),
-            "position": encodeIfNotNil(position),
-        ])
-    }
-
-    public var jsonString: String? { serializeJSONString(json) }
-
-    public init(
-        fragments: [String] = [],
-        progression: Double? = nil,
-        totalProgression: Double? = nil,
-        position: Int? = nil
-
-    ) {
+    public init(fragments: [String], progression: Double? = nil, totalProgression: Double? = nil, position: Int? = nil) {
         self.fragments = fragments
         self.progression = progression
         self.totalProgression = totalProgression
         self.position = position
-    }
-
-    public init(jsonString: String?) {
-        guard let jsonString = jsonString else {
-            self.init()
-            return
-        }
-
-        do {
-            let json = try JSONSerialization.jsonObject(with: jsonString.data(using: .utf8)!) as? [String: Any]
-
-            guard let json = json else {
-                self.init()
-                return
-            }
-
-            self.init(
-                fragments: json["fragments"] as? [String] ?? [],
-                progression: json["progression"] as? Double,
-                totalProgression: json["totalProgression"] as? Double,
-                position: json["position"] as? Int
-            )
-        } catch {
-            self.init()
-        }
     }
 }
 

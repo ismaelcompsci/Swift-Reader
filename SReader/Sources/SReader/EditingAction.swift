@@ -10,6 +10,7 @@ import PDFKit
 import UIKit
 
 // https://github.com/readium/swift-toolkit/blob/595037da028249bbdf491a05ee8121c7d1de46ec/Sources/Navigator/EditingAction.swift#L19
+@MainActor
 public struct EditingAction: Hashable {
     enum Kind: Hashable {
         case native(String)

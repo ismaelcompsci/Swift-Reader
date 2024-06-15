@@ -8,11 +8,12 @@
 import Foundation
 import WebKit
 
-public class HeadlessWebview: NSObject {
-    public var webView: WKWebView
-    private var htmlLocation: URL
+@MainActor
+public class HeadlessWebview {
+    public let webView: WKWebView
+    private let htmlLocation: URL
 
-    override init() {
+    init() {
         webView = WKWebView()
         webView.isInspectable = true
         webView.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
@@ -25,11 +26,5 @@ public class HeadlessWebview: NSObject {
 
     public func loadMetadataExtractorJS() -> WKNavigation? {
         return webView.loadFileURL(htmlLocation, allowingReadAccessTo: URL.documentsDirectory)
-    }
-}
-
-extension HeadlessWebview: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("DID FINISH LOADING")
     }
 }

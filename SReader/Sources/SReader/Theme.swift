@@ -33,60 +33,6 @@ public struct BookTheme: Codable {
     public var bg: ThemeBackground = .light
     public var fg: ThemeForeground = .light
 
-    // TODO: SET MINIMUM AND MAXIMUM VALUES
-
-    public mutating func increaseFontSize() {
-        fontSize += 2
-    }
-
-    public mutating func decreaseFontSize() {
-        fontSize -= 2
-    }
-
-    public mutating func increaseGap() {
-        let newGap = gap + 0.01
-        gap = min(100, newGap)
-    }
-
-    public mutating func decreaseGap() {
-        let newGap = gap - 0.01
-        gap = max(0, newGap)
-    }
-
-    public mutating func increaseBlockSize() {
-        maxBlockSize += 50
-    }
-
-    public mutating func decreaseBlockSize() {
-        maxBlockSize -= 50
-    }
-
-    public mutating func setMaxColumnCount(_ count: Int) {
-        maxColumnCount = count
-    }
-
-    public mutating func increaseMargin() {
-        let newMargin = margin + 2
-        margin = min(200, newMargin)
-    }
-
-    public mutating func decreaseMargin() {
-        let newMargin = margin - 2
-        margin = max(0, newMargin)
-    }
-
-    public mutating func increaseLineHeight() {
-        let new = lineHeight + 0.1
-
-        lineHeight = min(7, new)
-    }
-
-    public mutating func decreaseLineHeight() {
-        let new = lineHeight - 0.1
-
-        lineHeight = max(0.8, new)
-    }
-
     public init() {
         if let decodedData = UserDefaults.standard.data(forKey: BookTheme.saveKey) {
             if let theme = try? JSONDecoder().decode(BookTheme.self, from: decodedData) {
@@ -111,6 +57,60 @@ public struct BookTheme: Codable {
         if let encodedTheme = try? JSONEncoder().encode(self) {
             UserDefaults.standard.set(encodedTheme, forKey: BookTheme.saveKey)
         }
+    }
+}
+
+public extension BookTheme {
+    mutating func increaseFontSize() {
+        fontSize += 2
+    }
+
+    mutating func decreaseFontSize() {
+        fontSize -= 2
+    }
+
+    mutating func increaseGap() {
+        let newGap = gap + 0.01
+        gap = min(100, newGap)
+    }
+
+    mutating func decreaseGap() {
+        let newGap = gap - 0.01
+        gap = max(0, newGap)
+    }
+
+    mutating func increaseBlockSize() {
+        maxBlockSize += 50
+    }
+
+    mutating func decreaseBlockSize() {
+        maxBlockSize -= 50
+    }
+
+    mutating func setMaxColumnCount(_ count: Int) {
+        maxColumnCount = count
+    }
+
+    mutating func increaseMargin() {
+        let newMargin = margin + 2
+        margin = min(200, newMargin)
+    }
+
+    mutating func decreaseMargin() {
+        let newMargin = margin - 2
+        margin = max(0, newMargin)
+    }
+
+    mutating func increaseLineHeight() {
+        let new = lineHeight + 0.1
+
+        lineHeight = min(7, new)
+    }
+
+    mutating func decreaseLineHeight() {
+        let new = lineHeight - 0.1
+
+        lineHeight = max(0.8, new)
     }
 }
 

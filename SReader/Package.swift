@@ -29,7 +29,6 @@ let package = Package(
                 .copy("scripts"),
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency"),
-                .enableExperimentalFeature("StrictConcurrency"),
+                .swiftLanguageVersion(.v6),
             ]),
     ])

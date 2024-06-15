@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 public final class EditingActionsController: NSObject {
     public var actions: [EditingAction]
     public var editMenuInteraction: UIEditMenuInteraction!
@@ -89,7 +90,7 @@ public final class EditingActionsController: NSObject {
     }
 }
 
-extension EditingActionsController: UIEditMenuInteractionDelegate {
+extension EditingActionsController: @preconcurrency UIEditMenuInteractionDelegate {
     public func editMenuInteraction(
         _ interaction: UIEditMenuInteraction,
         menuFor configuration: UIEditMenuConfiguration,
