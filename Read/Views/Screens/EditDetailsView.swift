@@ -32,7 +32,7 @@ struct EditDetailsView: View {
             VStack {
                 ScrollView {
                     BookCover(
-                        imageURL: getCoverFullPath(for: book.coverPath ?? ""),
+                        imageURL: book.imagePath,
                         title: book.title,
                         author: book.author
                     )
@@ -55,8 +55,6 @@ struct EditDetailsView: View {
                         book.summary = description
                         book.author = author
                         
-//                        context.save()
-                        
                         dismiss()
                     }
                     .buttonStyle(.main)
@@ -67,9 +65,9 @@ struct EditDetailsView: View {
                         dismiss()
                     } label: {
                         Text("Cancel")
-                            .frame(minHeight: 44)
+                            .frame(minHeight: 36)
                     }
-                    .frame(minHeight: 44)
+                    .frame(minHeight: 36)
                     .padding(.horizontal, 12)
                     .foregroundStyle(.white)
                     .background(

@@ -33,7 +33,7 @@ extension BookList {
             } label: {
                 HStack(spacing: 12) {
                     BookCover(
-                        imageURL: getCoverFullPath(for: book.coverPath ?? ""),
+                        imageURL: book.imagePath,
                         title: book.title,
                         author: book.author
                     )

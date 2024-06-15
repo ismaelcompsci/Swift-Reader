@@ -59,35 +59,6 @@ public let fileTypes = [
     .pdf
 ]
 
-public func makeJSON(_ object: [String: Any]) -> [String: Any] {
-    object.filter { _, value in
-        !(value is NSNull)
-    }
-}
-
-public func encodeIfNotNil(_ value: Any?) -> Any {
-    value ?? NSNull()
-}
-
-public func serializeJSONString(_ object: Any) -> String? {
-    guard
-        let data = try? JSONSerialization.data(withJSONObject: object, options: .sortedKeys),
-        let string = String(data: data, encoding: .utf8)
-    else {
-        return nil
-    }
-
-    // Unescapes slashes
-    return string.replacingOccurrences(of: "\\/", with: "/")
-}
-
-public func encodeIfNotEmpty<T: Collection>(_ collection: T?) -> Any {
-    guard let collection = collection else {
-        return NSNull()
-    }
-    return collection.isEmpty ? NSNull() : collection
-}
-
 extension UIColor {
     // MARK: - Initialization
 

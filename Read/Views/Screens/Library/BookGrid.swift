@@ -66,7 +66,7 @@ extension BookGrid {
 
         var cover: some View {
             BookCover(
-                imageURL: getCoverFullPath(for: book.coverPath ?? ""),
+                imageURL: book.imagePath,
                 title: book.title,
                 author: book.author
             )

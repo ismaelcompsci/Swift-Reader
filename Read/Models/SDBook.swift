@@ -40,6 +40,15 @@ public class SDBook: Identifiable {
         }
     }
 
+    var imagePath: URL? {
+        guard let coverPath = coverPath else {
+            return nil
+        }
+
+        let documentsPath = URL.documentsDirectory
+        return documentsPath.appending(path: coverPath)
+    }
+
     var tags = [SDTag]()
     @Relationship(inverse: \SDCollection.books) var collections = [SDCollection]()
     @Relationship(deleteRule: .cascade, inverse: \SDHighlight.book) var highlights = [SDHighlight]()

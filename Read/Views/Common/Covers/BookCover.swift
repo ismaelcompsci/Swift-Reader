@@ -8,11 +8,6 @@
 import NukeUI
 import SwiftUI
 
-func getCoverFullPath(for path: String) -> URL {
-    let documentsPath = URL.documentsDirectory
-    return documentsPath.appending(path: path)
-}
-
 struct BookCover: View {
     var imageURL: URL?
     var isPlaceholderImage: Bool = false

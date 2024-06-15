@@ -17,8 +17,6 @@ struct LibraryView: View {
     @Query var books: [SDBook]
 
     var body: some View {
-        @Bindable var userPreferences = userPreferences
-
         ScrollView {
             LazyVStack(alignment: .leading, pinnedViews: [.sectionHeaders]) {
                 Section {
@@ -48,19 +46,7 @@ struct LibraryView: View {
                     VStack {
                         homeHeader
 
-                        HStack {
-                            if books.count > 0 {
-                                Text(books.count == 1 ? "\(books.count) Book" : "\(books.count) Books")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.gray)
-                            }
-
-                            LibrarySortPopover(
-                                selectedSortKey: $userPreferences.librarySortKey,
-                                selectedSortOrder: $userPreferences.librarySortOrder
-                            )
-                            .padding(.vertical, 8)
-                        }
+                        subHeader
                     }
                     .padding(.top, 8)
                     .padding(.vertical, 4)
@@ -82,6 +68,25 @@ struct LibraryView: View {
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .navigationBarTitle("Library", displayMode: .large)
+    }
+
+    @ViewBuilder
+    var subHeader: some View {
+        @Bindable var userPreferences = userPreferences
+
+        HStack {
+            if books.count > 0 {
+                Text(books.count == 1 ? "\(books.count) Book" : "\(books.count) Books")
+                    .font(.subheadline)
+                    .foregroundStyle(.gray)
+            }
+
+            LibrarySortPopover(
+                selectedSortKey: $userPreferences.librarySortKey,
+                selectedSortOrder: $userPreferences.librarySortOrder
+            )
+            .padding(.vertical, 8)
+        }
     }
 
     var homeHeader: some View {

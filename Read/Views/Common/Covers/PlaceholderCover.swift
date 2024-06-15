@@ -15,7 +15,6 @@ struct PlaceholderCover: View {
 
     var body: some View {
         return GeometryReader { proxy in
-
             Rectangle()
                 .fill(
                     LinearGradient(

@@ -19,13 +19,32 @@ struct BookDetailView: View {
 
     var body: some View {
         ScrollView {
-            BookDetails(
-                image: getCoverFullPath(for: book.coverPath ?? "").absoluteString,
-                title: book.title,
-                description: book.summary ?? "",
-                author: book.author ?? "Unknown Author",
-                tags: book.tags.map { $0.name }
-            ) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .bottom, spacing: 10) {
+                    BookCover(imageURL: book.imagePath, title: book.title, author: book.author)
+                        .frame(width: 114, height: 114 * 1.5)
+                        .clipShape(.rect(cornerRadius: 6))
+
+                    VStack(alignment: .leading) {
+                        Text(book.title)
+                            .font(.system(size: 22, weight: .semibold))
+                            .lineLimit(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Text(book.author ?? "Unknown Author")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(.horizontal, 12)
+
+                if let summary = book.summary {
+                    MoreText(text: summary)
+                        .tint(theme.tintColor)
+                        .padding(.horizontal, 12)
+                }
+
                 Button {
                     withAnimation(.spring()) {
                         openReader = true
@@ -42,6 +61,11 @@ struct BookDetailView: View {
                     }
                 }
                 .buttonStyle(.main)
+                .padding(.horizontal, 12)
+
+                if book.tags.isEmpty == false {
+                    TagScrollView(tags: book.tags.map { $0.name })
+                }
             }
         }
         .navigationTitle(book.title)
