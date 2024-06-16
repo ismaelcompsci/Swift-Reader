@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LibrarySortFilter: View {
     @Environment(UserPreferences.self) var userPreferences
+    @Environment(Navigator.self) var navigator
 
     var body: some View {
         @Bindable var userPreferences = userPreferences
@@ -66,6 +67,12 @@ struct LibrarySortFilter: View {
                 } else {
                     Text("Ascending")
                 }
+            }
+
+            Button {
+                navigator.presentedSheet = .uploadFile
+            } label: {
+                Label("Add Book", systemImage: "plus")
             }
 
         } label: {

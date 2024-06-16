@@ -66,4 +66,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .preferredColorScheme(.dark)
+        .applyTheme(AppTheme.shared)
+        .withPreviewsEnv()
 }

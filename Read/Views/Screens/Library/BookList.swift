@@ -12,12 +12,19 @@ struct BookList: View {
     let sortedBooks: [SDBook]
 
     var body: some View {
-        LazyVStack {
+        Section {
             ForEach(sortedBooks) { book in
                 BookRow(book: book)
                     .tint(.primary)
                     .modifier(ContextMenuModifier(navigator: navigator, book: book))
             }
+
+            Text("\(sortedBooks.count) Books")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 12)
+                .listRowSeparator(.hidden)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
     }
 }
@@ -49,13 +56,13 @@ extension BookList {
                     VStack(alignment: .leading, spacing: 8) {
                         VStack(alignment: .leading) {
                             Text(book.title)
-                                .font(.subheadline)
+                                .font(.caption)
                                 .fontWeight(.semibold)
                                 .lineLimit(2)
                                 .multilineTextAlignment(.leading)
 
                             Text(book.author ?? "Unkown Author")
-                                .font(.footnote)
+                                .font(.caption2)
                                 .lineLimit(2)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.leading)
@@ -73,10 +80,7 @@ extension BookList {
                         }
                     }
                 }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background()
             }
         }
 

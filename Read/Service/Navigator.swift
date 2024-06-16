@@ -10,11 +10,17 @@ import SwiftUI
 
 public enum NavigatorDestination: Hashable {
     case localDetails(book: SDBook)
+    case collections
+    case collectionDetails(collection: SDCollection)
 
     var id: String {
         switch self {
         case .localDetails:
             "localDetails"
+        case .collections:
+            "collections"
+        case .collectionDetails:
+            "collectionDetails"
         }
     }
 }
@@ -84,6 +90,10 @@ extension View {
             switch destination {
             case .localDetails(book: let book):
                 BookDetailView(book: book)
+            case .collections:
+                CollectionsView()
+            case .collectionDetails(collection: let collection):
+                CollectionDetailsView(collection: collection)
             }
         }
     }

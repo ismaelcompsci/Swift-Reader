@@ -50,12 +50,12 @@ class BookManager {
             throw BookImporterError.failedToGetMetadata
         }
 
-        add(with: metadata, fromSource: false)
+        add(with: metadata, isPDF: isPdf)
     }
 }
 
 extension BookManager {
-    func add(with metadata: BookMetadata, fromSource: Bool) {
+    func add(with metadata: BookMetadata, isPDF: Bool) {
         let book = SDBook(
             id: .init(),
             title: metadata.title ?? "Unknown Title",
@@ -66,6 +66,12 @@ extension BookManager {
         )
 
         modelContext.insert(book)
+
+        if isPDF {
+            try? addToCollection(book: book, name: "PDFs")
+        } else {
+            try? addToCollection(book: book, name: "Books")
+        }
 
         do {
             try modelContext.save()
@@ -79,6 +85,28 @@ extension BookManager {
             try modelContext.save()
             removeBookFromDisk(book: book)
         } catch { SRLogger.general.error("Failed to delete book \(error.localizedDescription)") }
+    }
+}
+
+// MARK: Collections
+
+extension BookManager {
+    func removeFromCollection(book: SDBook, name: String) throws {
+        let collectionFetchDescriptor = FetchDescriptor<SDCollection>()
+        let collections = try modelContext.fetch(collectionFetchDescriptor)
+        if let collection = collections.first(where: { $0.name == name }) {
+            collection.books.removeAll(where: { $0.id == book.id })
+            book.collections.removeAll(where: { $0.name == name })
+        }
+    }
+
+    func addToCollection(book: SDBook, name: String) throws {
+        let collectionFetchDescriptor = FetchDescriptor<SDCollection>()
+        let collections = try modelContext.fetch(collectionFetchDescriptor)
+        if let collection = collections.first(where: { $0.name == name }) {
+            collection.books.append(book)
+            book.collections.append(collection)
+        }
     }
 }
 

@@ -28,7 +28,7 @@ struct UploadFileView: View {
         VStack(spacing: 18) {
             WrappingStackLayout {
                 ForEach(SReaderFileTypes.allCases, id: \.self) { type in
-                    TagItem(name: ".\(type.rawValue.uppercased())", small: true)
+                    TagScrollView.TagItem(name: ".\(type.rawValue.uppercased())", small: true)
                 }
             }
             

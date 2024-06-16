@@ -34,6 +34,13 @@ struct BookGrid: View {
                     BookGridItem(book: book)
                 }
             }
+
+            Text("\(sortedBooks.count) Books")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 12)
+                .listRowSeparator(.hidden)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .readSize { size in
             gridWidth = size.width
@@ -117,21 +124,25 @@ extension BookGrid {
                             Button("Mark as Still Reading", systemImage: "minus.circle") {
                                 book.isFinsihed = false
                                 book.dateFinished = nil
+
+                                try? BookManager.shared.removeFromCollection(book: book, name: "Finished")
                             }
                         } else {
                             Button("Mark as Finished", systemImage: "checkmark.circle") {
                                 book.isFinsihed = true
                                 book.dateFinished = .now
+
+                                try? BookManager.shared.addToCollection(book: book, name: "Finished")
                             }
                         }
 
                         if book.collections.contains(where: { $0.name == "Want To Read" }) {
                             Button("Remove from Want to Read", systemImage: "minus.circle") {
-                                book.removeFromCollection(name: "Want To Read")
+                                try? BookManager.shared.removeFromCollection(book: book, name: "Want To Read")
                             }
                         } else {
                             Button("Add To Want to Read", systemImage: "text.badge.star") {
-                                book.addToCollection(name: "Want To Read")
+                                try? BookManager.shared.addToCollection(book: book, name: "Want To Read")
                             }
                         }
 

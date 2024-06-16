@@ -87,112 +87,22 @@ public class SDBook: Identifiable {
     }
 }
 
-@Model
-class SDTag {
-    @Attribute(.unique) var id: UUID
-    var name: String
-
-    init(name: String) {
-        id = .init()
-
-        self.name = name
-    }
-}
-
-@Model
-class SDCollection {
-    @Attribute(.unique) var id: UUID
-
-    var createdAt: Date
-    var name: String
-
-    var books: [SDBook]
-
-    init(createdAt: Date, name: String, books: [SDBook]) {
-        id = .init()
-        self.createdAt = createdAt
-        self.name = name
-        self.books = books
-    }
-}
-
-@Model
-class SDHighlight {
-    @Attribute(.unique) var id: String
-
-    var locator: SRLocator
-    var color: HighlightColor
-    var created = Date()
-    var progression: Double?
-
-    var book: SDBook?
-
-    init(
-        id: String,
-        locator: SRLocator,
-        color: HighlightColor,
-        created: Date = .now,
-        progression: Double? = nil
-    ) {
-        self.id = id
-        self.locator = locator
-        self.color = color
-        self.created = created
-        self.progression = progression
-        book = nil
+extension SDBook {
+    func removeLocator() {
+        position = nil
     }
 
-    init(_ highlight: SRHighlight) {
-        id = highlight.id
-        locator = highlight.locator
-        color = highlight.color
-        created = highlight.created
-        progression = highlight.progression
+    func update(_ locator: SRLocator) {
+        position = SDPosition(locator)
     }
 
-    func toSRHiglight() -> SRHighlight {
-        SRHighlight(
-            id: id,
-            locator: locator,
-            color: color,
-            created: created
-        )
-    }
-}
-
-@Model
-class SDPosition {
-    var type: BookType
-    var title: String?
-    var text: String?
-
-    var fragments: [String]
-    var progression: Double?
-    var totalProgression: Double?
-    var position: Int?
-
-    init(_ locater: SRLocator) {
-        type = locater.type
-        title = locater.title
-        text = locater.text
-
-        fragments = locater.locations.fragments
-        progression = locater.locations.progression
-        totalProgression = locater.locations.totalProgression
-        position = locater.locations.position
+    func highlighted(_ highlight: SRHighlight) {
+        let persistedHighlight = SDHighlight(highlight)
+        highlights.append(persistedHighlight)
+        persistedHighlight.book = self
     }
 
-    func toSRLocater() -> SRLocator {
-        SRLocator(
-            type: type,
-            title: title ?? "",
-            locations: .init(
-                fragments: fragments,
-                progression: progression,
-                totalProgression: totalProgression,
-                position: position
-            ),
-            text: text
-        )
+    func unhighlighted(_ highlight: SRHighlight) {
+        highlights.removeAll(where: { $0.id == highlight.id })
     }
 }
