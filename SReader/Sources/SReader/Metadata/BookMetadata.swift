@@ -29,33 +29,32 @@ public struct BookMetadata: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
 
-//        if let authorArray = try? container.decodeIfPresent([String].self, forKey: .author) {
-//            // Case: authors is an array of strings
-//            self.author = authorArray.map { author in
-//                MetadataAuthor(name: author)
-//            }
-//
-//        } else if let authorArray = try? container.decodeIfPresent([MetadataAuthor].self, forKey: .author) {
-//            // Case: authors is an array of dictionary with .name property
-//            self.author = authorArray.map { authorObject in
-//                MetadataAuthor(name: authorObject.name)
-//            }
-//        } else {
-        // Case: unknown format for authors, handle as needed
-        self.author = nil
-//        }
+        if let authorArray = try? container.decodeIfPresent([String].self, forKey: .author) {
+            // Case: authors is an array of strings
+            self.author = authorArray.map { author in
+                MetadataAuthor(name: author)
+            }
 
-//        if let tagString = try? container.decodeIfPresent(String.self, forKey: .subject) {
-//            self.subject = [tagString]
-//        } else if let tagArray = try? container.decodeIfPresent([String].self, forKey: .subject) {
-//            self.subject = tagArray
-//        } else if let tagObjectArray = try? container.decodeIfPresent([TagItem].self, forKey: .subject) {
-//            self.subject = tagObjectArray.map { object in
-//                object.name ?? ""
-//            }
-//        } else {
-        self.subject = nil
-//        }
+        } else if let authorArray = try? container.decodeIfPresent([MetadataAuthor].self, forKey: .author) {
+            // Case: authors is an array of dictionary with .name property
+            self.author = authorArray.map { authorObject in
+                MetadataAuthor(name: authorObject.name)
+            }
+        } else {
+            self.author = nil
+        }
+
+        if let tagString = try? container.decodeIfPresent(String.self, forKey: .subject) {
+            self.subject = [tagString]
+        } else if let tagArray = try? container.decodeIfPresent([String].self, forKey: .subject) {
+            self.subject = tagArray
+        } else if let tagObjectArray = try? container.decodeIfPresent([TagItem].self, forKey: .subject) {
+            self.subject = tagObjectArray.map { object in
+                object.name ?? ""
+            }
+        } else {
+            self.subject = nil
+        }
 
         self.description = try container.decodeIfPresent(String.self, forKey: .description)
         self.cover = try container.decodeIfPresent(String.self, forKey: .cover)

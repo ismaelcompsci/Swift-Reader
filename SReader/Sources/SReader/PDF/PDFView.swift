@@ -80,7 +80,7 @@ public class NoContextMenuPDFView: PDFView {
 }
 
 class PDFPageCustomBackground: PDFPage {
-    @MainActor static var bg: CGColor?
+    nonisolated(unsafe) static var bg: CGColor?
     static let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     override init() {
@@ -88,7 +88,7 @@ class PDFPageCustomBackground: PDFPage {
     }
 
     // https://github.com/drearycold/YetAnotherEBookReader/blob/6b1c67cee92917d53aea418956e5fbbd46342420/YetAnotherEBookReader/Views/PDFView/PDFPageWithBackground.swift#L11
-    @MainActor override func draw(with box: PDFDisplayBox, to context: CGContext) {
+    override func draw(with box: PDFDisplayBox, to context: CGContext) {
         super.draw(with: box, to: context)
 
         guard let fillColor = PDFPageCustomBackground.bg,

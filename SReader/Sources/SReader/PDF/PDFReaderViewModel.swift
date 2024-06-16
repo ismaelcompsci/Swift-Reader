@@ -125,6 +125,7 @@ public extension PDFAnnotationKey {
     }
 
     func pdfPageChanged() {
+        pdfView.disableMenuInteractions()
         var currentPageIndex: Int?
         var currentTocItemForPage: SRLink?
 
