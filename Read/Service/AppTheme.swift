@@ -42,4 +42,5 @@ extension Color {
     static let accentBackground = Color("Main").opacity(0.12)
 
     static let backgroundSecondary = Color(red: 0.10, green: 0.10, blue: 0.10)
+    static let darkPurpule = Color(red: 0.122, green: 0.220, blue: 0.327)
 }

@@ -28,6 +28,7 @@ public enum NavigatorDestination: Hashable {
 public enum SheetDestination: Identifiable, Hashable {
     case editBookDetails(book: SDBook)
     case uploadFile
+    case addToCollection(book: SDBook)
 
     public static func == (lhs: SheetDestination, rhs: SheetDestination) -> Bool {
         lhs.id == rhs.id
@@ -43,6 +44,8 @@ public enum SheetDestination: Identifiable, Hashable {
             return "edit-book-details"
         case .uploadFile:
             return "upload-file"
+        case .addToCollection:
+            return "addToCollection"
         }
     }
 }
@@ -105,6 +108,8 @@ extension View {
                 EditDetailsView(book: book)
             case .uploadFile:
                 UploadFileView()
+            case .addToCollection(book: let book):
+                AddToCollectionView(book: book)
             }
         }
     }
