@@ -32,14 +32,7 @@ struct InjectedHighlight: Codable {
     @ObservationIgnored
     public var currentSelection: SRSelection?
     public var toc: [SRLink]
-
-    public var flattenedToc: [(level: Int, link: SRLink)] {
-        func flatten(_ links: [SRLink], level: Int = 0) -> [(level: Int, link: SRLink)] {
-            links.flatMap { [(level, $0)] + flatten($0.children, level: level + 1) }
-        }
-
-        return flatten(toc)
-    }
+    public var flattenedToc: [(level: Int, link: SRLink)]
 
     public var editingActions: EditingActionsController!
     public var highlightActions: EditingActionsController!
@@ -62,8 +55,7 @@ struct InjectedHighlight: Codable {
         self.initialLocation = initialLocation
         self.webServer = WebServer()
         self.toc = []
-
-        webServer.setUpWebServer()
+        self.flattenedToc = []
 
         setupActions()
     }
@@ -76,6 +68,8 @@ struct InjectedHighlight: Codable {
 
         webView.isHidden = true
         webServer.file = file
+        webServer.setUpWebServer()
+
         let baseURL = webServer.fileServer.base
         webView.load(.init(url: URL(string: baseURL)!))
         initialHighlights = highlights
@@ -86,7 +80,9 @@ struct InjectedHighlight: Codable {
             Task {
                 await renderEBook(initialLocation: initialLocation)
                 setTheme()
-                self.toc = await generateLinks()
+
+                flattenedToc = await generateLinks()
+                self.toc = flattenedToc.map { $0.link }
 
                 self.injectInitialHighlights()
                 selectedHighlight = nil
@@ -469,7 +465,7 @@ public extension EBookReaderViewModel {
 }
 
 public extension EBookReaderViewModel {
-    func generateLinks() async -> [SRLink] {
+    func generateLinks() async -> [(Int, SRLink)] {
         let script = """
         return JSON.stringify(globalReader?.book?.toc)
         """
@@ -481,25 +477,47 @@ public extension EBookReaderViewModel {
         }
 
         let toc = try? JSONDecoder().decode([FoliateToc].self, from: tocJSONData)
+        var items: [(Int, SRLink)] = []
 
-        func node(from item: FoliateToc) -> SRLink? {
-            return .init(
+        func flatten(item: FoliateToc, depth: Int) {
+            let link = SRLink(
                 href: "#cfi=\(item.href)",
                 title: item.label,
                 type: .book,
-                children: nodes(in: item.subitems)
+                children: []
             )
-        }
 
-        func nodes(in children: [FoliateToc]?) -> [SRLink] {
-            guard let children = children else {
-                return []
+            items.append((depth, link))
+
+            for i in 0 ..< (item.subitems?.count ?? 0) {
+                if let subItem = item.subitems?[i] {
+                    flatten(item: subItem, depth: depth + 1)
+                }
             }
-
-            return children.compactMap { node(from: $0) }
         }
 
-        return nodes(in: toc)
+        toc?.forEach { flatten(item: $0, depth: 0) }
+
+        return items
+
+//        func node(from item: FoliateToc) -> SRLink? {
+//            return .init(
+//                href: "#cfi=\(item.href)",
+//                title: item.label,
+//                type: .book,
+//                children: nodes(in: item.subitems)
+//            )
+//        }
+//
+//        func nodes(in children: [FoliateToc]?) -> [SRLink] {
+//            guard let children = children else {
+//                return []
+//            }
+//
+//            return children.compactMap { node(from: $0) }
+//        }
+//
+//        return nodes(in: toc)
     }
 
     func goForward() {

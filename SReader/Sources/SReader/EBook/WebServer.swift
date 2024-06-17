@@ -17,8 +17,9 @@ class WebServer {
     }
 
     func setUpWebServer() {
-        guard !fileServer.server.isRunning else {
-            return
+        if fileServer.server.isRunning == true {
+            fileServer.server.stop()
+            fileServer.server.removeAllHandlers()
         }
 
         let scriptDir = Bundle.module.path(forResource: "scripts", ofType: nil)

@@ -69,13 +69,7 @@ public extension PDFAnnotationKey {
     public var currentTocLink: SRLink?
 
     public var toc: [SRLink]
-    public var flattenedToc: [(level: Int, link: SRLink)] {
-        func flatten(_ links: [SRLink], level: Int = 0) -> [(level: Int, link: SRLink)] {
-            links.flatMap { [(level, $0)] + flatten($0.children, level: level + 1) }
-        }
-
-        return flatten(toc)
-    }
+    public var flattenedToc: [(level: Int, link: SRLink)]
 
     public var onTap = PassthroughSubject<CGPoint, Never>()
     public var onHighlighted = PassthroughSubject<SRHighlight, Never>()
@@ -93,6 +87,7 @@ public extension PDFAnnotationKey {
         self.pdfDocument = PDFDocument(url: file) ?? PDFDocument()
         self.pdfView = NoContextMenuPDFView()
         self.toc = []
+        self.flattenedToc = []
 
         setupActions()
     }
@@ -105,7 +100,8 @@ public extension PDFAnnotationKey {
         pdfView.isHidden = true
         setTheme()
 
-        toc = generateLinks()
+        flattenedToc = generateLinks()
+        toc = flattenedToc.map { $0.1 }
 
         for highlight in highlights {
             injectHighlight(highlight)
@@ -180,34 +176,38 @@ public extension PDFAnnotationKey {
     }
 
     // https://github.com/readium/swift-toolkit/blob/a3635b5f1eb28a52e73aeb14240479f5979887bc/Sources/Shared/Toolkit/PDF/CGPDF.swift#L123
-    private func generateLinks() -> [SRLink] {
-        guard let outline = pdfDocument.documentRef?.outline as? [String: Any] else {
+    private func generateLinks() -> [(Int, SRLink)] {
+        guard let outlineRoot = pdfDocument.outlineRoot else {
             return []
         }
 
-        func node(from dictionary: [String: Any]) -> PDFOutlineNode? {
-            guard let pageNumber = dictionary[kCGPDFOutlineDestination as String] as? Int else {
-                return nil
+        var links: [(Int, SRLink)] = []
+
+        var stack: [(outline: PDFOutline, depth: Int)] = [(outlineRoot, -1)]
+        while !stack.isEmpty {
+            let (current, depth) = stack.removeLast()
+            if let label = current.label, !label.isEmpty {
+                links.append(
+                    (
+                        depth,
+                        .init(
+                            href: "#page=\(current.destination?.page?.pageRef?.pageNumber ?? 0)",
+                            title: label,
+                            type: .pdf,
+                            children: []
+                        )
+                    )
+                )
             }
 
-            return PDFOutlineNode(
-                title: dictionary[kCGPDFOutlineTitle as String] as? String,
-                pageNumber: pageNumber,
-                children: nodes(in: dictionary[kCGPDFOutlineChildren as String] as? [[String: Any]])
-            )
-        }
-
-        func nodes(in children: [[String: Any]]?) -> [PDFOutlineNode] {
-            guard let children = children else {
-                return []
+            for i in (0 ..< current.numberOfChildren).reversed() {
+                if let child = current.child(at: i) {
+                    stack.append((child, depth + 1))
+                }
             }
-
-            return children.compactMap { node(from: $0) }
         }
 
-        let outlineNodes = nodes(in: outline[kCGPDFOutlineChildren as String] as? [[String: Any]])
-
-        return outlineNodes.map { $0.link() }
+        return links
     }
 
     func find(index pageNumber: Int) -> SRLink? {

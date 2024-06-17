@@ -20,20 +20,23 @@ struct ReaderContent: View {
         NavigationView {
             ScrollViewReader { proxy in
                 List {
-                    ForEach(tocItems, id: \.link.href) { _, item in
-                        let selected = item.href == currentTocItem?.href
+                    ForEach(Array(tocItems.enumerated()), id: \.offset) { _, item in
+                        let level = item.level
+                        let link = item.link
+
+                        let selected = link.title == currentTocItem?.title
 
                         Button {
-                            onTocItemPress(item)
+                            onTocItemPress(link)
                             dismiss()
                         } label: {
-                            ContentRow(item: item)
+                            ContentRow(item: link)
                         }
-                        .listRowInsets(.init(top: 10, leading: 20, bottom: 10, trailing: 20))
+                        .listRowInsets(.init(top: 10, leading: 20 + (Double(level) * 10), bottom: 10, trailing: 20))
                         .listRowBackground(
                             selected ? Color(uiColor: UIColor.tertiarySystemBackground) : nil
                         )
-                        .id(item.href)
+                        .id(link.title ?? "")
                     }
                 }
                 .listStyle(.plain)
@@ -47,7 +50,7 @@ struct ReaderContent: View {
                     }
                 }
                 .onAppear {
-                    proxy.scrollTo(currentTocItem?.href, anchor: .center)
+                    proxy.scrollTo(currentTocItem?.title, anchor: .center)
                 }
             }
         }
