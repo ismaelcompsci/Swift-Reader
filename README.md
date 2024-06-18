@@ -7,7 +7,7 @@
   <img src="/Screenshots/reader.PNG?raw=true" width="120" />
   <img src="/Screenshots/grid.PNG?raw=true" width="120" />
   <img src="/Screenshots/list.PNG?raw=true" width="120" />
-  <img src="/Screenshots/search.PNG?raw=true" width="120" />
+  <img src="/Screenshots/readingNow.PNG?raw=true" width="120" />
 </p>
 
 ---
