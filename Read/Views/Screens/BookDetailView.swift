@@ -70,6 +70,7 @@ struct BookDetailView: View {
             }
         }
         .navigationTitle(book.title)
+        .navigationBarTitleDisplayMode(.inline)
         .contentMargins(.vertical, 24, for: .scrollContent)
         .fullScreenCover(isPresented: $openReader, content: {
             Reader(book: book)
