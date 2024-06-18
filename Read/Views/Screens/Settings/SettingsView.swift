@@ -22,8 +22,6 @@ struct SettingsView: View {
                 Section {
                     ThemeColorPicker()
 
-                    homeGridColumn
-
                 } header: {
                     Text("Settings")
                 }
@@ -51,22 +49,6 @@ struct SettingsView: View {
                 .foregroundStyle(.red)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    var homeGridColumn: some View {
-        HStack {
-            Text("Columns")
-
-            Spacer()
-
-            Stepper("\(preferences.numberOfColumns)") {
-                preferences.numberOfColumns += 1
-            } onDecrement: {
-                let newValue = preferences.numberOfColumns - 1
-
-                preferences.numberOfColumns = max(1, newValue)
-            }
-        }
     }
 
     var resetThemeButton: some View {

@@ -16,7 +16,7 @@ var descriptor: FetchDescriptor<SDBook> {
         sortBy: [SortDescriptor(\.lastEngaged, order: .reverse)]
     )
 
-    descriptor.fetchLimit = 4
+    descriptor.fetchLimit = 6
     return descriptor
 }
 
@@ -53,6 +53,7 @@ struct LastEngaged: View {
 
                             BookGrid.BookGridItem(book: book, withTitle: true)
                         }
+                        .padding(.leading, 10)
                         .frame(maxWidth: 184)
                     }
                 }

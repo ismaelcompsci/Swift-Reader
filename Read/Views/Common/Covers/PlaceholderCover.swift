@@ -30,7 +30,8 @@ struct PlaceholderCover: View {
                     VStack {
                         Text(title)
                             .getContrastText(backgroundColor: randomColor)
-                            .font(.system(size: 48, weight: .semibold))
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
                             .minimumScaleFactor(0.01)
                             .multilineTextAlignment(.center)
                             .aspectRatio(9 / 16, contentMode: .fit)
@@ -39,7 +40,8 @@ struct PlaceholderCover: View {
 
                         Text(author)
                             .getContrastText(backgroundColor: randomColor)
-                            .font(.system(size: 48, weight: .light))
+                            .font(.largeTitle)
+                            .fontWeight(.light)
                             .multilineTextAlignment(.center)
                             .minimumScaleFactor(0.01)
                             .aspectRatio(9 / 16, contentMode: .fit)

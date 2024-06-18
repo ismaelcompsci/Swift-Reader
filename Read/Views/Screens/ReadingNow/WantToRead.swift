@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct WantToRead: View {
+    @Environment(Navigator.self) var navigator
+
     @Query(filter: #Predicate<SDBook> { book in
         book.collections.contains(where: { $0.name == "Want To Read" })
     }, animation: .easeInOut) var wantToReadBooks: [SDBook]
@@ -17,14 +19,22 @@ struct WantToRead: View {
         if wantToReadBooks.isEmpty == false {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading) {
-                    HStack {
-                        Text("Want To Read")
-                            .font(.headline)
-                            .fontDesign(.serif)
+                    Button {
+                        if let wantToReadCollection = wantToReadBooks.first?.collections.first(where: { $0.name == "Want To Read" }) {
+                            navigator.navigate(to: .collectionDetails(collection: wantToReadCollection))
+                        }
+                    } label: {
+                        HStack {
+                            Text("Want To Read")
+                                .font(.title3)
+                                .fontDesign(.serif)
+                                .fontWeight(.semibold)
 
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.gray)
+                        }
                     }
+                    .tint(.primary)
 
                     Text("Books you'd like to read next.")
                         .font(.subheadline)

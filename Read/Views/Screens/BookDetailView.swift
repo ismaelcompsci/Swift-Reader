@@ -27,7 +27,8 @@ struct BookDetailView: View {
 
                     VStack(alignment: .leading) {
                         Text(book.title)
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.title2)
+                            .fontWeight(.semibold)
                             .lineLimit(3)
                             .frame(maxWidth: .infinity, alignment: .leading)
 

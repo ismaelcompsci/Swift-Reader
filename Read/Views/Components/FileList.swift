@@ -91,7 +91,7 @@ struct FileList: View {
                         Text("\(ByteCountFormatter.string(fromByteCount: Int64(totalBytes), countStyle: .file))")
                     }
                     .textCase(.uppercase)
-                    .font(.system(size: 12))
+                    .font(.caption)
                     .foregroundStyle(.gray)
                     .padding(.horizontal, 28)
                     

@@ -8,43 +8,29 @@
 import SwiftUI
 
 struct BookGrid: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(UserPreferences.self) var preferences
-    @State private var gridWidth = UIScreen.main.bounds.width
 
     let sortedBooks: [SDBook]
-    let spacing: CGFloat = 24
+
+    private var minimumWidth: CGFloat {
+        horizontalSizeClass == .compact ? 160.0 : 200.0
+    }
 
     var body: some View {
-        VStack {
-            let width = gridWidth
-            let cols = CGFloat(preferences.numberOfColumns)
-            let availableWidth = width - (spacing * cols)
-            let itemWidth = availableWidth / cols
-
-            LazyVGrid(
-                columns: [GridItem(
-                    .adaptive(
-                        minimum: itemWidth,
-                        maximum: itemWidth
-                    ), spacing: spacing
-                )],
-                spacing: spacing
-            ) {
-                ForEach(sortedBooks) { book in
-                    BookGridItem(book: book)
-                }
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: minimumWidth, maximum: 400), spacing: 15)], spacing: 20) {
+            ForEach(sortedBooks) { book in
+                BookGridItem(book: book)
             }
+        }
 
-            Text("\(sortedBooks.count) Books")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 12)
-                .listRowSeparator(.hidden)
-                .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .readSize { size in
-            gridWidth = size.width
-        }
+        Text("\(sortedBooks.count) Books")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 12)
+            .listRowSeparator(.hidden)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.top, 12)
     }
 }
 
@@ -101,7 +87,7 @@ extension BookGrid {
             VStack(alignment: .leading, spacing: 0) {
                 if withTitle == true {
                     Text(book.title)
-                        .font(.system(size: 15))
+                        .font(.subheadline)
                         .fontWeight(.semibold)
                         .lineLimit(1)
                 }
@@ -175,7 +161,15 @@ extension BookGrid {
 
 #Preview {
     ScrollView {
-        BookGrid(sortedBooks: [.init(id: .init(), title: "The Book")])
-            .withPreviewsEnv()
+        BookGrid(
+            sortedBooks: [
+                .init(id: .init(), title: "The Book"),
+                .init(id: .init(), title: "The Book2"),
+                .init(id: .init(), title: "The Book3"),
+                .init(id: .init(), title: "The Book4"),
+                .init(id: .init(), title: "The Book5"),
+            ]
+        )
+        .withPreviewsEnv()
     }
 }

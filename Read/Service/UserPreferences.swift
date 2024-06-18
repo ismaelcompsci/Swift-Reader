@@ -14,7 +14,6 @@ import SwiftUI
         @AppStorage("library_sort_key") public var librarySortKey: LibrarySortKeys = .title
         @AppStorage("library_sort_order") public var librarySortOrder: LibrarySortOrder = .descending
         @AppStorage("library_display_mode") public var libraryDisplayMode: LibraryDisplayMode = .list
-        @AppStorage("number_of_grid_columns") var numberOfColumns: Int = 2
     }
 
     public static let shared = UserPreferences()
@@ -38,24 +37,16 @@ import SwiftUI
         }
     }
 
-    public var numberOfColumns: Int {
-        didSet {
-            storage.numberOfColumns = numberOfColumns
-        }
-    }
-
     init() {
         librarySortKey = storage.librarySortKey
         librarySortOrder = storage.librarySortOrder
         libraryDisplayMode = storage.libraryDisplayMode
-        numberOfColumns = storage.numberOfColumns
     }
 
     func reset() {
         librarySortKey = .title
         librarySortOrder = .descending
         libraryDisplayMode = .list
-        numberOfColumns = 2
     }
 }
 

@@ -50,19 +50,21 @@ public enum SheetDestination: Identifiable, Hashable {
     }
 }
 
-public enum TabNavigation: String, Hashable, CaseIterable {
+@MainActor
+public enum TabNavigation: String, Hashable, @preconcurrency CaseIterable, Identifiable {
+    case readingNow = "Reading Now"
     case library = "Library"
-    case discover = "Discover"
     case search = "Search"
     case settings = "Settings"
-    case readingNow = "Reading Now"
+
+    public nonisolated var id: String {
+        rawValue
+    }
 
     var icon: String {
         switch self {
         case .library:
             "books.vertical.fill"
-        case .discover:
-            "shippingbox"
         case .search:
             "magnifyingglass"
         case .settings:
@@ -71,12 +73,26 @@ public enum TabNavigation: String, Hashable, CaseIterable {
             "book.fill"
         }
     }
+
+    @ViewBuilder
+    func makeContentView() -> some View {
+        switch self {
+        case .readingNow:
+            ReadingNowView()
+        case .library:
+            LibraryView()
+        case .search:
+            SearchView()
+        case .settings:
+            SettingsView()
+        }
+    }
 }
 
 @Observable
 public class Navigator {
     public var path: [NavigatorDestination] = []
-    public var sideMenuTab: TabNavigation = .library
+    public var tab: TabNavigation = .library
 
     public var presentedSheet: SheetDestination?
 

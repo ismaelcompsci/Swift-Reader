@@ -101,10 +101,10 @@ extension LibraryView {
                         Divider()
                             .padding(.leading, 28)
                     }
-                    .padding(.horizontal, 20)
 
                     BookGrid(sortedBooks: books)
                 }
+                .padding(.horizontal, 20)
 
             case .list:
                 List {

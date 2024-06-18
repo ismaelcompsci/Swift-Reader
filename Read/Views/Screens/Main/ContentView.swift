@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(AppTheme.self) private var theme
     @Environment(Toaster.self) private var toaster
     @Environment(Navigator.self) private var navigator
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     init() {
         let appearance = UINavigationBarAppearance()
@@ -26,41 +27,59 @@ struct ContentView: View {
         UINavigationBar.appearance().compactAppearance = appearance
     }
 
+    @ViewBuilder
+    var tabBarView: some View {
+        @Bindable var navigator = navigator
+
+        NavigationStack(path: $navigator.path) {
+            TabView(selection: $navigator.tab) {
+                ForEach(TabNavigation.allCases, id: \.self) { tab in
+                    NavigationView {
+                        navigator.tab.makeContentView()
+                    }
+                    .tag(tab)
+                    .tabItem {
+                        Label(tab.rawValue, systemImage: tab.icon)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var sideBarView: some View {
+        @Bindable var navigator = navigator
+
+        NavigationSplitView {
+            List {
+                ForEach(TabNavigation.allCases, id: \.self) { tab in
+                    Button {
+                        navigator.tab = tab
+                    } label: {
+                        Label(tab.rawValue, systemImage: tab.icon)
+                    }
+                }
+            }
+        } detail: {
+            NavigationStack(path: $navigator.path) {
+                navigator.tab.makeContentView()
+                    .withNavigator()
+            }
+        }
+    }
+
     var body: some View {
         @Bindable var toaster = toaster
         @Bindable var navigator = navigator
 
-        NavigationStack(path: $navigator.path) {
-            Group {
-                TabView(selection: $navigator.sideMenuTab) {
-                    NavigationView {
-                        ReadingNowView()
-                    }
-                    .tag(TabNavigation.readingNow)
-                    .tabItem {
-                        Label(TabNavigation.readingNow.rawValue, systemImage: TabNavigation.readingNow.icon)
-                    }
-
-                    NavigationView {
-                        LibraryView()
-                    }
-                    .tag(TabNavigation.library)
-                    .tabItem {
-                        Label("Library", systemImage: TabNavigation.library.icon)
-                    }
-
-                    NavigationView {
-                        SettingsView()
-                    }
-                    .tag(TabNavigation.settings)
-                    .tabItem {
-                        Label("Settings", systemImage: TabNavigation.settings.icon)
-                    }
-                }
+        Group {
+            if horizontalSizeClass == .compact {
+                tabBarView
+            } else {
+                sideBarView
             }
-            .withNavigator()
-            .withSheetDestinations(sheetDestinations: $navigator.presentedSheet)
         }
+        .withSheetDestinations(sheetDestinations: $navigator.presentedSheet)
     }
 }
 
