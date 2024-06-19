@@ -68,6 +68,7 @@
 		9FCC6ECC2C224D1A0043AB06 /* grid.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FCC6EC62C224D1A0043AB06 /* grid.PNG */; };
 		9FCC6ECD2C224D1A0043AB06 /* readingNow.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FCC6EC92C224D1A0043AB06 /* readingNow.PNG */; };
 		9FCC6ECE2C224D1A0043AB06 /* reader.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 9FCC6EC82C224D1A0043AB06 /* reader.PNG */; };
+		9FCC6ED02C225B820043AB06 /* InfoTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCC6ECF2C225B820043AB06 /* InfoTag.swift */; };
 		9FCFBE222B9D84F500BD9E3D /* EditDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */; };
 		9FD16EC12BA3DFF500A18F3B /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD16EC02BA3DFF500A18F3B /* LibraryView.swift */; };
 		9FD808862B981E020007D8F6 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808852B981E020007D8F6 /* ReaderSettings.swift */; };
@@ -153,6 +154,7 @@
 		9FCC6EC72C224D1A0043AB06 /* list.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = list.PNG; sourceTree = "<group>"; };
 		9FCC6EC82C224D1A0043AB06 /* reader.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reader.PNG; sourceTree = "<group>"; };
 		9FCC6EC92C224D1A0043AB06 /* readingNow.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = readingNow.PNG; sourceTree = "<group>"; };
+		9FCC6ECF2C225B820043AB06 /* InfoTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoTag.swift; sourceTree = "<group>"; };
 		9FCFBE212B9D84F500BD9E3D /* EditDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDetailsView.swift; sourceTree = "<group>"; };
 		9FD16EC02BA3DFF500A18F3B /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		9FD808852B981E020007D8F6 /* ReaderSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSettings.swift; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 				9FD16EC02BA3DFF500A18F3B /* LibraryView.swift */,
 				9F35B6D72C1B76D000259C1E /* ContextMenuModifier.swift */,
 				9FCC6EBE2C1FB0FB0043AB06 /* MenuButton.swift */,
+				9FCC6ECF2C225B820043AB06 /* InfoTag.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -571,6 +574,7 @@
 				9FCC6EBF2C1FB0FB0043AB06 /* MenuButton.swift in Sources */,
 				9F3DDA172BE036450052F8A4 /* Log.swift in Sources */,
 				9FCC6EC12C212BAB0043AB06 /* SearchView.swift in Sources */,
+				9FCC6ED02C225B820043AB06 /* InfoTag.swift in Sources */,
 				9FD808862B981E020007D8F6 /* ReaderSettings.swift in Sources */,
 				9F4602B42BA65A9000E15D0C /* UIImage+Quality.swift in Sources */,
 				9F137C192BED691B000C4603 /* WantToRead.swift in Sources */,

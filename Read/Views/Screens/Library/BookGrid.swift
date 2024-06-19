@@ -41,22 +41,6 @@ extension BookGrid {
         var book: SDBook
         var withTitle: Bool = false
 
-        enum TagState {
-            case new
-            case progress
-            case finished
-        }
-
-        var tagState: TagState {
-            if book.isFinsihed == true {
-                return .finished
-            } else if book.position != nil {
-                return .progress
-            } else {
-                return .new
-            }
-        }
-
         var cover: some View {
             BookCover(
                 imageURL: book.imagePath,
@@ -93,15 +77,7 @@ extension BookGrid {
                 }
 
                 HStack(alignment: .center) {
-                    // TODO: MAKE ABSTARCT TO OWN VIEW
-                    switch tagState {
-                    case .new:
-                        newtag
-                    case .progress:
-                        progress
-                    case .finished:
-                        finished
-                    }
+                    InfoTag(book: book)
 
                     Spacer()
 
@@ -127,34 +103,6 @@ extension BookGrid {
                 maxHeight: .infinity,
                 alignment: .bottom
             )
-        }
-
-        var finished: some View {
-            Text("Finished")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .minimumScaleFactor(0.001)
-        }
-
-        var progress: some View {
-            let position = book.position?.totalProgression ?? 0
-
-            return Text("\(Int(position * 100))%")
-                .foregroundStyle(.secondary)
-                .font(.footnote)
-                .minimumScaleFactor(0.001)
-        }
-
-        var newtag: some View {
-            Text("NEW")
-                .font(.caption2)
-                .minimumScaleFactor(0.001)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(.indigo)
-                .clipShape(.rect(cornerRadius: 8))
-                .foregroundStyle(.white)
         }
     }
 }

@@ -42,10 +42,10 @@ struct ReadApp: App {
 
             if collectionEmpty {
                 let defaultCollections = [
+                    SDCollection(name: "PDFs", books: [], icon: "doc.text.fill", editable: false, addable: false, removable: false),
+                    SDCollection(name: "Books", books: [], icon: "book.fill", editable: false, addable: false, removable: false),
                     SDCollection(name: "Want To Read", books: [], icon: "arrow.right.circle.fill", removable: false),
                     SDCollection(name: "Finished", books: [], icon: "checkmark.circle.fill", removable: false),
-                    SDCollection(name: "Books", books: [], icon: "book.fill", editable: false, addable: false, removable: false),
-                    SDCollection(name: "PDFs", books: [], icon: "doc.text.fill", editable: false, addable: false, removable: false),
                 ]
 
                 for collection in defaultCollections {
