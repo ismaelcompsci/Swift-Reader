@@ -29,16 +29,18 @@ struct ContentView: View {
     var tabBarView: some View {
         @Bindable var navigator = navigator
 
-        Group {
-            TabView(selection: $navigator.tab) {
-                ForEach(TabNavigation.allCases, id: \.self) { tab in
-                    NavigationStack(path: $navigator.path) {
-                        navigator.tab.makeContentView()
-                            .withNavigator()
-                    }
-                    .tag(tab)
-                    .tabItem {
-                        Label(tab.rawValue, systemImage: tab.icon)
+        NavigationStack(path: $navigator.path) {
+            Group {
+                TabView(selection: $navigator.tab) {
+                    ForEach(TabNavigation.allCases, id: \.self) { tab in
+                        NavigationView {
+                            navigator.tab.makeContentView()
+                                .withNavigator()
+                        }
+                        .tag(tab)
+                        .tabItem {
+                            Label(tab.rawValue, systemImage: tab.icon)
+                        }
                     }
                 }
             }
