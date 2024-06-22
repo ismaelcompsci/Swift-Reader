@@ -34,16 +34,16 @@ struct ContextMenuModifier: ViewModifier {
                     navigator.presentedSheet = .addToCollection(book: book)
                 }
 
-                if book.isFinsihed == true {
+                if book.isFinished == true {
                     Button("Mark as Still Reading", systemImage: "minus.circle") {
-                        book.isFinsihed = false
+                        book.isFinished = false
                         book.dateFinished = nil
 
                         try? BookManager.shared.removeFromCollection(book: book, name: "Finished")
                     }
                 } else {
                     Button("Mark as Finished", systemImage: "checkmark.circle") {
-                        book.isFinsihed = true
+                        book.isFinished = true
                         book.dateFinished = .now
 
                         try? BookManager.shared.addToCollection(book: book, name: "Finished")

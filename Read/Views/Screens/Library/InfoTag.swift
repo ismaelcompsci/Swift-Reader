@@ -17,7 +17,7 @@ struct InfoTag: View {
     }
 
     var tagState: TagState {
-        if book.isFinsihed == true {
+        if book.isFinished == true {
             return .finished
         } else if book.position != nil {
             return .progress

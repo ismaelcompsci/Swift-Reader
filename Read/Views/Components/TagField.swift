@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-struct Tag: Identifiable, Hashable {
-    var id: UUID = .init()
-    var value: String
-}
-
 struct TagField: View {
     @Binding var tags: [Tag]
     var header: String?
@@ -19,28 +14,6 @@ struct TagField: View {
 
     @FocusState private var isFocused: Bool
     @State var text: String = ""
-
-    @ViewBuilder
-    func createTagView(_ tag: Tag) -> some View {
-        HStack {
-            Text(tag.value)
-
-            Button {
-                withAnimation {
-                    tags.removeAll(where: { $0.id == tag.id })
-                }
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 13))
-            }
-            .foregroundStyle(.primary)
-        }
-        .padding(.horizontal, 8)
-        .frame(height: 24)
-        .background(.background)
-        .clipShape(.rect(cornerRadius: 12))
-        .colorInvert()
-    }
 
     var body: some View {
         WrappingStackLayout(alignment: .leading) {
@@ -79,9 +52,38 @@ struct TagField: View {
     }
 }
 
+extension TagField {
+    struct Tag: Identifiable, Hashable {
+        var id: UUID = .init()
+        var value: String
+    }
+
+    @ViewBuilder
+    func createTagView(_ tag: Tag) -> some View {
+        HStack {
+            Text(tag.value)
+
+            Button {
+                withAnimation {
+                    tags.removeAll(where: { $0.id == tag.id })
+                }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 13))
+            }
+            .foregroundStyle(.primary)
+        }
+        .padding(.horizontal, 8)
+        .frame(height: 24)
+        .background(.background)
+        .clipShape(.rect(cornerRadius: 12))
+        .colorInvert()
+    }
+}
+
 #Preview {
     struct Test: View {
-        @State var tags: [Tag] = [
+        @State var tags: [TagField.Tag] = [
             .init(value: "first")
         ]
         var body: some View {

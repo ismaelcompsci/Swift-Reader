@@ -13,8 +13,6 @@ struct ReadingNowView: View {
             LastEngaged()
 
             WantToRead()
-
-            Spacer()
         }
         .navigationBarTitle("Reading Now", displayMode: .large)
     }

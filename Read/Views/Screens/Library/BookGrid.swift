@@ -41,6 +41,7 @@ extension BookGrid {
         var book: SDBook
         var withTitle: Bool = false
 
+        @ViewBuilder
         var cover: some View {
             BookCover(
                 imageURL: book.imagePath,
@@ -48,23 +49,9 @@ extension BookGrid {
                 author: book.author
             )
             .aspectRatio(contentMode: .fit)
-            .background()
-            .background(
-                Rectangle()
-                    .fill(.white)
-                    .padding(.top, 12)
-                    .padding(.horizontal, 10)
-                    .shadow(
-                        color: .gray.opacity(0.5),
-                        radius: 6,
-                        x: 0,
-                        y: 0
-                    )
-            )
             .clipShape(
                 RoundedRectangle(cornerRadius: 4)
             )
-            .shadow(radius: 6, x: 0, y: 12)
         }
 
         var footer: some View {

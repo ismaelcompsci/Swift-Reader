@@ -13,6 +13,7 @@
 import Foundation
 import SReader
 import SwiftData
+import UIKit
 
 @Model
 public class SDBook: Identifiable {
@@ -23,7 +24,7 @@ public class SDBook: Identifiable {
     var summary: String?
     var bookPath: String?
     var coverPath: String?
-    var isFinsihed: Bool = false
+    var isFinished: Bool = false
     var dateFinished: Date?
     var addedAt = Date.now
     var updatedAt = Date.now
@@ -70,7 +71,8 @@ public class SDBook: Identifiable {
         addedAt: Foundation.Date = Date.now,
         updatedAt: Foundation.Date = Date.now,
         lastOpened: Foundation.Date? = nil,
-        lastEngaged: Date? = nil
+        lastEngaged: Date? = nil,
+        isFinished: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -84,6 +86,7 @@ public class SDBook: Identifiable {
         self.updatedAt = updatedAt
         self.lastOpened = lastOpened
         self.lastEngaged = lastEngaged
+        self.isFinished = isFinished
     }
 }
 
