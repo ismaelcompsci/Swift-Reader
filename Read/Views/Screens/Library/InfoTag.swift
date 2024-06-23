@@ -28,8 +28,9 @@ struct InfoTag: View {
 
     var finished: some View {
         Text("Finished")
-            .font(.subheadline)
+            .font(.footnote)
             .foregroundStyle(.secondary)
+            .textCase(.uppercase)
     }
 
     var progress: some View {
@@ -63,5 +64,6 @@ struct InfoTag: View {
                 finished
             }
         }
+        .frame(height: 28)
     }
 }

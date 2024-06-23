@@ -77,14 +77,7 @@ struct EBookReader: View {
             }
         }
         .overlay {
-            if viewModel.state == .loading {
-                ZStack {
-                    viewModel.theme.bg.color
-
-                    ProgressView()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            StateOverlay(book: book, viewModel: $viewModel)
         }
         .overlay {
             ReaderSettingsButton(
@@ -112,14 +105,12 @@ struct EBookReader: View {
         .sheet(isPresented: $showSettings, content: {
             ReaderSettings(bookTheme: $viewModel.theme, isPDF: false, updateTheme: viewModel.setTheme)
         })
-        .sheet(isPresented: $showContent,
-               content: {
-                   ReaderContent(
-                       currentTocItem: viewModel.currentTocLink,
-                       tocItems: viewModel.flattenedToc,
-                       onTocItemPress: tocItemPressedHandler
-                   )
-               })
+        .sheet(
+            isPresented: $showContent,
+            content: {
+                ReaderContent(currentTocItem: viewModel.currentTocLink, tocItems: viewModel.flattenedToc, onTocItemPress: viewModel.goTo)
+            }
+        )
     }
 
     private func settingsButtonHandler(_ action: ReaderSettingsAction) {
@@ -132,8 +123,57 @@ struct EBookReader: View {
             showSettings = true
         }
     }
+}
 
-    private func tocItemPressedHandler(_ link: SRLink) {
-        viewModel.goTo(for: link)
+extension EBookReader {
+    struct StateOverlay: View {
+        let book: SDBook
+
+        @Binding var viewModel: EBookReaderViewModel
+        @State var show = false
+
+        var body: some View {
+            GeometryReader { p in
+
+                VStack {
+                    switch viewModel.state {
+                    case .loading:
+                        ZStack {
+                            viewModel.theme.bg.color
+
+                            VStack(spacing: 12) {
+                                BookCover(imageURL: book.imagePath, title: book.title, author: book.author)
+                                    .frame(width: p.size.width * 0.8, height: (p.size.width * 0.8) * 1.77)
+
+                                ProgressView()
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .transition(
+                            .opacity
+                                .animation(.snappy)
+                                .combined(
+                                    with: .scale(1.5)
+                                )
+                        )
+                    case .ready:
+                        viewModel.theme.bg.color
+                            .opacity(show ? 0 : 1)
+
+                    case .error(let string):
+                        Text("errror \(string)")
+                            .transition(.opacity)
+                    }
+                }
+                .onChange(of: viewModel.state) {
+                    if viewModel.state == .ready {
+                        withAnimation(.easeOut(duration: 0.8)) {
+                            show = true
+                        }
+                    }
+                }
+                .animation(.easeInOut(duration: 0.2), value: viewModel.state)
+            }
+        }
     }
 }

@@ -75,14 +75,7 @@ struct PDFReader: View {
             }
         }
         .overlay {
-            if viewModel.state == .loading {
-                ZStack {
-                    viewModel.theme.bg.color
-
-                    ProgressView()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            StateOverlay(book: book, viewModel: $viewModel)
         }
         .overlay {
             ReaderSettingsButton(
@@ -114,7 +107,7 @@ struct PDFReader: View {
             ReaderContent(
                 currentTocItem: viewModel.currentTocLink,
                 tocItems: viewModel.flattenedToc,
-                onTocItemPress: tocItemPressedHandler
+                onTocItemPress: viewModel.goTo
             )
         }
     }
@@ -129,8 +122,57 @@ struct PDFReader: View {
             showSettings = true
         }
     }
+}
 
-    private func tocItemPressedHandler(_ link: SRLink) {
-        viewModel.goTo(for: link)
+extension PDFReader {
+    struct StateOverlay: View {
+        let book: SDBook
+
+        @Binding var viewModel: PDFReaderViewModel
+        @State var show = false
+
+        var body: some View {
+            GeometryReader { p in
+
+                VStack {
+                    switch viewModel.state {
+                    case .loading:
+                        ZStack {
+                            viewModel.theme.bg.color
+
+                            VStack(spacing: 12) {
+                                BookCover(imageURL: book.imagePath, title: book.title, author: book.author)
+                                    .frame(width: p.size.width * 0.8, height: (p.size.width * 0.8) * 1.77)
+
+                                ProgressView()
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .transition(
+                            .opacity
+                                .animation(.snappy)
+                                .combined(
+                                    with: .scale(1.5)
+                                )
+                        )
+                    case .ready:
+                        viewModel.theme.bg.color
+                            .opacity(show ? 0 : 1)
+
+                    case .error(let string):
+                        Text("errror \(string)")
+                            .transition(.opacity)
+                    }
+                }
+                .onChange(of: viewModel.state) {
+                    if viewModel.state == .ready {
+                        withAnimation(.easeOut(duration: 0.8)) {
+                            show = true
+                        }
+                    }
+                }
+                .animation(.easeInOut(duration: 0.2), value: viewModel.state)
+            }
+        }
     }
 }

@@ -54,6 +54,7 @@ struct CollectionDetailsView: View {
                 ScrollView {
                     BookGrid(sortedBooks: sortedBooks)
                 }
+                .padding(.horizontal, 20)
 
             case .list:
                 List {

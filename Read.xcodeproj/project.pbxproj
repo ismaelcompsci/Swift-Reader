@@ -75,6 +75,7 @@
 		9FD808862B981E020007D8F6 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808852B981E020007D8F6 /* ReaderSettings.swift */; };
 		9FD8088A2B982CE40007D8F6 /* ReaderContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD808892B982CE40007D8F6 /* ReaderContent.swift */; };
 		9FDC05F42C1CCDB40005F64B /* SReader in Frameworks */ = {isa = PBXBuildFile; productRef = 9FDC05F32C1CCDB40005F64B /* SReader */; };
+		9FF865BF2C28CB0800F45DB5 /* FadeInFullScreenCoverModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF865BE2C28CB0800F45DB5 /* FadeInFullScreenCoverModifier.swift */; };
 		9FF989B82BCA430000B6CF97 /* Reader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989B72BCA430000B6CF97 /* Reader.swift */; };
 		9FFADFE72C1E446600018284 /* Env.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFADFE62C1E446600018284 /* Env.swift */; };
 		9FFFBC9D2BD1E9AA0019E6DD /* Filemanger+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */; };
@@ -162,6 +163,7 @@
 		9FD808852B981E020007D8F6 /* ReaderSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSettings.swift; sourceTree = "<group>"; };
 		9FD808892B982CE40007D8F6 /* ReaderContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderContent.swift; sourceTree = "<group>"; };
 		9FE38F012B7DCDC9005A446A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9FF865BE2C28CB0800F45DB5 /* FadeInFullScreenCoverModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadeInFullScreenCoverModifier.swift; sourceTree = "<group>"; };
 		9FF989B72BCA430000B6CF97 /* Reader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reader.swift; sourceTree = "<group>"; };
 		9FFADFE62C1E446600018284 /* Env.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Env.swift; sourceTree = "<group>"; };
 		9FFFBC9C2BD1E9AA0019E6DD /* Filemanger+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Filemanger+Ext.swift"; sourceTree = "<group>"; };
@@ -420,6 +422,7 @@
 				9F612CFC2BD8960B006D573C /* TagField.swift */,
 				9F612CF72BD891E8006D573C /* WrappingStackLayout.swift */,
 				9FFFBCA12BD1FD0E0019E6DD /* FileList.swift */,
+				9FF865BE2C28CB0800F45DB5 /* FadeInFullScreenCoverModifier.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -555,6 +558,7 @@
 				9F0C00682BE9CC7000984BF4 /* ReadingNowView.swift in Sources */,
 				9F35B6D82C1B76D000259C1E /* ContextMenuModifier.swift in Sources */,
 				9F5954AF2B6DCCF8009FC2F1 /* ContentView.swift in Sources */,
+				9FF865BF2C28CB0800F45DB5 /* FadeInFullScreenCoverModifier.swift in Sources */,
 				9FCC6EB92C1F7A130043AB06 /* SDHighlight.swift in Sources */,
 				9F8F9CE62BB52C2A0081C57F /* View+If.swift in Sources */,
 				9FBB590D2C23B73000B36D60 /* UIImageColors.swift in Sources */,
